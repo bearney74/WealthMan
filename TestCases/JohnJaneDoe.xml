@@ -1,0 +1,65 @@
+//  Dates MM/DD/YYYY  Death, Retirement, None
+
+<WealthMan version="0.1">
+  <GlobalVars InflationRate="3.0" SocialSecurityCOLA="2.0" 
+              AssetWithdrawOrderByType="TaxDeferred,Regular,TaxFree" />
+  <People RelationStatus="Married">
+     <Person num="1" Name="John" DateOfBirth="" Relationship="Spouse"
+             LifeExpectancy="" RetirementDate=""/>
+     <Person num="2" Name="Jane" DateOfBirth="" Relationship="Spouse"
+             LifeExpectancy="" RetirementDate=""/>
+  </People>
+  <Income>
+     <Employment Name="John's FT Job" Amount="" Period="Annual" EndDate=""
+                 COLA="" Taxable="Yes" Owner="1"/>
+     <Employment Name="Jane's FT Job" Amount="" Period="Annual" EndDate=""
+                 COLA="" Taxable="Yes" Owner="2"/>
+     <Employment Name="John's PT Job" Amount="" Period="Annual"
+                 BeginDate="" EndDate="" Taxable="Yes"
+                 COLA="" Owner="1"/>
+     <Pension Name="John's Pension" Amount="" BeginDate="" EndDate=""
+              SurvivorPercent=""   
+              COLA="" Taxable="Yes" Owner="1"/>
+     <SocialSecurity FRA="67" AmountFRA="" BeginDate="" Amount="" />
+  </Income>
+  <Expenses>
+     <Expense Name="Annual Expenses" Period="Annual" Amount="36000" />
+     <Expense Name="Health Care" Period="Annual" Amount="1200" 
+              AnnualPercentIncrease="4"/>
+  </Expenses>
+  <Assets>
+      <Account Name="Brokerage" Type="Regular" Balance=""
+               UnrealizedCapitalGains="" CapitalLossCarryOver="" Owner="0">
+         <AllocationPeriods>
+             <Allocation BeginDate="" EndDate="" PercentStocks="" PercentBonds="" PercentMoneyMarket="" /> 
+         </AllocationPeriods>
+      </Account>
+      <Account Name="401k" Type="TaxDeferred" Balance="" Owner="1">
+         <AllocationPeriods>
+             <Allocation BeginDate="" EndDate="" PercentStocks="" PercentBonds="" PercentMoneyMarket="" /> 
+         </AllocationPeriods>
+      </Account>
+      <Account Name="401k" Type="TaxDeferred" Balance="" Owner="2">
+         <AllocationPeriods>
+             <Allocation BeginDate="" EndDate="" PercentStocks="" PercentBonds="" PercentMoneyMarket="" /> 
+         </AllocationPeriods>
+      </Account>
+      <Account Name="John's Roth" Type="TaxFree" Balance="" Owner="1">
+         <AllocationPeriods>
+             <Allocation BeginDate="" EndDate="" PercentStocks="" PercentBonds="" PercentMoneyMarket="" /> 
+         </AllocationPeriods>
+      </Account>
+      <Account Name="Jane's Roth" Type="TaxFree" Balance="" Owner="2">
+         <AllocationPeriods>
+             <Allocation BeginDate="" EndDate="" PercentStocks="" PercentBonds="" PercentMoneyMarket="" /> 
+         </AllocationPeriods>
+      </Account>
+  </Assets>
+  <AssetClasses>
+     <Period BeginDate="" EndDate="">
+       <Stocks RateOfReturn="5.0" StandardDeviation="20%" />
+       <Bonds  RateOfReturn="2.0" StandardDeviation="7.5%" />
+       <MoneyMarket RateOfReturn="-2.0%" StandardDeviation="0.1%" />
+     </Period>
+  </AssetClasses>
+</WealthMan>
