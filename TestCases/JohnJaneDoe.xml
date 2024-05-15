@@ -1,65 +1,89 @@
-//  Dates MM/DD/YYYY  Death, Retirement, None
-
-<WealthMan version="0.1">
-  <GlobalVars InflationRate="3.0" SocialSecurityCOLA="2.0" 
-              AssetWithdrawOrderByType="TaxDeferred,Regular,TaxFree" />
+<WealthMan Version="0.1">
+  <GlobalVars>
+    <InflationRate>3.0</InflationRate>
+    <SocialSecurityCOLA>2.0</SocialSecurityCOLA> 
+    <AssetWithdrawOrderByType>TaxDeferred,Regular,TaxFree</AssetWithdrawOrderByType>
+    <YearsToForecast>30</YearsToForecast>
+  </GlobalVars>
   <People RelationStatus="Married">
-     <Person num="1" Name="John" DateOfBirth="" Relationship="Spouse"
-             LifeExpectancy="" RetirementDate=""/>
-     <Person num="2" Name="Jane" DateOfBirth="" Relationship="Spouse"
-             LifeExpectancy="" RetirementDate=""/>
+     <Person Num="1" Name="John" BirthDate="02/02/1970" Relationship="Spouse"
+             LifeExpectancy="02/02/2060" RetirementDate="06/30/2030"/>
+     <Person Num="2" Name="Jane" BirthDate="03/03/1971" Relationship="Spouse"
+             LifeExpectancy="03/03/2066" RetirementDate="05/31/2030"/>
   </People>
   <Income>
-     <Employment Name="John's FT Job" Amount="" Period="Annual" EndDate=""
-                 COLA="" Taxable="Yes" Owner="1"/>
-     <Employment Name="Jane's FT Job" Amount="" Period="Annual" EndDate=""
-                 COLA="" Taxable="Yes" Owner="2"/>
-     <Employment Name="John's PT Job" Amount="" Period="Annual"
-                 BeginDate="" EndDate="" Taxable="Yes"
+     <Employment Name="John's FT Job" Amount="90000" AmountPeriod="Annual" 
+                 EndDate="05/31/2030" COLA="2.0" Taxable="Yes" Owner="1"/>
+     <Employment Name="Jane's FT Job" Amount="60000" AmountPeriod="Annual" 
+                 EndDate="05/31/2030" COLA="3.0" Taxable="Yes" Owner="2"/>
+     <Employment Name="John's PT Job" Amount="" AmountPeriod="Annual"
+                 BeginDate="01/01/2031" EndDate="12/31/2035" Taxable="Yes"
                  COLA="" Owner="1"/>
-     <Pension Name="John's Pension" Amount="" BeginDate="" EndDate=""
-              SurvivorPercent=""   
-              COLA="" Taxable="Yes" Owner="1"/>
-     <SocialSecurity FRA="67" AmountFRA="" BeginDate="" Amount="" />
+     <Pension Name="John's Pension" Amount="60000" AmountPeriod="Annual" 
+              BeginDate="06/01/2030" EndDate="Death" SurvivorPercent="100%"
+              COLA="0" Taxable="Yes" Owner="1"/>
+     <SocialSecurity Name="John's SS" FRA="67" FRAAmount="50000" BeginDate="02/02/2032" 
+                     Amount="30000" Owner="1"/>
+     <SocialSecurity Name="Jane's SS" FRA="67" FRAAmount="40000" BeginDate="03/03/2033" 
+                     Amount="20000" Owner="2"/>
   </Income>
   <Expenses>
-     <Expense Name="Annual Expenses" Period="Annual" Amount="36000" />
-     <Expense Name="Health Care" Period="Annual" Amount="1200" 
+     <Expense Name="Annual Expenses" AmountPeriod="Annual" Amount="36000" />
+     <Expense Name="Health Care" AmountPeriod="Annual" Amount="1200" 
               AnnualPercentIncrease="4"/>
   </Expenses>
   <Assets>
-      <Account Name="Brokerage" Type="Regular" Balance=""
+      <Account Name="Brokerage" Type="Regular" Balance="120000"
                UnrealizedCapitalGains="" CapitalLossCarryOver="" Owner="0">
          <AllocationPeriods>
-             <Allocation BeginDate="" EndDate="" PercentStocks="" PercentBonds="" PercentMoneyMarket="" /> 
+             <Allocation BeginDate="" EndDate="05/31/2030" 
+                PercentStocks="95" PercentBonds="5" PercentMoneyMarket="0" /> 
+             <Allocation BeginDate="06/01/2030" EndDate="02/02/2032" 
+                PercentStocks="60" PercentBonds="30" PercentMoneyMarket="10" />
+             <Allocation BeginDate="02/03/2032" EndDate="" 
+                PercentStocks="80" PercentBonds="10" PercentMoneyMarket="10" /> 
          </AllocationPeriods>
       </Account>
-      <Account Name="401k" Type="TaxDeferred" Balance="" Owner="1">
+      <Account Name="401k" Type="TaxDeferred" Balance="300000" Owner="1">
          <AllocationPeriods>
-             <Allocation BeginDate="" EndDate="" PercentStocks="" PercentBonds="" PercentMoneyMarket="" /> 
+             <Allocation BeginDate="" EndDate="" 
+                 PercentStocks="90" PercentBonds="10" PercentMoneyMarket="" /> 
          </AllocationPeriods>
       </Account>
-      <Account Name="401k" Type="TaxDeferred" Balance="" Owner="2">
+      <Account Name="401k" Type="TaxDeferred" Balance="200000" Owner="2">
          <AllocationPeriods>
-             <Allocation BeginDate="" EndDate="" PercentStocks="" PercentBonds="" PercentMoneyMarket="" /> 
+             <Allocation BeginDate="" EndDate="" 
+                 PercentStocks="90" PercentBonds="10" PercentMoneyMarket="" /> 
          </AllocationPeriods>
       </Account>
-      <Account Name="John's Roth" Type="TaxFree" Balance="" Owner="1">
+      <Account Name="John's Roth" Type="TaxFree" Balance="50000" Owner="1">
          <AllocationPeriods>
-             <Allocation BeginDate="" EndDate="" PercentStocks="" PercentBonds="" PercentMoneyMarket="" /> 
+             <Allocation BeginDate="" EndDate="" 
+                PercentStocks="85" PercentBonds="15" PercentMoneyMarket="" /> 
          </AllocationPeriods>
       </Account>
-      <Account Name="Jane's Roth" Type="TaxFree" Balance="" Owner="2">
+      <Account Name="Jane's Roth" Type="TaxFree" Balance="60000" Owner="2">
          <AllocationPeriods>
-             <Allocation BeginDate="" EndDate="" PercentStocks="" PercentBonds="" PercentMoneyMarket="" /> 
+             <Allocation BeginDate="" EndDate="" 
+                 PercentStocks="100" PercentBonds="0" PercentMoneyMarket="" /> 
          </AllocationPeriods>
       </Account>
   </Assets>
   <AssetClasses>
-     <Period BeginDate="" EndDate="">
+     <Period BeginDate="" EndDate="12/31/2030">
        <Stocks RateOfReturn="5.0" StandardDeviation="20%" />
        <Bonds  RateOfReturn="2.0" StandardDeviation="7.5%" />
        <MoneyMarket RateOfReturn="-2.0%" StandardDeviation="0.1%" />
+     </Period>
+     <Period BeginDate="01/01/2031" EndDate="12/31/2040">
+       <Stocks RateOfReturn="6.0" StandardDeviation="25%" />
+       <Bonds  RateOfReturn="1.0" StandardDeviation="7%" />
+       <MoneyMarket RateOfReturn="-3.0%" StandardDeviation="0.1%" />
+     </Period>
+     <Period BeginDate="01/01/2041" EndDate="">
+       <Stocks RateOfReturn="5.0" StandardDeviation="30%" />
+       <Bonds  RateOfReturn="3.0" StandardDeviation="10%" />
+       <MoneyMarket RateOfReturn="-3.0%" StandardDeviation="0.1%" />
      </Period>
   </AssetClasses>
 </WealthMan>
