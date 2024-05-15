@@ -1,20 +1,23 @@
-from dataclass import dataclass
+from dataclasses import dataclass
 from datetime import date
-from Account import Account
+#from Account import Account
 
 @dataclass
 class Person:
-    name:str
-    DOB:datetime.date = None         #date of birth
-    DOD:datetime.date = None         #date of death (Dec 31st of year)
-    accounts: list(Account)
-
-  def add_account(self, account:Account):
-      self._accounts.append(account)
+  Name:str
+  BirthDate:date              #date of birth
+  RetirementDate:date=None    
+  LifeExpectancy:date=None    #date of death (Dec 31st of year)
+  Relationship:str=None
       
-  def remove_account(self, account:Account):
-      self._accounts.remove(account)
+  def set_LifeExpectancy_by_age(self, age: int):   #DOD = Date of Death
+      assert isinstance(self.BirthDate, date)
+      self.LifeExpectancy=date(self.BirthDate+age, 12, 31)    #set to Dec 31st of year
       
-  def set_DOD_by_age(self, age: int):
-      assert isinstance(self.DOB, date)
-      self.DOD=date(self.DOB+age, 12, 31)    #set to Dec 31st of year
+  def calc_age_by_date(self, dt: date) -> int:
+      """ returns the number of years between two dates """
+      return dt.year - self.BirthDate.year - ((dt.month, dt.day) < (self.BirthDate.month, self.BirthDate.day))
+    
+  def calc_age_by_year(self, year:int) -> int:   #get age of person on Dec 31st of year
+      """ returns the age of person on Dec 31st of year """
+      return self.calc_age_by_date(dt=date(year, 12, 31))
