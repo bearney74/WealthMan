@@ -6,7 +6,7 @@ sys.path.append("../..")
 
 from GlobalVars import GlobalVars
 from Person import Person
-from IncomeSources import IncomeSource
+from IncomeSources import IncomeSource, SocialSecurity
 from Expense import Expense
 from EnumTypes import IncomeType, AmountPeriodType
 
@@ -62,11 +62,14 @@ class Import0x1(ImportHelper):
       assert self._root.tag == "WealthMan"
       assert self._root.attrib["Version"] == "0.1"
       
+      self._ss_cola=None
+      
   def get_data(self):
-      return {'Persons': self._get_people_data(),
-              'IncomeSources': self._get_income_data(),
-              'Expenses': self._get_expense_data(),
+      return {
               'GlobalVars': self._get_globalvars_data(),
+              'Persons': self._get_people_data(),
+              'IncomeSources': self._get_income_data(self._ss_cola),
+              'Expenses': self._get_expense_data(),
              }
   
   def _get_tag_text(self, xml, tag):
@@ -79,11 +82,12 @@ class Import0x1(ImportHelper):
       assert len(_gv)==1
       
       _inflation_rate=self.str2float(self._get_tag_text(_gv[0], "InflationRate"))
-      _ss_cola=self.str2float(self._get_tag_text(_gv[0], "SocialSecurityCOLA"))
+      self._ss_cola=self.str2float(self._get_tag_text(_gv[0], "SocialSecurityCOLA"))
+      print("ss cola=%s"  % self._ss_cola)
       _ordertype = self._get_tag_text(_gv[0], "AssetWithdrawOrderByType")
       _years_to_forecast = self.str2int(self._get_tag_text(_gv[0], "YearsToForecast"))
       
-      return GlobalVars(InflationRate=_inflation_rate, SocialSecurityCOLA=_ss_cola,
+      return GlobalVars(InflationRate=_inflation_rate, SocialSecurityCOLA=self._ss_cola,
                         AssetWithdrawOrderByType=_ordertype, YearsToForecast=_years_to_forecast)
       
   def _get_people_data(self):
@@ -138,7 +142,7 @@ class Import0x1(ImportHelper):
           
       return _person_dict
 
-  def _get_income_data(self):
+  def _get_income_data(self, ss_cola):
       #<Income>
       # ie, Income types such as Employment, Pension, and Social Security..
       #</Income>
@@ -149,7 +153,7 @@ class Import0x1(ImportHelper):
       
       _incomes+=self._get_income_employment_data(_income_xml[0])
       _incomes+=self._get_income_pension_data(_income_xml[0])
-      _incomes+=self._get_income_socialsecurity_data(_income_xml[0])
+      _incomes+=self._get_income_socialsecurity_data(_income_xml[0], ss_cola)
       
       return _incomes
 
@@ -229,7 +233,7 @@ class Import0x1(ImportHelper):
 
       return _pensions
 
-  def _get_income_socialsecurity_data(self, income_xml):
+  def _get_income_socialsecurity_data(self, income_xml, cola):
       #<SocialSecurity Name="John's SS" FRA="67" FRAAmount="50000" BeginDate="02/02/2032" 
       #                Amount="30000" Owner="1"/>
       #<SocialSecurity Name="Jane's SS" FRA="67" FRAAmount="40000" BeginDate="03/03/2033" 
@@ -250,10 +254,11 @@ class Import0x1(ImportHelper):
           #if _begin_date is not None and _end_date is not None:
           #   assert _begin_date <= _end_date
           
-          _inc=IncomeSource(Name=_dict['Name'], IncomeSource=IncomeType.SocialSecurity, FRA=self.str2float(_dict['FRA']),
+          _inc=SocialSecurity(Name=_dict['Name'], IncomeSource=IncomeType.SocialSecurity, FRA=self.str2float(_dict['FRA']),
                             FRAAmount=self.str2float(_dict['FRAAmount']),
                             Amount=self.str2float(_dict['Amount']), AmountPeriod=AmountPeriodType.Annual,
                             BeginDate=_begin_date, Owner=_dict['Owner'], SurvivorPercent=None, Taxable=None)
+          _inc.set_COLA(cola)
           _ss.append(_inc)
 
       return _ss

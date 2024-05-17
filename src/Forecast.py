@@ -20,7 +20,7 @@ class Forecast:
           for _src in self._vars['IncomeSources']:
               _income=_src.calc_income_by_year(_year)
               print(_year, _src.Name, _income)
-              _total+=_src.calc_income_by_year(_year)
+              _total+=_income #_src.calc_income_by_year(_year)
           print(_year, _person1.calc_age_by_year(_year), _person2.calc_age_by_year(_year), _total)
 
 if __name__ == '__main__':

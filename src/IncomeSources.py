@@ -3,6 +3,7 @@ from datetime import date
 from EnumTypes import IncomeType, AmountPeriodType
 from DateHelper import DateHelper
 
+
 @dataclass
 class IncomeSource:
     Name:str
@@ -152,7 +153,31 @@ class IncomeSource:
         if self.COLA != 0 and self.COLA is not None:
            self._annual_income=int(self._annual_income * (1.0 + self.COLA/100.0))
            return self._annual_income
-        
-        
-        
+
         return self._annual_income
+    
+    
+class SocialSecurity(IncomeSource):
+
+  def set_COLA(self, COLA):
+      if COLA is None:
+          #produce an error, it should be 0 or something similar (1,2,3, etc)
+          print("Error, Social Security COLA has not been set")
+          self.COLA=0
+
+      self.COLA = COLA
+
+  def _calc_income(self) -> int:
+      if self._annual_income == 0:
+         self._annual_income=self._calc_annual_income()
+        
+      print("Social Security")
+      self._annual_income = int(self._annual_income * (1.0 + self.COLA/100.0))    #fix me!!
+      return self._annual_income
+
+  def calc_Full_Retirement_Age(self, date_of_birth:date) -> date:
+      if date_of_birth.year > 1960:
+          return date(date_of_birth.year + 67, date_of_birth.month, date_of_birth.day)
+      else:
+          assert(False)
+          #todo
