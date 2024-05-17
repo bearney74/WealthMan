@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, date
+from inspect import currentframe
 import sys
 sys.path.append("../..")
 
@@ -33,7 +34,10 @@ class ImportHelper:
       try:
          return int(s)
       except:
-         print("Cannot convert '%s' to an integer" % s)
+         cf = currentframe()
+         #return cf.f_back.f_lineno
+          
+         print("File:%s, lineno:%s, Cannot convert '%s' to an integer" % (__name__, cf.f_back.f_lineno, s))
          
       return 0
 
@@ -41,9 +45,10 @@ class ImportHelper:
       if s is None or s == 'None':
          return None
         
-      datetime.strptime(s, "%m/%d/%Y")
+      
       try:
-         return datetime.strptime(s, "%m/%d/%Y")
+         _dt=datetime.strptime(s, "%m/%d/%Y")
+         return date(_dt.year, _dt.month, _dt.day)
       except:
          print("Cannot convert '%s' to a date" % s)
          

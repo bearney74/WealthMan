@@ -1,26 +1,37 @@
 from datetime import date
 
+
 class DateHelper:
-  def __init__(self, begin_dt:str, end_dt:str, death_dates=list(date)):
-      self._death_dates=death_dates
+  """ calculates the number of days between 2 dates in the same year"""
+
+  def __init__(self, begin_dt:date, end_dt:date):
+      self._begin_date=begin_dt
+      self._end_date=end_dt
       
-  def _helper(self, dt: str) -> date:
-      if dt is None or dt is 'None':
-         return None
+      #this class should only be used for a single year  (ie where begin_date and end_date occur in the same year)
+      if self._begin_date is not None and self._end_date is not None:
+          print(self._begin_date.year, self._end_date.year)
+          assert(self._begin_date.year == self._end_date.year)
+      
+  def days_in_year(self) -> float:
+      if self._end_date is None and self._begin_date is None:
+          return 365.0
+        
+      if self._end_date is None:
+         _end_of_year=date(self._begin_date.year, 12, 31)
+         _diff = _end_of_year - self._begin_date
+         return _diff.days + 1
+          
+      if self._begin_date is None:
+         _beginning_of_year=date(self._end_date.year, 1, 1)
+         _diff = self._end_date - _beginning_of_year
+         return _diff.days + 1
+          
+      _diff = self._end_date - self._begin_date
+      return _diff.days + 1
     
+  def percent_of_year(self) -> float:
+      if self._end_date is None and self._begin_date is None:
+          return 100.0
       
-  def after_death(self, dt:date) -> list(str):
-      """ returns a list of persons that are dead after the dt date """
-      
-      _death_persons=[]
-      for _person_num, _death_date in self._death_dates:
-          if dt.year > _death_date.year:   # this is after the death year..
-             _death_persons.append(_person_num)
-          elif dt.year == _death_date.year:
-             if dt.month > _death_date.month:
-                _death_persons.append(_person_num)
-             elif dt.month == _death_date.month:
-                 if dt.day >= _death_date.day:
-                     _death_persons.append(_person_num)
-                     
-      return _death_persons
+      return 100.0 * self.days_in_year()/365.0
