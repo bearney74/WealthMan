@@ -16,16 +16,16 @@
                  EndDate="05/31/2030" COLA="2.0" Taxable="Yes" Owner="1"/>
      <Employment Name="Jane's FT Job" Amount="60000" AmountPeriod="Annual" 
                  EndDate="05/31/2030" COLA="3.0" Taxable="Yes" Owner="2"/>
-     <Employment Name="John's PT Job" Amount="" AmountPeriod="Annual"
+     <Employment Name="John's PT Job" Amount="20000" AmountPeriod="Annual"
                  BeginDate="01/01/2031" EndDate="12/31/2035" Taxable="Yes"
                  COLA="" Owner="1"/>
      <Pension Name="John's Pension" Amount="60000" AmountPeriod="Annual" 
-              BeginDate="06/01/2030" EndDate="Death" SurvivorPercent="100%"
+              BeginDate="06/01/2030" EndDate="02/02/2060" SurvivorPercent="100%"
               COLA="0" Taxable="Yes" Owner="1"/>
      <SocialSecurity Name="John's SS" FRA="67" FRAAmount="50000" BeginDate="02/02/2032" 
-                     Amount="30000" Owner="1"/>
+                     Amount="30000" Owner="1" AmountPeriod="Annual" />
      <SocialSecurity Name="Jane's SS" FRA="67" FRAAmount="40000" BeginDate="03/03/2033" 
-                     Amount="20000" Owner="2"/>
+                     Amount="20000" Owner="2" AmountPeriod="Annual" />
   </Income>
   <Expenses>
      <Expense Name="Annual Expenses" AmountPeriod="Annual" Amount="36000" />
