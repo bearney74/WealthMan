@@ -16,12 +16,27 @@ class Forecast:
       for _i in range(self._vars['GlobalVars'].YearsToForecast):
           _year = self._current_year + _i
           #figure out the total income for the next year
+          print(_year, _person1.calc_age_by_year(_year), _person2.calc_age_by_year(_year), " " , end="")
+          
           _total=0
           for _src in self._vars['IncomeSources']:
-              _income=_src.calc_income_by_year(_year)
-              print(_year, _src.Name, _income)
+              _income=_src.calc_balance_by_year(_year)
+              #print(_year, _src.Name, _income)
               _total+=_income #_src.calc_income_by_year(_year)
-          print(_year, _person1.calc_age_by_year(_year), _person2.calc_age_by_year(_year), _total)
+          print(" ", _total, end="")
+          
+          print("\n")
+          #output expenses..
+          _total=0
+          for _src in self._vars['Expenses']:
+              _expense=_src.calc_balance_by_year(_year)
+              print(_year, _src.Name, _expense)
+              
+              _total+=_expense
+          print(" ", _total, end="")
+          
+          print("\n")
+
 
 if __name__ == '__main__':
     _f=Forecast("../TestCases/JohnJaneDoe.xml")

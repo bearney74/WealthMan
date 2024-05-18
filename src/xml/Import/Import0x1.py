@@ -42,10 +42,9 @@ class ImportHelper:
       return 0
 
   def str2date(self, s:str):
-      if s is None or s == 'None':
+      if s is None or s in ('',  'None'):
          return None
         
-      
       try:
          _dt=datetime.strptime(s, "%m/%d/%Y")
          return date(_dt.year, _dt.month, _dt.day)
@@ -113,7 +112,7 @@ class Import0x1(ImportHelper):
       if _relationstatus == "Married":
           assert len(_persons) > 1
           
-      print(_persons)
+      #print(_persons)
     
       _person_dict={}
       for _person in _persons:
@@ -233,7 +232,7 @@ class Import0x1(ImportHelper):
 
       return _pensions
 
-  def _get_income_socialsecurity_data(self, income_xml, cola):
+  def _get_income_socialsecurity_data(self, income_xml, COLA):
       #<SocialSecurity Name="John's SS" FRA="67" FRAAmount="50000" BeginDate="02/02/2032" 
       #                Amount="30000" Owner="1"/>
       #<SocialSecurity Name="Jane's SS" FRA="67" FRAAmount="40000" BeginDate="03/03/2033" 
@@ -249,16 +248,11 @@ class Import0x1(ImportHelper):
               _dict[_attr]=_emp.attrib[_attr]
           
           _begin_date = self.str2date(_dict['BeginDate'])
-          #_end_date = self.str2date(_dict['EndDate'])
-          # verify that the begin date comes before the end date
-          #if _begin_date is not None and _end_date is not None:
-          #   assert _begin_date <= _end_date
           
-          _inc=SocialSecurity(Name=_dict['Name'], IncomeSource=IncomeType.SocialSecurity, FRA=self.str2float(_dict['FRA']),
+          _inc=SocialSecurity(Name=_dict['Name'], FRA=self.str2float(_dict['FRA']),
                             FRAAmount=self.str2float(_dict['FRAAmount']),
-                            Amount=self.str2float(_dict['Amount']), AmountPeriod=AmountPeriodType.Annual,
-                            BeginDate=_begin_date, Owner=_dict['Owner'], SurvivorPercent=None, Taxable=None)
-          _inc.set_COLA(cola)
+                            Amount=self.str2float(_dict['Amount']),
+                            BeginDate=_begin_date, Owner=_dict['Owner'], COLA=COLA)
           _ss.append(_inc)
 
       return _ss
@@ -282,14 +276,18 @@ class Import0x1(ImportHelper):
           for _attr in ['Name', 'Amount', 'AmountPeriod']:
               _dict[_attr]=_exp.attrib[_attr]
       
-          for _attr in ['COLA']:
+          for _attr in ['COLA', "BeginDate", "EndDate"]:
               if _attr in _exp.attrib:
                   _dict[_attr]=_exp.attrib[_attr]
               elif _attr in ['COLA']:
-                  _dict[_attr]=0
+                  _dict[_attr]="0.0"
+              elif _attr in ['BeginDate', 'EndDate']:
+                  _dict[_attr]=None
                   
-          _expense=Expense(Name=_dict['Name'], Amount=_dict['Amount'], AmountPeriod=_dict['AmountPeriod'],
-                           COLA=_dict['COLA'])
+          _expense=Expense(Name=_dict['Name'], Amount=self.str2int(_dict['Amount']),
+                           AmountPeriod=AmountPeriodType[_dict['AmountPeriod']],
+                           BeginDate=self.str2date(_dict['BeginDate']), EndDate=self.str2date(_dict['EndDate']),
+                           COLA=self.str2float(_dict['COLA']))
 
           _expenses.append(_expense)
           
