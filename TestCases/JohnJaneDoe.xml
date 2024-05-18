@@ -28,9 +28,12 @@
                      Amount="20000" Owner="2" AmountPeriod="Annual" />
   </Income>
   <Expenses>
-     <Expense Name="Annual Expenses" AmountPeriod="Annual" Amount="36000" />
+     <Expense Name="Annual Expenses" AmountPeriod="Annual" Amount="36000" 
+              BeginDate="" EndDate="" COLA="2" />
      <Expense Name="Health Care" AmountPeriod="Annual" Amount="1200" 
-              AnnualPercentIncrease="4"/>
+              BeginDate="" EndDate="" COLA="4"/>
+     <Expense Name="New Car Savings" AmountPeriod="Monthly" Amount="250" 
+              BeingDate="01/01/2030" EndDate="12/31/2039" />
   </Expenses>
   <Assets>
       <Account Name="Brokerage" Type="Regular" Balance="120000"
