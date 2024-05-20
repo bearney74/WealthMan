@@ -2,20 +2,38 @@ from datetime import date
 
 from Person import Person
 
+#FRA <= means Full Retirement Age
+
 class SocialSecurity:
-  def __init__(self, benefit_amount:int, benefit_reduction:float, start_date:date, end_date:date=None, COLA:float=0.0, FRA:int=None,
-               FRAAmount:int=0):
-      self.benefit_amount=benefit_amount
-      self.benefit_reduction=benefit_reduction
-      self.start_date=start_date
-      self.end_date=end_date
+  def __init__(self, FRAAmount:int, person:Person, start_date:date=None, COLA:float=0.0):
       
-      self.COLA=COLA
-      self.FRA=FRA
+      assert isinstance(FRAAmount, int)
       self.FRAAmount=FRAAmount
-    
-  def calc_full_retirement_age(self, person:Person):
-      if person.BirthDate > date(1960, 1, 1):
+      
+      assert isinstance(person, Person)
+      self.person:Person=person
+      
+      self.start_date:date=start_date
+      
+      self.COLA:float=COLA
+      
+      #birthdate after 1960  FRA=67
+      self._table:dict[int,float]={62: 0.7, 63: 0.75, 64: 0.80, 65: 0.866667, 66: 0.933333, 67: 1.0, 68: 1.08, 69: 1.16, 70: 1.24}
+  
+  def calc_benefit_amount_by_age(self, age:int):
+      assert isinstance(age, int)
+      
+      if self.calc_full_retirement_age() == 67:
+         if age in self._table:
+            _ratio=self._table[age]
+            return int(self.FRAAmount * _ratio)
+         if age < 62:
+             return 0
+         if age > 70:
+             return int(self.FRAAmount * self._table[70])
+  
+  def calc_full_retirement_age(self):
+      if self.person.BirthDate > date(1960, 1, 1):
          return 67
       return 66
     
