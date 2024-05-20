@@ -5,10 +5,11 @@ import sys
 sys.path.append("../..")
 
 from GlobalVars import GlobalVars
+from Account import Account, AllocationPeriod, AssetClass, AssetClassPeriod
 from Person import Person
 from IncomeSources import IncomeSource, SocialSecurity
 from Expense import Expense
-from EnumTypes import IncomeType, AmountPeriodType
+from EnumTypes import IncomeType, AmountPeriodType, AccountType
 
 class ImportHelper:
   def str2float(self, s: str):
@@ -28,6 +29,8 @@ class ImportHelper:
       s=s.strip()
       if s.endswith("%"):
           s=s[:-1]
+      if s=="":
+         return 0.0
       return self.str2float(s)
     
   def str2int(self, s:str):
@@ -69,7 +72,8 @@ class Import0x1(ImportHelper):
               'Persons': self._get_people_data(),
               'IncomeSources': self._get_income_data(self._ss_cola),
               'Expenses': self._get_expense_data(),
-             }
+              'Assets': self._get_assets_data()
+      }
   
   def _get_tag_text(self, xml, tag):
       _tag=xml.findall(tag)
@@ -82,7 +86,7 @@ class Import0x1(ImportHelper):
       
       _inflation_rate=self.str2float(self._get_tag_text(_gv[0], "InflationRate"))
       self._ss_cola=self.str2float(self._get_tag_text(_gv[0], "SocialSecurityCOLA"))
-      print("ss cola=%s"  % self._ss_cola)
+      #print("ss cola=%s"  % self._ss_cola)
       _ordertype = self._get_tag_text(_gv[0], "AssetWithdrawOrderByType")
       _years_to_forecast = self.str2int(self._get_tag_text(_gv[0], "YearsToForecast"))
       
@@ -332,68 +336,126 @@ class Import0x1(ImportHelper):
       # </Account>
       #</Assets>
     
+      _asset_classes=self._get_assetclass_data()
+      #print(_asset_classes)
+      assert(len(_asset_classes) > 0)
+    
       _assets=[]
       _assets_xml = self._root.findall("./Assets")
      
-      _account_xml = self._root.findall("./Account")
+      assert(len(_assets_xml) == 1)
+      _account_xml = _assets_xml[0].findall("./Account")
       
       for _account in _account_xml:
+          #print(_account)
           # required attributes
           _dict={}
           for _attr in ['Name', 'Balance', 'Owner']:
-              _dict[_attr]=_exp.attrib[_attr]
+              _dict[_attr]=_account.attrib[_attr]
       
-          _dict['Type'] = AccountType[_exp.attrib['Type']]
+          _dict['Type'] = AccountType[_account.attrib['Type']]
           
           for _attr in ['COLA']:
-              if _attr in _exp.attrib:
-                  _dict[_attr]=_exp.attrib[_attr]
+              if _attr in _account.attrib:
+                  _dict[_attr]=_account.attrib[_attr]
               elif _attr in ['COLA']:
-                  _dict[_attr]=0
+                  _dict[_attr]="0.0"
                   
-          _acc=Account(Name=_dict['Name'], Type=_dict['Type'], Balance=_dict['Balance'], Owner=_dict['Owner'],
-                       COLA=_dict['COLA'])
+          _acc=Account(Name=_dict['Name'], Type=_dict['Type'], Balance=self.str2float(_dict['Balance']), Owner=_dict['Owner'],
+                       COLA=self.str2float(_dict['COLA']))
 
+          _aps=self._get_account_allocation_periods(_account)
+          _acc.set_AllocationPeriods(_aps)
+          _acc.set_AssetClasses(_asset_classes)
           _assets.append(_acc)
           
       return _assets
     
   def _get_account_allocation_periods(self, xml):
+      #   <AllocationPeriods>
       #       <Allocation BeginDate="" EndDate="05/31/2030" 
       #          PercentStocks="95" PercentBonds="5" PercentMoneyMarket="0" /> 
       #       <Allocation BeginDate="06/01/2030" EndDate="02/02/2032" 
       #          PercentStocks="60" PercentBonds="30" PercentMoneyMarket="10" />
       #       <Allocation BeginDate="02/03/2032" EndDate="" 
       #          PercentStocks="80" PercentBonds="10" PercentMoneyMarket="10" /> 
+      #   </AllocationPeriods>
 
       _periods=[]
       _periods_xml = xml.findall('./AllocationPeriods')
+      #print(_periods_xml)
       assert len(_periods_xml) == 1
       
-      _period_xml = _periods_xml.findall('./Allocation')
+      _period_xml = _periods_xml[0].findall('./Allocation')
       assert len(_period_xml) > 0
       
       for _period in _period_xml:
-          for _attr in ['Name', 'BeginDate', 'EndDate']:
-              _dict[_attr]=_period.attrib[_attr]
+          _dict={}
+          for _attr in ["Name", "BeginDate", "EndDate"]:
+              if _attr in _period.attrib:
+                 _dict[_attr]=self.str2date(_period.attrib[_attr])
+              elif _attr in ["BeginDate", "EndDate"]:
+                  _dict[_attr]=None
+              else:
+                 _dict[_attr]=""
               
-          _total=0
           for _attr in ['PercentStocks', 'PercentBonds', 'PercentMoneyMarket']:
               if _attr in _period.attrib: 
-                 _pct = _period.attr[_attr]
-                 _pct=_pct.trim()
-                 if _pct.endwith('%'):
-                    _pct=_pct[:-1]
-                 _num=float(_pct)
-                 _total+=_num
-                 _dict[_attr]=_num
+                 _pct = _period.attrib[_attr]
+                 _dict[_attr]=self.strpct2float(_pct)
               else:
-                 _dict[_attr]=0
-          assert _total == 100.0
-    
+                 _dict[_attr]=0.0
+          
           _ap=AllocationPeriod(Name=_dict['Name'], BeginDate=_dict['BeginDate'], EndDate=_dict['EndDate'],
                            PercentStocks=_dict['PercentStocks'], PercentBonds=_dict['PercentBonds'],
                            PercentMoneyMarket=_dict['PercentMoneyMarket'])
           _periods.append(_ap)
     
       return _periods
+    
+  def _get_assetclass_data(self):
+      # <AssetClasses>
+      #   <Period BeginDate="" EndDate="12/31/2030">
+      #      <Stocks RateOfReturn="5.0" StandardDeviation="20%" />
+      #      <Bonds  RateOfReturn="2.0" StandardDeviation="7.5%" />
+      #      <MoneyMarket RateOfReturn="-2.0%" StandardDeviation="0.1%" />
+      #   </Period>
+      #   <Period BeginDate="01/01/2031" EndDate="12/31/2040">
+      #      <Stocks RateOfReturn="6.0" StandardDeviation="25%" />
+      #      <Bonds  RateOfReturn="1.0" StandardDeviation="7%" />
+      #      <MoneyMarket RateOfReturn="-3.0%" StandardDeviation="0.1%" />
+      #   </Period>
+      #   <Period BeginDate="01/01/2041" EndDate="">
+      #     <Stocks RateOfReturn="5.0" StandardDeviation="30%" />
+      #     <Bonds  RateOfReturn="3.0" StandardDeviation="10%" />
+      #     <MoneyMarket RateOfReturn="-3.0%" StandardDeviation="0.1%" />
+      #   </Period>
+      # </AssetClasses>
+  
+      _ac=self._root.findall('./AssetClasses')
+      assert(len(_ac) == 1)
+      
+      _periods=_ac[0].findall('Period')
+      
+      _list=[]
+      for _period in _periods:
+          _begin_date=self.str2date(_period.attrib["BeginDate"])
+          _end_date=self.str2date(_period.attrib["EndDate"])
+      
+          _classes={}
+          for _class in ["Stocks", "Bonds", "MoneyMarket"]:
+              _c=_period.findall('./%s' % _class)
+              assert(len(_c) in (0, 1))
+              if len(_c) == 1:
+                 _ror=self.strpct2float(_c[0].attrib["RateOfReturn"])
+                 _sd=self.strpct2float(_c[0].attrib["StandardDeviation"])
+              else:
+                 _ror=0.0
+                 _sd=0.0
+              
+              _classes[_class]=AssetClass(_ror, _sd)
+        
+          _acp=AssetClassPeriod(_classes["Stocks"], _classes["Bonds"], _classes["MoneyMarket"], BeginDate=_begin_date, EndDate=_end_date)      
+          _list.append(_acp)
+           
+      return _list

@@ -1,5 +1,5 @@
 import IncomeExpenseBase
-from EnumTypes import IncomeType, AmountPeriodType
+from EnumTypes import AmountPeriodType
 from datetime import date
 
 class Expense(IncomeExpenseBase.IncomeExpenseBase):

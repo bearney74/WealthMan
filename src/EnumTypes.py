@@ -1,9 +1,9 @@
 from enum import Enum
 
 class AmountPeriodType(Enum):
-    Annual=1,
-    Monthly=2,
-    BiWeekly=3,
+    Annual=1
+    Monthly=2
+    BiWeekly=3
     Weekly=4
     
 class RelationStatus(Enum):
