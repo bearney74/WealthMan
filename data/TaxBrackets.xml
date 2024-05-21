@@ -1,0 +1,39 @@
+<xml data="Tax Brackets" year="2024">
+ <Brackets>
+   <File Status="Single">
+      <Tax Rate="10%" Begin="" End="11600" />
+      <Tax Rate="12%" Begin="11601" End="47150" />
+      <Tax Rate="22%" Begin="47151" End="100525" />
+      <Tax Rate="24%" Begin="100526" End="191950" />
+      <Tax Rate="32%" Begin="100526" End="191950" />
+      <Tax Rate="35%" Begin="243726" End="609350" />
+      <Tax Rate="37%" Begin="243726" End="" />
+   </File>
+   <File Status="MarriedJointly">
+      <Tax Rate="10%" Begin="" End="23200" />
+      <Tax Rate="12%" Begin="23201" End="94300" />
+      <Tax Rate="22%" Begin="94301" End="201050" />
+      <Tax Rate="24%" Begin="201051" End="383900" />
+      <Tax Rate="32%" Begin="383901" End="487450" />
+      <Tax Rate="35%" Begin="487451" End="731200" />
+      <Tax Rate="37%" Begin="731201" End="" />
+   </File>
+   <File Status="MarriedSeparate">
+      <Tax Rate="10%" Begin="" End="11600" />
+      <Tax Rate="12%" Begin="11601" End="47150" />
+      <Tax Rate="22%" Begin="47151" End="100525" />
+      <Tax Rate="24%" Begin="100526" End="191150" />
+      <Tax Rate="32%" Begin="191151" End="243725" />
+      <Tax Type="35%" Begin="243726" End="365600" />
+      <Tax Type="37%" Begin="365601" End="" />
+   </File>
+   <File Status="HeadOfHousehold">
+      <File Rate="10%" Begin="" End="16550" />
+      <File Rate="12%" Begin="16551" End="63100" />
+      <File Rate="22%" Begin="63101" End="100500" />
+      <File Rate="24%" Begin="100501" End="191150" />
+      <File Rate="32%" Begin="191151" End="243700" />
+      <File Rate="35%" Begin="243701" End="609350" />
+      <File Rate="37%" Begin="609351" End="" />
+   </File>
+ </Brackets>
