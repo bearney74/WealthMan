@@ -2,7 +2,7 @@ from datetime import date
 from EnumTypes import AccountType
 
 class Account:
-  def __init__(self, Name:str, Type: AccountType, Owner:str, Balance:float=0, COLA:float=0):
+  def __init__(self, Name:str, Type: AccountType, Owner:str, Balance:int=0, COLA:float=0):
       
       assert(isinstance(Name, str))
       self.Name=Name
@@ -13,7 +13,7 @@ class Account:
       assert(isinstance(Owner, str))
       self.Owner=Owner
       
-      assert(isinstance(Balance, float))
+      assert(isinstance(Balance, int))
       self.Balance=Balance
       
       assert(isinstance(COLA, float))

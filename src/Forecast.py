@@ -52,5 +52,5 @@ class Forecast:
 
 
 if __name__ == "__main__":
-   _f = Forecast("../TestCases/JohnJaneDoe.xml")
+   _f = Forecast("../tests/TestCases/JohnJaneDoe.xml")
    _f.execute()

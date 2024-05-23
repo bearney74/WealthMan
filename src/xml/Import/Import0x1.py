@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
-from datetime import datetime, date
+#from datetime import datetime, date
 #from inspect import currentframe
+
+from ImportHelper import ImportHelper
 import sys
 sys.path.append("../..")
 
@@ -208,9 +210,9 @@ class Import0x1(ImportHelper):
           
           _begin_date = self.str2date(_dict['BeginDate'])
           
-          _inc=SocialSecurity(Name=_dict['Name'], FRA=self.str2float(_dict['FRA']),
-                            FRAAmount=self.str2float(_dict['FRAAmount']),
-                            Amount=self.str2float(_dict['Amount']),
+          _inc=SocialSecurity(Name=_dict['Name'], FRA=self.str2int(_dict['FRA']),
+                            FRAAmount=self.str2int(_dict['FRAAmount']),
+                            Amount=self.str2int(_dict['Amount']),
                             BeginDate=_begin_date, Owner=_dict['Owner'], COLA=COLA)
           _ss.append(_inc)
 
@@ -316,7 +318,7 @@ class Import0x1(ImportHelper):
               elif _attr in ['COLA']:
                   _dict[_attr]="0.0"
                   
-          _acc=Account(Name=_dict['Name'], Type=_dict['Type'], Balance=self.str2float(_dict['Balance']), Owner=_dict['Owner'],
+          _acc=Account(Name=_dict['Name'], Type=_dict['Type'], Balance=self.str2int(_dict['Balance']), Owner=_dict['Owner'],
                        COLA=self.str2float(_dict['COLA']))
 
           _aps=self._get_account_allocation_periods(_account)
@@ -357,10 +359,13 @@ class Import0x1(ImportHelper):
           for _attr in ['PercentStocks', 'PercentBonds', 'PercentMoneyMarket']:
               if _attr in _period.attrib: 
                  _pct = _period.attrib[_attr]
+                 if _pct is None or _pct == "":
+                     _pct="0.0"
                  _dict[_attr]=self.strpct2float(_pct)
               else:
-                 _dict[_attr]=0.0
+                 _dict[_attr]="0.0"
           
+          print(_dict)
           _ap=AllocationPeriod(Name=_dict['Name'], BeginDate=_dict['BeginDate'], EndDate=_dict['EndDate'],
                            PercentStocks=_dict['PercentStocks'], PercentBonds=_dict['PercentBonds'],
                            PercentMoneyMarket=_dict['PercentMoneyMarket'])
