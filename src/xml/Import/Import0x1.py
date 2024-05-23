@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime, date
-from inspect import currentframe
+#from inspect import currentframe
 import sys
 sys.path.append("../..")
 
@@ -10,51 +10,6 @@ from Person import Person
 from IncomeSources import IncomeSource, SocialSecurity
 from Expense import Expense
 from EnumTypes import IncomeType, AmountPeriodType, AccountType
-
-class ImportHelper:
-  def str2float(self, s: str):
-      s=s.strip()
-      if s == "":
-          return None
-
-      try:
-         return float(s)
-      except:
-         print("Cannot convert '%s' to a float" % s)
-      
-      return 0.0
-    
-  def strpct2float(self, s:str):
-      """ convert a percent string to a float value """
-      s=s.strip()
-      if s.endswith("%"):
-          s=s[:-1]
-      if s=="":
-         return 0.0
-      return self.str2float(s)
-    
-  def str2int(self, s:str):
-      try:
-         return int(s)
-      except:
-         cf = currentframe()
-         #return cf.f_back.f_lineno
-          
-         print("File:%s, lineno:%s, Cannot convert '%s' to an integer" % (__name__, cf.f_back.f_lineno, s))
-         
-      return 0
-
-  def str2date(self, s:str):
-      if s is None or s in ('',  'None'):
-         return None
-        
-      try:
-         _dt=datetime.strptime(s, "%m/%d/%Y")
-         return date(_dt.year, _dt.month, _dt.day)
-      except:
-         print("Cannot convert '%s' to a date" % s)
-         
-      return None
 
 
 class Import0x1(ImportHelper):

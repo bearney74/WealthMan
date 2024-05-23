@@ -26,14 +26,14 @@ class SocialSecurity:
       if self.calc_full_retirement_age() == 67:
          if age in self._table:
             _ratio=self._table[age]
-            return int(self.FRAAmount * _ratio)
+            return round(self.FRAAmount * _ratio)
          if age < 62:
              return 0
          if age > 70:
-             return int(self.FRAAmount * self._table[70])
+             return round(self.FRAAmount * self._table[70])
   
   def calc_full_retirement_age(self):
-      if self.person.BirthDate > date(1960, 1, 1):
+      if self.person.BirthDate >= date(1960, 1, 1):
          return 67
       return 66
     

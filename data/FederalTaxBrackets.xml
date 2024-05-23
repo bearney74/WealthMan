@@ -1,13 +1,13 @@
-<xml data="Tax Brackets" year="2024">
+<xml Data="Federal Tax Brackets" Year="2024">
  <Brackets>
    <File Status="Single">
       <Tax Rate="10%" Begin="" End="11600" />
       <Tax Rate="12%" Begin="11601" End="47150" />
       <Tax Rate="22%" Begin="47151" End="100525" />
       <Tax Rate="24%" Begin="100526" End="191950" />
-      <Tax Rate="32%" Begin="100526" End="191950" />
+      <Tax Rate="32%" Begin="1919551" End="243725" />
       <Tax Rate="35%" Begin="243726" End="609350" />
-      <Tax Rate="37%" Begin="243726" End="" />
+      <Tax Rate="37%" Begin="609351" End="" />
    </File>
    <File Status="MarriedJointly">
       <Tax Rate="10%" Begin="" End="23200" />
@@ -37,3 +37,4 @@
       <File Rate="37%" Begin="609351" End="" />
    </File>
  </Brackets>
+</xml>

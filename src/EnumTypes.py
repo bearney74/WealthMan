@@ -23,3 +23,9 @@ class IncomeType(Enum):
     Employment=1
     Pension=2
     SocialSecurity=3
+
+class TaxFileStatus(Enum):
+    Single=1
+    MarriedJointly=2
+    MarriedSeparate=3
+    HeadOfHousehold=4

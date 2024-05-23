@@ -41,5 +41,8 @@ class SocialSecurityFRA67Test(unittest.TestCase):
       
       for _age, _amount in ((55, 0), (60, 0), (62, 1750), (63, 1875), (64, 2000), (65, 2167),
                             (66, 2333), (67, 2500), (68, 2700), (69, 2900), (70, 3100), (71, 3100)):
-          self.assertEqual(_ss.calc_benefit_amount_by_age(_age), _amount)
-      
+          self.assertEqual(_ss1.calc_benefit_amount_by_age(_age), _amount)
+
+
+if __name__ == '__main__':
+    unittest.main()
