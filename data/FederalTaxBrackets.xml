@@ -1,4 +1,10 @@
 <xml Data="Federal Tax Brackets" Year="2024">
+ <StandardDeductions>
+   <File Status="Single">14600</File>
+   <File Status="MarriedJointly">29200</File>
+   <File Status="MarriedSeparately">14600</File>
+   <File Status="HeadOfHousehold">21900</File>
+ </StandardDeductions>
  <Brackets>
    <File Status="Single">
       <Tax Rate="10%" Begin="" End="11600" />
