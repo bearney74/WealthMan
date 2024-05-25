@@ -27,7 +27,6 @@ class SocialSecurityFRA67Test(unittest.TestCase):
       _ss=SocialSecurity(FRAAmount=0, person=_p)
       self.assertEqual(_ss.calc_full_retirement_age(), 66)
 
-      
 
   def test_benefits_by_age(self):
       _p=Person(Name="Jane", BirthDate=date(1963, 1, 1))

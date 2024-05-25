@@ -2,7 +2,7 @@
  <StandardDeductions>
    <File Status="Single">14600</File>
    <File Status="MarriedJointly">29200</File>
-   <File Status="MarriedSeparately">14600</File>
+   <File Status="MarriedSeparate">14600</File>
    <File Status="HeadOfHousehold">21900</File>
  </StandardDeductions>
  <Brackets>
@@ -30,17 +30,17 @@
       <Tax Rate="22%" Begin="47151" End="100525" />
       <Tax Rate="24%" Begin="100526" End="191150" />
       <Tax Rate="32%" Begin="191151" End="243725" />
-      <Tax Type="35%" Begin="243726" End="365600" />
-      <Tax Type="37%" Begin="365601" End="" />
+      <Tax Rate="35%" Begin="243726" End="365600" />
+      <Tax Rate="37%" Begin="365601" End="" />
    </File>
    <File Status="HeadOfHousehold">
-      <File Rate="10%" Begin="" End="16550" />
-      <File Rate="12%" Begin="16551" End="63100" />
-      <File Rate="22%" Begin="63101" End="100500" />
-      <File Rate="24%" Begin="100501" End="191150" />
-      <File Rate="32%" Begin="191151" End="243700" />
-      <File Rate="35%" Begin="243701" End="609350" />
-      <File Rate="37%" Begin="609351" End="" />
+      <Tax Rate="10%" Begin="" End="16550" />
+      <Tax Rate="12%" Begin="16551" End="63100" />
+      <Tax Rate="22%" Begin="63101" End="100500" />
+      <Tax Rate="24%" Begin="100501" End="191150" />
+      <Tax Rate="32%" Begin="191151" End="243700" />
+      <Tax Rate="35%" Begin="243701" End="609350" />
+      <Tax Rate="37%" Begin="609351" End="" />
    </File>
  </Brackets>
 </xml>

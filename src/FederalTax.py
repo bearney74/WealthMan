@@ -32,6 +32,18 @@ class FederalTax(ImportHelper):
       
       assert self._root.attrib["Data"] == "Federal Tax Brackets"
       
+      _sd=self._root.findall("./StandardDeductions")
+      assert len(_sd) == 1
+      
+      _files=_sd[0].findall("./File")
+      assert len(_files) > 0
+      
+      for _file in _files:
+          _status=_file.attrib["Status"]
+          if TaxFileStatus[_status] == self.FileStatus:
+             self.StandardDeduction=int(_file.text)
+      
+      
       _b = self._root.findall("./Brackets")
       assert len(_b)==1
       
