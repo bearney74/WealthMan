@@ -27,28 +27,32 @@ class Forecast:
                 end=" ",
           )
 
-          _total = 0
+          _income_total = 0
           for _src in self._vars["IncomeSources"]:
               _income = _src.calc_balance_by_year(_year)
               # print(_year, _src.Name, _income)
-              _total += _income  # _src.calc_income_by_year(_year)
-          print(_total, end=" ")
+              print(_income, end=" ")
+              _income_total += _income  # _src.calc_income_by_year(_year)
+          print(_income_total, end=" *** ")
 
           # print("\n")
           # output expenses..
-          _total = 0
+          _expense_total = 0
           for _src in self._vars["Expenses"]:
               _expense = _src.calc_balance_by_year(_year)
               print(_expense, end=" ")
 
-              _total += _expense
-          print(_total, end=" ")
+              _expense_total += _expense
+          print(_expense_total, end=" *** ")
 
+          print(_income_total - _expense_total, end= " *** ")
+
+          _total=0
           for _src in self._vars["Assets"]:
               _balance = _src.calc_balance_by_year(_year)
+              _total+=_balance
               print(_balance, end=" ")
-
-          print()
+          print(_total)
 
 
 if __name__ == "__main__":
