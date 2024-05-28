@@ -23,4 +23,5 @@ jobs:
         pylint $(git ls-files '*.py')
     - name: Running Unit Tests
       run: |
-        python -m unittest discover -s "./tests" -p "*Test.py"
+        cd tests 
+        python -m unittest discover -p "*Test.py"
