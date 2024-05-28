@@ -48,8 +48,9 @@ class RMD:
 
   def calc(self, currdate:date) -> float:
       _age=calc_age(self.Person1.BirthDate, currdate)
-      if _age < 72:
+      if _age <= 72:
          return 0.0
+        
       if _age > 120:
          return 100.0/self._table[120]
 
