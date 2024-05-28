@@ -14,7 +14,9 @@ ULT={             72:27.4, 73:26.5, 74:25.5, 75:24.6, 76:23.7, 77:22.9, 78:22.0,
 # should this be moved to DateHelper class?
 def calc_age(date1:date, date2:date) -> int:
     _diff=date1 - date2
-    return int(abs((_diff.days + _diff.seconds/86400)/365.2425))
+    #return int(abs((_diff.days + _diff.seconds/86400)/365.2425))
+    print(_diff.days)
+    return int(abs(_diff.days)/365.2466)
 
 
 class RMD:
@@ -48,6 +50,7 @@ class RMD:
 
   def calc(self, currdate:date) -> float:
       _age=calc_age(self.Person1.BirthDate, currdate)
+      print(_age)
       if _age <= 72:
          return 0.0
         
