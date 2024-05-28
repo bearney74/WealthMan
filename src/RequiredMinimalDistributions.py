@@ -1,5 +1,7 @@
 from datetime import date
 
+from Person import Person
+
 # for now just assume the usual (most common case)
 ULT={             72:27.4, 73:26.5, 74:25.5, 75:24.6, 76:23.7, 77:22.9, 78:22.0, 79:21.1,
 80:20.2, 81:19.4, 82:18.5, 83:17.7, 84:16.8, 85:16.0, 86:15.2, 87:14.4, 88:13.7, 89:12.9,
@@ -15,17 +17,19 @@ def calc_age(date1:date, date2:date) -> int:
     return int(abs((_diff.days + _diff.seconds/86400)/365.2425))
 
 
-class RequiredMinimumDistributions:
+class RMD:
   def __init__(self, person1:Person, person2:Person):
       self.Person1=person1
       self.Person2=person2
+
+      self._calc_init()
 
   def _calc_init(self):
       """ used to see which lookup table to use... """
       if self.Person2 is None:
          self._table=ULT
       else:  #need to check for age difference  (< 10 or > 10)?
-         if calc_age(self.Person1, self.Person2) <= 10:
+         if calc_age(self.Person1.BirthDate, self.Person2.BirthDate) <= 10:
             self._table=ULT
          else:
             #TODO
@@ -43,7 +47,7 @@ class RequiredMinimumDistributions:
       #self._calc_init()
 
   def calc(self, currdate:date) -> float:
-      _age=calc_age(self.Person1, currdate)
+      _age=calc_age(self.Person1.BirthDate, currdate)
       if _age < 72:
          return 0.0
       if _age > 120:
