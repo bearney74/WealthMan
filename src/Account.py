@@ -80,6 +80,8 @@ class Account:
               if _ap.BeginDate.year <= year <= _ap.EndDate.year:
                  return _ap 
 
+      assert False, "We don't have a valid allocation period for year %s" % year
+
   def _get_assetclass_period(self, year):
       for _ac in self.AssetClasses:
           if _ac.BeginDate is None and _ac.EndDate is None:   #this period has no begin or end dated (ie, all years are valid)

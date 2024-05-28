@@ -365,7 +365,7 @@ class Import0x1(ImportHelper):
               else:
                  _dict[_attr]="0.0"
           
-          print(_dict)
+          #print(_dict)
           _ap=AllocationPeriod(Name=_dict['Name'], BeginDate=_dict['BeginDate'], EndDate=_dict['EndDate'],
                            PercentStocks=_dict['PercentStocks'], PercentBonds=_dict['PercentBonds'],
                            PercentMoneyMarket=_dict['PercentMoneyMarket'])

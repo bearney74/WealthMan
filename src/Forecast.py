@@ -1,10 +1,11 @@
 # look at persons and see
+from datetime import date
 import sys
 
 sys.path.append("xml/Import")
 from Import import Import
-
-# from EnumTypes import AccountType
+from RequiredMinimalDistributions import RMD
+from EnumTypes import AccountType
 
 
 class Forecast:
@@ -16,6 +17,8 @@ class Forecast:
   def execute(self):
       _person1 = self._vars["Persons"]["1"]
       _person2 = self._vars["Persons"]["2"]
+      
+      _rmd=RMD(_person1, _person2)
       for _i in range(self._vars["GlobalVars"].YearsToForecast):
           _year = self._current_year + _i
           # figure out the total income for the next year
@@ -46,15 +49,24 @@ class Forecast:
           print(_expense_total, end=" *** ")
 
           print(_income_total - _expense_total, end= " *** ")
+          #TODO: if _income - _expense is negative, we need to pull resources from savings...
 
           _total=0
+          _ira_total=0
           for _src in self._vars["Assets"]:
               _balance = _src.calc_balance_by_year(_year)
+              if _src.Type == AccountType.TaxDeferred:
+                  _ira_total+=_balance
+            
               _total+=_balance
               print(_balance, end=" ")
+
+          _rmd_pct=_rmd.calc(date(_year, 12, 31))
+          print("RMD = %s%%, %d" % (_rmd_pct, int(_rmd_pct/100.0 * _ira_total)))
           print(_total)
 
 
 if __name__ == "__main__":
-   _f = Forecast("../tests/TestCases/JohnJaneDoe.xml")
+   #_f = Forecast("../tests/TestCases/JohnJaneDoe.xml")
+   _f = Forecast("../tests/TestCases/ChuckJaneSmith.xml")
    _f.execute()
