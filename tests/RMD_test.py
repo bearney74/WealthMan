@@ -15,17 +15,17 @@ class RMDTest(unittest.TestCase):
       _p=Person(Name="Jane", BirthDate=date(1960, 1, 1))
       _rmd=RMD(_p, None)
       
-      #before age 72
+      #before age 73
       self.assertEqual(_rmd.calc(date(1990,1,1)), 0.0)
       
-      #just before 72 birthday
-      self.assertEqual(_rmd.calc(date(2031,12,31)), 0.0)
+      #just before 73 birthday
+      self.assertEqual(_rmd.calc(date(2032,12,31)), 0.0)
       
-      #on 72 birthday
-      self.assertEqual(_rmd.calc(date(2032,1,1)), 100.0/27.4)
+      #on 73 birthday
+      self.assertEqual(_rmd.calc(date(2032,1,1)), 100.0/26.5)
       
-      #on 75 birthday
-      self.assertEqual(_rmd.calc(date(2035,1,1)), 100.0/24.6)
+      #on 80 birthday
+      self.assertEqual(_rmd.calc(date(2040,1,1)), 100.0/20.2)
       
       #100
       self.assertEqual(_rmd.calc(date(2060,1,1)), 100.0/6.4)
