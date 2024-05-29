@@ -2,6 +2,10 @@ from inspect import currentframe
 from datetime import datetime, date
 
 class ImportHelper:
+  def __init__(self, global_vars:dict):
+      assert isinstance(global_vars, dict)
+      self._global_vars=global_vars
+    
   def str2float(self, s: str):
       s=s.strip()
       if s == "":
@@ -50,7 +54,10 @@ class ImportHelper:
   def str2date(self, s:str):
       if s is None or s in ('',  'None'):
          return None
-        
+      
+      if s.upper() in ("RETIRE", "RETIREMENT"):
+         return self._global_vars["Retire"]
+      
       try:
          _dt=datetime.strptime(s, "%m/%d/%Y")
          return date(_dt.year, _dt.month, _dt.day)

@@ -10,7 +10,10 @@ from EnumTypes import AccountType
 
 class Forecast:
   def __init__(self, xml_file, current_year: int = 2024):
-      _i = Import(xml_file)
+      with open(xml_file) as fp:
+         xml=fp.read()
+         
+      _i = Import(xml)
       self._vars = _i.get_data()
       self._current_year = current_year
 
@@ -67,6 +70,6 @@ class Forecast:
 
 
 if __name__ == "__main__":
-   #_f = Forecast("../tests/TestCases/JohnJaneDoe.xml")
-   _f = Forecast("../tests/TestCases/ChuckJaneSmith.xml")
+   _f = Forecast("../tests/TestCases/JohnJaneDoe.xml")
+   #_f = Forecast("../tests/TestCases/ChuckJaneSmith.xml")
    _f.execute()

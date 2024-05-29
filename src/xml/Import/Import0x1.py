@@ -15,9 +15,10 @@ from EnumTypes import IncomeType, AmountPeriodType, AccountType
 
 
 class Import0x1(ImportHelper):
-  def __init__(self, filename):
-      _xml=ET.parse(filename)
-      self._root=_xml.getroot()
+  def __init__(self, xml):
+      #_xml=ET.parse(filename)
+      self._root=ET.fromstring(xml)
+      #self._root=_xml.getroot()
       assert self._root.tag == "WealthMan"
       assert self._root.attrib["Version"] == "0.1"
       
