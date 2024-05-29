@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import StringVar
 from tkinter import ttk
 
 class IntegerEntry(ttk.Entry):

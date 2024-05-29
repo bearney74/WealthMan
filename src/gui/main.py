@@ -1,6 +1,6 @@
 
 
-from tkinter import *
+from tkinter import Tk, StringVar, IntVar, Button
 from tkinter import ttk
 
 import sys
