@@ -53,11 +53,11 @@ class BasicInfoFrame(tk.Frame):
       selected_index=self.status.current()
       print(selected_index)
       if selected_index == 1:
-         if 1: #not self.winfo_manager():
+         if not self.spouse_frame.winfo_manager():
             print("grid")
             self.spouse_frame.grid(row=self.spouse_frame_row, column=0, columnspan=2)
       elif selected_index == 0:
-         if self.winfo_manager(): 
+         if self.spouse_frame.winfo_manager(): 
             self.spouse_frame.grid_forget()
        
   def submit(self):
