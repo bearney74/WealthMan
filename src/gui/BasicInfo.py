@@ -18,6 +18,9 @@ class BasicInfoFrame(tk.Frame):
       self.tk_lifespan.set(90)  #set default lifespan to 90
 
       _row=0
+      tk.Label(self, text="Client Information").grid(row=_row, column=0, columnspan=2, sticky='w')
+      
+      _row+=1
       tk.Label(self, text="Name:").grid(row=_row, column=0)
       tk.Entry(self, textvariable=self.tk_name).grid(row=_row, column=1, sticky='w')
 
@@ -46,24 +49,25 @@ class BasicInfoFrame(tk.Frame):
       self.spouse_frame_row=_row
       self.spouse_frame=BasicInfoSpouseFrame(self)
 
-      _row+=1
-      tk.Button(self, text="Submit", command=self.submit).grid(row=_row, column=1)
+      
+  def show_spouse_frame(self):
+      self.spouse_frame.grid(row=self.spouse_frame_row, column=0, columnspan=2)
 
+  def hide_spouse_frame(self):
+      self.spouse_frame.grid_forget()
+      
   def on_select(self, event):
       selected_index=self.status.current()
       print(selected_index)
       if selected_index == 1:
          if not self.spouse_frame.winfo_manager():
             print("grid")
-            self.spouse_frame.grid(row=self.spouse_frame_row, column=0, columnspan=2)
+            self.show_spouse_frame()
+            #self.spouse_frame.grid(row=self.spouse_frame_row, column=0, columnspan=2)
       elif selected_index == 0:
          if self.spouse_frame.winfo_manager(): 
-            self.spouse_frame.grid_forget()
-       
-  def submit(self):
-      name=self.tk_name.get()
-      print(name)
-
+            #self.spouse_frame.grid_forget()
+            self.hide_spouse_frame()
 
 class BasicInfoSpouseFrame(tk.Frame):
   def __init__(self, parent):
