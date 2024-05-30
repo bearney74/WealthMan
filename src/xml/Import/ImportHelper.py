@@ -2,7 +2,7 @@ from inspect import currentframe
 from datetime import datetime, date
 
 class ImportHelper:
-  def __init__(self, global_vars:dict):
+  def __init__(self, global_vars:dict={}):
       assert isinstance(global_vars, dict)
       self._global_vars=global_vars
     
@@ -55,8 +55,8 @@ class ImportHelper:
       if s is None or s in ('',  'None'):
          return None
       
-      if s.upper() in ("RETIRE", "RETIREMENT"):
-         return self._global_vars["Retire"]
+      if s.upper() in ("RETIRE", "RETIREMENT", "RETIREDATE"):
+         return self._global_vars["RetireDate"]
       
       try:
          _dt=datetime.strptime(s, "%m/%d/%Y")
