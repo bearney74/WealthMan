@@ -1,6 +1,6 @@
-from tkinter import Tk, Button, Entry
+import tkinter as tk
 
-class FloatEntry(Entry):
+class FloatEntry(tk.Entry):
   def __init__(self, *args, **kwargs):
       self.length=None
       if 'length' in kwargs:

@@ -13,7 +13,6 @@ class App(tk.Tk):
       self.title("Wealth Manager")
       self.geometry("800x600")
 
-
       self.rowconfigure(0, weight=1)
       self.columnconfigure(0, weight=1)
       tabControl = ttk.Notebook(self)

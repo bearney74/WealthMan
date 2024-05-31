@@ -24,7 +24,7 @@ class IncomeInfoFrame(tk.Frame):
       self.tk_start_age=[]
       self.tk_end_age=[]
       
-      tk.Button(self, text="Add Income", command=self.add_row).grid(row=0, column=0, sticky='n')
+      tk.Button(self, text="Add Row", command=self.add_row).grid(row=0, column=0, sticky='n')
       
       ttk.Separator().grid(row=2, sticky='ew')
       
