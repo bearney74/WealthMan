@@ -1,79 +1,59 @@
 import tkinter as tk
 #from tkinter import Tk, StringVar, IntVar, Button
-from tkinter import ttk
+from tkinter import ttk, font
 
 import sys
 sys.path.append("guihelpers")
 from IntegerEntry import IntegerEntry
+from FloatEntry import FloatEntry
 
+class BoldLabel(tk.Label):
+  def __init__(self, master=None, **kwargs):
+      super().__init__(master, **kwargs)
+      bold_font = font.Font(self, self.cget("font"))
+      bold_font.configure(weight="bold")
+      self.configure(font=bold_font)
 
 class IncomeInfoFrame(tk.Frame):
-  def __init__(self, parent, BasicInfo):
-      tk.Frame.__init__(self, parent)
-      
-      self.BasicInfo=BasicInfo
-
-      self.tk_name=tk.StringVar()
-      self.tk_age=tk.IntVar()
-      self.tk_retirement_age=tk.IntVar()
-      self.tk_lifespan=tk.IntVar()
-      self.tk_lifespan.set(90)  #set default lifespan to 90
-
-      _row=0
-      tk.Label(self, text="Client Information").grid(row=_row, column=0, columnspan=2, sticky='w')
-      
-      _row+=1
-      tk.Label(self, text="IRA:").grid(row=_row, column=0)
-      tk.Entry(self, textvariable=self.tk_name).grid(row=_row, column=1, sticky='w')
-
-      _row+=1
-      tk.Label(self, text="Roth IRA:").grid(row=_row, column=0)
-      IntegerEntry(self, length=7, textvariable=self.tk_age, width=7).grid(row=_row, column=1, sticky='w')
-
-      _row+=1
-      tk.Label(self, text="Taxable:").grid(row=_row, column=0)
-      IntegerEntry(self, length=7, textvariable=self.tk_retirement_age, width=7).grid(row=_row, column=1, sticky='w')
-
-      _row+=1
-      tk.Label(self, text="Lifespan:").grid(row=_row, column=0)
-      IntegerEntry(self, length=7, textvariable=self.tk_lifespan, width=7).grid(row=_row, column=1, sticky='w')
-
-      _row+=1
-      
-      _row+=1
-      ttk.Separator(self, orient=tk.HORIZONTAL).grid(row=_row, column=0, columnspan=2, sticky="ew")
-      
-      _row+=1
-      self.spouse_frame_row=_row
-      self.spouse_frame=IncomeInfoSpouseFrame(self)
-
-  def show_spouse_frame(self):
-      self.spouse_frame.grid(row=self.spouse_frame_row, column=0, columnspan=2)
-      
-  def hide_spouse_frame(self):
-      self.spouse_frame
-
-class IncomeInfoSpouseFrame(tk.Frame):
   def __init__(self, parent):
       tk.Frame.__init__(self, parent)
-
-      self.tk_name=tk.StringVar()
-      self.tk_age=tk.IntVar()
-      self.tk_retirement_age=tk.IntVar()
-      self.tk_lifespan=tk.IntVar()  # lifespan in age (90)
-      self.tk_lifespan.set("90")
-
-      _row=0
-      tk.Label(self, text="Spouse Income Information").grid(row=_row, column=0, columnspan=2, sticky='w')
       
-      _row+=1
-      tk.Label(self, text="IRA:").grid(row=_row, column=0)
-      IntegerEntry(self, length=7, textvariable=self.tk_age, width=7).grid(row=_row, column=1, sticky='w')
+      self.tk_name=[] #tk.IntVar()
+      self.tk_amount=[] #tk.IntVar()
+      self.tk_pct_change=[] #taxable=tk.IntVar()
+      self.tk_start_age=[]
+      self.tk_end_age=[]
+      
+      tk.Button(self, text="Add Income", command=self.add_row).grid(row=0, column=0, sticky='n')
+      
+      ttk.Separator().grid(row=2, sticky='ew')
+      
+      tk.Label(self, text="Income Information").grid(row=3, column=0, columnspan=2, sticky='w')
+      
+      ttk.Separator().grid(row=4, sticky='ew')
+      
+      BoldLabel(self, text="Name:").grid(row=5, column=0, sticky='w')
+      BoldLabel(self, text="Annual\nAmount").grid(row=5, column=1, sticky='w')
+      BoldLabel(self, text="Annual %\nChange").grid(row=5, column=2, sticky='w')
+      BoldLabel(self, text="Start\nAge").grid(row=5, column=3, sticky='w')
+      BoldLabel(self, text="End\nAge").grid(row=5, column=4, sticky='w')
 
-      _row+=1
-      tk.Label(self, text="Roth IRA:").grid(row=_row, column=0)
-      IntegerEntry(self, length=7, textvariable=self.tk_lifespan, width=7).grid(row=_row, column=1, sticky='w')
+      self.length=0
+      self.add_row()
 
-      _row+=1
-      tk.Label(self, text="Taxable (Regular):").grid(row=_row, column=0)
-      IntegerEntry(self, length=7, textvariable=self.tk_lifespan, width=7).grid(row=_row, column=1, sticky='w')
+
+  def add_row(self):    
+      self.tk_name.append(tk.StringVar())
+      self.tk_amount.append(tk.IntVar())
+      self.tk_pct_change.append(tk.IntVar())
+      self.tk_start_age.append(tk.IntVar())
+      self.tk_end_age.append(tk.IntVar())
+      
+      _row=self.length+6
+      tk.Entry(self, textvariable=self.tk_name[self.length]).grid(row=_row, column=0)
+      IntegerEntry(self, length=5, textvariable=self.tk_amount[self.length], width=5).grid(row=_row, column=1)
+      FloatEntry(self, length=3, textvariable=self.tk_pct_change[self.length], width=3).grid(row=_row, column=2)
+      IntegerEntry(self, length=2, textvariable=self.tk_start_age[self.length], width=2).grid(row=_row, column=3)
+      IntegerEntry(self, length=2, textvariable=self.tk_end_age[self.length], width=2).grid(row=_row, column=4)
+      
+      self.length+=1
