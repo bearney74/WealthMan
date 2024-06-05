@@ -11,7 +11,7 @@ from Account import Account, AllocationPeriod, AssetClass, AssetClassPeriod
 from Person import Person
 from IncomeSources import IncomeSource, SocialSecurity
 from Expense import Expense
-from EnumTypes import IncomeType, AmountPeriodType, AccountType
+from EnumTypes import IncomeType, AmountPeriodType, AccountType, FederalTaxStatusType
 
 
 class Import0x1(ImportHelper):
@@ -47,9 +47,12 @@ class Import0x1(ImportHelper):
       #print("ss cola=%s"  % self._ss_cola)
       _ordertype = self._get_tag_text(_gv[0], "AssetWithdrawOrderByType")
       _years_to_forecast = self.str2int(self._get_tag_text(_gv[0], "YearsToForecast"))
-      
+
+      _federal_tax_status=self._get_tag_text(_gv[0], "FederalTaxStatus")
+
       return GlobalVars(InflationRate=_inflation_rate, SocialSecurityCOLA=self._ss_cola,
-                        AssetWithdrawOrderByType=_ordertype, YearsToForecast=_years_to_forecast)
+                        AssetWithdrawOrderByType=_ordertype, YearsToForecast=_years_to_forecast,
+                        FederalTaxStatus=FederalTaxStatusType[_federal_tax_status])
       
   def _get_people_data(self):
       _people = self._root.findall("./People")

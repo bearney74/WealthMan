@@ -4,6 +4,7 @@
     <SocialSecurityCOLA>2.0</SocialSecurityCOLA> 
     <AssetWithdrawOrderByType>TaxDeferred,Regular,TaxFree</AssetWithdrawOrderByType>
     <YearsToForecast>30</YearsToForecast>
+    <FederalTaxStatus>MarriedJointly</FederalTaxStatus>
   </GlobalVars>
   <People RelationStatus="Married">
      <Person Num="1" Name="John" BirthDate="02/02/1970" Relationship="Spouse"
@@ -19,13 +20,13 @@
      <Employment Name="John's PT Job" Amount="20000" AmountPeriod="Annual"
                  BeginDate="01/01/2031" EndDate="12/31/2035" Taxable="Yes"
                  COLA="" Owner="1"/>
-     <Pension Name="John's Pension" Amount="60000" AmountPeriod="Annual" 
+     <Pension Name="John's Pension" Amount="10000" AmountPeriod="Annual" 
               BeginDate="06/01/2030" EndDate="02/02/2060" SurvivorPercent="100%"
               COLA="0" Taxable="Yes" Owner="1"/>
      <SocialSecurity Name="John's SS" FRA="67" FRAAmount="50000" BeginDate="02/02/2032" 
-                     Amount="30000" Owner="1" AmountPeriod="Annual" />
+                     Amount="15000" Owner="1" AmountPeriod="Annual" />
      <SocialSecurity Name="Jane's SS" FRA="67" FRAAmount="40000" BeginDate="03/03/2033" 
-                     Amount="20000" Owner="2" AmountPeriod="Annual" />
+                     Amount="15000" Owner="2" AmountPeriod="Annual" />
   </Income>
   <Expenses>
      <Expense Name="Annual Expenses" AmountPeriod="Annual" Amount="36000" 
@@ -47,13 +48,13 @@
                 PercentStocks="80" PercentBonds="10" PercentMoneyMarket="10" /> 
          </AllocationPeriods>
       </Account>
-      <Account Name="401k" Type="TaxDeferred" Balance="300000" Owner="1">
+      <Account Name="John's 401k" Type="TaxDeferred" Balance="300000" Owner="1">
          <AllocationPeriods>
              <Allocation BeginDate="" EndDate="" 
                  PercentStocks="90" PercentBonds="10" PercentMoneyMarket="" /> 
          </AllocationPeriods>
       </Account>
-      <Account Name="401k" Type="TaxDeferred" Balance="200000" Owner="2">
+      <Account Name="Jane's 401k" Type="TaxDeferred" Balance="200000" Owner="2">
          <AllocationPeriods>
              <Allocation BeginDate="" EndDate="" 
                  PercentStocks="90" PercentBonds="10" PercentMoneyMarket="" /> 
