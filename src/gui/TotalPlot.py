@@ -1,9 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
-
-import matplotlib.collections as mcol
-from matplotlib.legend_handler import HandlerLineCollection, HandlerTuple
-from matplotlib.lines import Line2D
 
 import collections
 
