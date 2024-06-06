@@ -21,11 +21,13 @@ class Inputs(tk.Frame):
       self.Income_tab = IncomeInfoFrame(tabControl)
       Expense_tab = ttk.Frame(tabControl)
       self.Asset_tab = AssetInfoFrame(tabControl, self.Basic_tab)
+      Global_tab = ttk.Frame(tabControl)
 
       tabControl.add(self.Basic_tab, text="Basic Info")
       tabControl.add(self.Income_tab, text="Income")
       tabControl.add(Expense_tab, text="Expenses")
       tabControl.add(self.Asset_tab, text="Assets")
+      tabControl.add(Global_tab, text="Global Variables")
 
       tabControl.grid(row=0, column=0, sticky='nsew') #.pack(expand=1, fill='both')
 
