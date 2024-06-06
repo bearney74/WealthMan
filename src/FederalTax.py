@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 
-from EnumTypes import TaxFileStatus
+from EnumTypes import FederalTaxStatusType
 
 import sys
 sys.path.append("../src/xml/Import")
@@ -8,7 +8,7 @@ from ImportHelper import ImportHelper
 
 
 class FederalTax(ImportHelper):
-  def __init__(self, FileStatus:TaxFileStatus, Year:int):
+  def __init__(self, FileStatus:FederalTaxStatusType, Year:int):
       #ImportHelper.__init__(self)
       self.FileStatus=FileStatus
       self.Year=Year
@@ -40,7 +40,7 @@ class FederalTax(ImportHelper):
       
       for _file in _files:
           _status=_file.attrib["Status"]
-          if TaxFileStatus[_status] == self.FileStatus:
+          if FederalTaxStatusType[_status] == self.FileStatus:
              self.StandardDeduction=int(_file.text)
       
       
@@ -51,7 +51,7 @@ class FederalTax(ImportHelper):
       
       for _file in _files:
           _status=_file.attrib["Status"]
-          if TaxFileStatus[_status] == self.FileStatus:
+          if FederalTaxStatusType[_status] == self.FileStatus:
              _taxes=_file.findall("Tax")
              assert len(_taxes) > 1
       

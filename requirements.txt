@@ -1,0 +1,2 @@
+matplotlib >= 3.9
+tksheet >= 7.2

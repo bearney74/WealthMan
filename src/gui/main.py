@@ -4,6 +4,7 @@ from tkinter import ttk
 from BasicInfo import BasicInfoFrame
 from IncomeInfo import IncomeInfoFrame
 from MenuBar import MenuBar
+from Inputs import Inputs
 
 class App(tk.Tk):
   def __init__(self):
@@ -28,7 +29,17 @@ class App(tk.Tk):
       tabControl.add(Asset_tab, text="Assets")
       tabControl.add(Global_tab, text="Global Variables")
 
-      tabControl.pack(expand=1, fill='both')
+      self.rowconfigure(0, weight=1)
+      self.columnconfigure(0, weight=1)
+      tabControl = ttk.Notebook(self)
+
+      self.Inputs_tab = Inputs(tabControl)
+      self.Analysis_tab = ttk.Frame(tabControl)
+
+      tabControl.add(self.Inputs_tab, text="Inputs")
+      tabControl.add(self.Analysis_tab, text="Analysis")
+
+      tabControl.grid(row=0, column=0, sticky='nsew') #.pack(expand=1, fill='both')
 
       tabControl.bind("<<NotebookTabChanged>>", self.on_tab_change)
       
@@ -49,6 +60,7 @@ class App(tk.Tk):
          if tab == "Income":
             self.Income_tab.hide_spouse_frame()
 
+    
 if __name__ == '__main__':
    _app=App()
    _app.mainloop()
