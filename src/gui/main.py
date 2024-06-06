@@ -5,6 +5,7 @@ from BasicInfo import BasicInfoFrame
 from IncomeInfo import IncomeInfoFrame
 from MenuBar import MenuBar
 from Inputs import Inputs
+from Logs import Logs
 
 class App(tk.Tk):
   def __init__(self):
@@ -21,7 +22,7 @@ class App(tk.Tk):
 
       self.Inputs_tab = Inputs(tabControl)
       self.Analysis_tab = ttk.Frame(tabControl)
-      self.logs_tab=ttk.Frame(tabControl)
+      self.logs_tab=Logs(tabControl)
 
       tabControl.add(self.Inputs_tab, text="Inputs")
       tabControl.add(self.Analysis_tab, text="Analysis")
