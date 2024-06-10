@@ -1,19 +1,23 @@
-import tkinter as tk
+from PyQt6.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout
+from PyQt6.QtCore import QT_VERSION_STR, PYQT_VERSION_STR
+
 import sys
 
-class Logs(tk.Frame):
-  def __init__(self, parent):
-      tk.Frame.__init__(self, parent)
+class Logs(QWidget):
+  def __init__(self, parent=None):
+      super(Logs, self).__init__(parent)
       
-      self.log=tk.Text(self, wrap=tk.WORD)
-      self.log.pack()
+      self.log=QPlainTextEdit()
       
-      self.log.insert(tk.END, "Python Version=%s\n" % sys.version)
-      self.log.insert(tk.END, "Tkinter Version=%s\n" % tk.TkVersion)
-      self.log.config(state=tk.DISABLED)
+      mainLayout = QVBoxLayout()
+      mainLayout.addWidget(self.log)
+      self.setLayout(mainLayout)
+      
+      _str="Python Version=%s\nQt Version=%s\nPyQt Version=%s\n" % (sys.version, QT_VERSION_STR, PYQT_VERSION_STR)
+      self.log.setPlainText(_str)
       
   def append(self, text):
-      self.log.config(state=tk.ENABLED)
-      self.log.insert(tk.END, text)
-      self.log.config(state=tk.DISABLED)
-      
+      #fix me?
+      _text=self.log.toPlainText()
+      _text+=text
+      self.log.setPlainText(_text)
