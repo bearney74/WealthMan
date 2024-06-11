@@ -1,54 +1,28 @@
-import tkinter as tk
-from tkinter import ttk
+from PyQt6.QtWidgets import QMainWindow, QTabWidget, QVBoxLayout, QWidget
 
-from BasicInfo import BasicInfoFrame
-from IncomeInfo import IncomeInfoFrame
-from MenuBar import MenuBar
 from Inputs import Inputs
 from Logs import Logs
 
-class App(tk.Tk):
-  def __init__(self):
-      tk.Tk.__init__(self)
-
-      self.title("Wealth Manager")
-      self.geometry("800x600")
-
-      self.menubar=MenuBar(self)
+class Main(QMainWindow):
+  def __init__(self, parent=None):
+      super(Main, self).__init__(parent)
+      #self.menubar=MenuBar(self)
       
-      self.rowconfigure(0, weight=1)
-      self.columnconfigure(0, weight=1)
-      tabControl = ttk.Notebook(self)
+      tabWidget=QTabWidget()
+      tabWidget.addTab(Inputs(), "Input")
+      tabWidget.addTab(QWidget(), "Analysis")
+      tabWidget.addTab(Logs(), "Logs")
 
-      self.Inputs_tab = Inputs(tabControl)
-      self.Analysis_tab = ttk.Frame(tabControl)
-      self.logs_tab=Logs(tabControl)
-
-      tabControl.add(self.Inputs_tab, text="Inputs")
-      tabControl.add(self.Analysis_tab, text="Analysis")
-      tabControl.add(self.logs_tab, text="Logs")
-
-      tabControl.grid(row=0, column=0, sticky='nsew') #.pack(expand=1, fill='both')
-
-      tabControl.bind("<<NotebookTabChanged>>", self.on_tab_change)
+      self.setCentralWidget(tabWidget)
       
-      #tk.Button(self, text="Submit", command=self.submit).pack()
-
-  def submit(self):
-      name=self.tk_name.get()
-      print(name)
-
-  def on_tab_change(self, event):
-      pass
-      #tab=event.widget.tab('current')['text']
-      #if self.Basic_tab.status.current()==1:  #married
-      #   if tab=="Income":
-      #      self.Income_tab.show_spouse_frame()
-      #elif self.Basic_tab.status==0:
-      #   if tab == "Income":
-      #      self.Income_tab.hide_spouse_frame()
-
-    
+      self.setWindowTitle("Wealth Manager")
+      self.resize(800, 600)
+      
 if __name__ == '__main__':
-   _app=App()
-   _app.mainloop()
+   from PyQt6.QtWidgets import QApplication
+   import sys
+   
+   _app = QApplication(sys.argv)
+   _main = Main()
+   _main.show()
+   sys.exit(_app.exec())
