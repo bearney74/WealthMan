@@ -1,10 +1,4 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget
-from PyQt6.QtGui import QIntValidator
-
-import sys
-sys.path.append("guihelpers")
-from Entry import AgeEntry
-
 
 class AnalysisTab(QWidget):
   def __init__(self, parent=None):
@@ -21,4 +15,3 @@ class AnalysisTab(QWidget):
       layout.addWidget(self.tabs)
       
       self.setLayout(layout)
-      
