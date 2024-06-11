@@ -1,5 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, \
-                            QFormLayout, QLineEdit, QComboBox
+from PyQt6.QtWidgets import QLineEdit
 from PyQt6.QtGui import QIntValidator, QDoubleValidator
 
 class AgeEntry(QLineEdit):
@@ -15,7 +14,7 @@ class AgeEntry(QLineEdit):
 class FloatEntry(QLineEdit):
   def __init__(self, parent=None, min=0.0, max=10.0, num_decimal_places=1, limit_size:bool=True):
       super(FloatEntry, self).__init__(parent)
-      
+     
       self.setMaxLength(4)
       if limit_size:
           self.setFixedWidth(30)
