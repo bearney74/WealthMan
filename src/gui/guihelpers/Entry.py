@@ -5,11 +5,11 @@ class AgeEntry(QLineEdit):
   def __init__(self, parent=None, limit_size:bool=True):
       super(AgeEntry, self).__init__(parent)
       
-      self.setMaxLength(2)
+      #self.setMaxLength(2)
       if limit_size:
           self.setFixedWidth(30)
       
-      self.setValidator(QIntValidator())
+      self.setValidator(QIntValidator(0,99))
       
 class FloatEntry(QLineEdit):
   def __init__(self, parent=None, min=0.0, max=10.0, num_decimal_places=1, limit_size:bool=True):
