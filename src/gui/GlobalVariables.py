@@ -1,5 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QLineEdit, QComboBox
-from PyQt6.QtGui import QIntValidator, QDoubleValidator
+from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QComboBox
 
 import sys
 sys.path.append("guihelpers")
