@@ -9,10 +9,10 @@ from Analysis import AnalysisTab
 class Main(QMainWindow):
   def __init__(self, parent=None):
       super(Main, self).__init__(parent)
-      #self.menubar=MenuBar(self)
       
       tabWidget=QTabWidget()
-      tabWidget.addTab(Inputs(), "Input")
+      self.Inputs=Inputs()
+      tabWidget.addTab(self.Inputs, "Input")
       tabWidget.addTab(AnalysisTab(), "Analysis")
       tabWidget.addTab(Logs(), "Logs")
 
@@ -28,6 +28,7 @@ class Main(QMainWindow):
       self.setStatusBar(_statusbar)
       
       self._createMenuBar()
+      self.show()
       
   def _createMenuBar(self):
       _mb=MenuBar(self)
@@ -39,5 +40,4 @@ if __name__ == '__main__':
    
    _app = QApplication(sys.argv)
    _main = Main()
-   _main.show()
    sys.exit(_app.exec())

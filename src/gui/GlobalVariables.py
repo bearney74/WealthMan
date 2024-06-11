@@ -30,3 +30,16 @@ class GlobalVariablesTab(QWidget):
       formlayout.addRow(QLabel("Withdrawal Order"), self._WithdrawOrder)
       
       self.setLayout(formlayout)
+
+  def is_valid(self) -> bool:
+      return self._forecast_years.is_valid() and self._Inflation.is_valid() and self._SS_Cola.is_valid()
+
+  def export_xml(self) -> str:
+      return """<GlobalVars>
+                 <InflationRate>%s</InflationRate>
+                 <SocialSecurityCOLA>%s</SocialSecurityCOLA>
+                 <AssetWithdrawOrderByType>%s</AssetWithdrawOrderByType>
+                 <YearsToForecast>%s</YearsToForecast>
+             </GlobalVars>
+       """ % (str(self._Inflation.text()), str(self._SS_Cola.text()),
+              self._WithdrawOrder.currentText(), self._forecast_years.text())

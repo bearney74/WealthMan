@@ -1,3 +1,5 @@
+import datetime
+
 from PyQt6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, \
                             QFormLayout, QLineEdit, QComboBox
 
@@ -20,6 +22,19 @@ class BasicInfoTab(QWidget):
       hlayout.addWidget(self._spouseinfo)
       
       self.setLayout(hlayout)
+      
+  def is_valid(self) -> bool:
+      if self._clientinfo._status.currentText() == "Single":
+          return self._clientinfo.is_valid()
+        
+      return self._clientinfo.is_valid() and self._spouse_info.is_valid()
+      
+  def export_xml(self):
+      if self._clientinfo._status.currentText() == "Married":
+         return """<People RelationStatus="Married">%s %s</People>""" % (self._clientinfo.export_xml(), self._spouseinfo.export_xml()) 
+                
+      return """<People RelationStatus="Single">%s</People>""" % (self._clientinfo.export_xml())
+        
 
 class PersonBasicInfo(QWidget):
   def __init__(self, person_type:str, parent):
@@ -38,24 +53,15 @@ class PersonBasicInfo(QWidget):
       self._name.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}")
       formlayout.addRow(QLabel("%s Name:" % _person_type), self._name)
       
-      #self._age=QLineEdit()
       self._age=AgeEntry()
-      #self._age.setMaxLength(2)
-      #self._age.setValidator(QIntValidator())
       self._age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}")
       formlayout.addRow(QLabel("%s Age:" % _person_type), self._age)
       
       self._retirement_age=AgeEntry()
-      #self._retirement_age=QLineEdit()
-      #self._retirement_age.setMaxLength(2)
-      #self._retirement_age.setValidator(QIntValidator())
       self._retirement_age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}")
       formlayout.addRow(QLabel("%s Retirement Age:" % _person_type), self._retirement_age)
       
       self._lifespan_age=AgeEntry()
-      #self._lifespan_age=QLineEdit()
-      #self._lifespan_age.setMaxLength(2)
-      #self._lifespan_age.setValidator(QIntValidator())
       self._lifespan_age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}")
       formlayout.addRow(QLabel("%s Lifespan Age:" % _person_type), self._lifespan_age)
            
@@ -79,3 +85,18 @@ class PersonBasicInfo(QWidget):
   def selectionchange(self, i):
       self.parent._spouseinfo.setEnabled(self._status.currentText() == "Married")
       
+  def is_valid(self) -> bool:
+      if self._name.text().strip() == "":
+         return False
+      
+      return self._age.is_valid() and self._life_span.is_valid() and self._retirement_age.is_valid()
+      
+  def export_xml(self):
+      _current_year=datetime.now().year
+      _birth_year=_current_year - self._age.get_int()
+      _birthdate="01/01/%s" % _birth_year
+      _lifespan="01/01/%s" % (_birth_year + self._life_span_age.get_int())
+      _retirement = "01/01/%s" % (_birth_year + self._retirement_age.get_int())
+      return  """<Person Num="1" Name="%s" BirthDate="%s" Relationship="Spouse"
+                 LifeExpectancy="%s" RetirementDate="%s" />
+              """ % (self._name.text(), _birthdate, _lifespan, _retirement)
