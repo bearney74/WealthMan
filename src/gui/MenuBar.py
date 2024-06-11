@@ -1,7 +1,6 @@
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox
 
-
 class MenuBar:
   def __init__(self, parent):
 
@@ -62,7 +61,8 @@ class MenuBar:
       """brings up a dialog window displaying information about this app"""
       d=QDialog()
       d.setWindowTitle("About WealthMan")
-      _info=QLabel("This is the info about WealthMan...")
+      _info=QLabel("WealthMan is an open source financial planning tool that one day hopes to rival standard tools used by Certified Financial Planners (CFP), and other individuals in the Financial field.")
+      _info.setWordWrap(True)
       
       _layout=QVBoxLayout()
       _layout.addWidget(_info)
