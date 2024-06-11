@@ -1,6 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, \
                             QFormLayout, QLineEdit, QComboBox
-from PyQt6.QtGui import QIntValidator
 
 import sys
 sys.path.append("guihelpers")
@@ -50,14 +49,14 @@ class PersonBasicInfo(QWidget):
       #self._retirement_age=QLineEdit()
       #self._retirement_age.setMaxLength(2)
       #self._retirement_age.setValidator(QIntValidator())
-      self._retirement_age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}");
+      self._retirement_age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}")
       formlayout.addRow(QLabel("%s Retirement Age:" % _person_type), self._retirement_age)
       
       self._lifespan_age=AgeEntry()
       #self._lifespan_age=QLineEdit()
       #self._lifespan_age.setMaxLength(2)
       #self._lifespan_age.setValidator(QIntValidator())
-      self._lifespan_age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}");
+      self._lifespan_age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}")
       formlayout.addRow(QLabel("%s Lifespan Age:" % _person_type), self._lifespan_age)
            
       if _person_type == "Client":
