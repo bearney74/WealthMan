@@ -1,27 +1,16 @@
-#import tkinter as tk
-#from tkinter import Tk, StringVar, IntVar, Button
-#from tkinter import ttk
-
 from PyQt6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, \
                             QFormLayout, QLineEdit, QComboBox
 from PyQt6.QtGui import QIntValidator
 
 import sys
 sys.path.append("guihelpers")
-from IntegerEntry import IntegerEntry
+from Entry import AgeEntry
 
 
 class BasicInfoTab(QWidget):
   def __init__(self, parent=None):
       super(BasicInfoTab, self).__init__(parent)
-      #tk.Frame.__init__(self, parent)
-
-      #self.tk_name=tk.StringVar()
-      #self.tk_age=tk.IntVar()
-      #self.tk_retirement_age=tk.IntVar()
-      #self.tk_lifespan=tk.IntVar()
-      #self.tk_lifespan.set(90)  #set default lifespan to 90
-
+      
       hlayout=QHBoxLayout()
       
       self._clientinfo=PersonBasicInfo("Client", self)
@@ -50,21 +39,24 @@ class PersonBasicInfo(QWidget):
       self._name.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}")
       formlayout.addRow(QLabel("%s Name:" % _person_type), self._name)
       
-      self._age=QLineEdit()
-      self._age.setMaxLength(2)
-      self._age.setValidator(QIntValidator())
+      #self._age=QLineEdit()
+      self._age=AgeEntry()
+      #self._age.setMaxLength(2)
+      #self._age.setValidator(QIntValidator())
       self._age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}")
       formlayout.addRow(QLabel("%s Age:" % _person_type), self._age)
       
-      self._retirement_age=QLineEdit()
-      self._retirement_age.setMaxLength(2)
-      self._retirement_age.setValidator(QIntValidator())
+      self._retirement_age=AgeEntry()
+      #self._retirement_age=QLineEdit()
+      #self._retirement_age.setMaxLength(2)
+      #self._retirement_age.setValidator(QIntValidator())
       self._retirement_age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}");
       formlayout.addRow(QLabel("%s Retirement Age:" % _person_type), self._retirement_age)
       
-      self._lifespan_age=QLineEdit()
-      self._lifespan_age.setMaxLength(2)
-      self._lifespan_age.setValidator(QIntValidator())
+      self._lifespan_age=AgeEntry()
+      #self._lifespan_age=QLineEdit()
+      #self._lifespan_age.setMaxLength(2)
+      #self._lifespan_age.setValidator(QIntValidator())
       self._lifespan_age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}");
       formlayout.addRow(QLabel("%s Lifespan Age:" % _person_type), self._lifespan_age)
            

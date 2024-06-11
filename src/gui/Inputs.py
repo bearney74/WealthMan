@@ -1,8 +1,10 @@
 from PyQt6.QtWidgets import QWidget, QTabWidget, QVBoxLayout
 
 from BasicInfo import BasicInfoTab
+from GlobalVariables import GlobalVariablesTab
 #from IncomeInfo import IncomeInfoFrame
 #from AssetInfo import AssetInfoFrame
+
 
 class Inputs(QWidget):
   def __init__(self, parent=None):
@@ -21,7 +23,7 @@ class Inputs(QWidget):
       self.tabs.addTab(QWidget(), "Income")
       self.tabs.addTab(QWidget(), "Expenses")
       self.tabs.addTab(QWidget(), "Assets")
-      self.tabs.addTab(QWidget(), "Global Variables")
+      self.tabs.addTab(GlobalVariablesTab(), "Global Variables")
       
       mainLayout = QVBoxLayout()
       mainLayout.addWidget(self.tabs)
