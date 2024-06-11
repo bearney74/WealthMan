@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QTabWidget, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QMainWindow, QTabWidget
 from PyQt6.QtWidgets import QToolBar, QStatusBar
 
 from MenuBar import MenuBar
