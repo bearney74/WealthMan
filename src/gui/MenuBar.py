@@ -1,5 +1,9 @@
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QFileDialog
+
+import sys
+sys.path.append("../xml/Import")
+from Import import Import
 
 class MenuBar:
   def __init__(self, parent):
@@ -20,7 +24,7 @@ class MenuBar:
   def file_open_action(self):
       _action=QAction("&Open", self.parent)
       _action.setStatusTip("Open a file")
-      _action.triggered.connect(self.file_open)
+      _action.triggered.connect(lambda: self.file_open())
       return _action
          
   def file_save_action(self):
@@ -37,6 +41,17 @@ class MenuBar:
     
   def file_open(self):
       print("open file")
+      _fname, _type = QFileDialog.getOpenFileName(
+            self.parent,
+            "Open File",
+            "${HOME}",
+            "xml Files (*.xml)",)
+      print(_fname)
+      with open(_fname) as _fp:
+          _xml=_fp.read()
+
+      _import=Import(_xml)
+      _import.get_gui_data(self.parent)
                   
   def file_new(self):
       pass

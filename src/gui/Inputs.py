@@ -17,13 +17,14 @@ class Inputs(QWidget):
       #self.Income_tab = IncomeInfoFrame(tabControl)
       #Expense_tab = ttk.Frame(tabControl)
       ##self.Asset_tab = AssetInfoFrame(tabControl, self.Basic_tab)
-      self.GlobalVars_tab = GlobalVariablesTab()
+      self.BasicInfoTab=BasicInfoTab()
+      self.GlobalVariablesTab = GlobalVariablesTab()
 
-      self.tabs.addTab(BasicInfoTab(), "Basic Info")
+      self.tabs.addTab(self.BasicInfoTab, "Basic Info")
       self.tabs.addTab(QWidget(), "Income")
       self.tabs.addTab(QWidget(), "Expenses")
       self.tabs.addTab(QWidget(), "Assets")
-      self.tabs.addTab(self.GlobalVars_tab, "Global Variables")
+      self.tabs.addTab(self.GlobalVariablesTab, "Global Variables")
       
       mainLayout = QVBoxLayout()
       mainLayout.addWidget(self.tabs)

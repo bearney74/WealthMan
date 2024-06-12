@@ -6,6 +6,9 @@ from Inputs import Inputs
 from Logs import Logs
 from Analysis import AnalysisTab
 
+import sys
+sys.path.append("../")
+
 class Main(QMainWindow):
   def __init__(self, parent=None):
       super(Main, self).__init__(parent)

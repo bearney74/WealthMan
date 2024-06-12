@@ -6,6 +6,7 @@ from ImportHelper import ImportHelper
 import sys
 sys.path.append("../..")
 
+print(sys.path)
 from GlobalVars import GlobalVars
 from Account import Account, AllocationPeriod, AssetClass, AssetClassPeriod
 from Person import Person
@@ -32,6 +33,14 @@ class Import0x1(ImportHelper):
               'Expenses': self._get_expense_data(),
               'Assets': self._get_assets_data()
       }
+  
+  def get_gui_data(self, gui):
+      gv=self._get_globalvars_data()
+      gv.gui_import_data(gui.Inputs.GlobalVariablesTab)
+      
+      b=self._get_people_data()
+      for _num, _person in b.items():
+          _person.gui_import_data(gui.Inputs.BasicInfoTab, _num)
   
   def _get_tag_text(self, xml, tag):
       _tag=xml.findall(tag)
@@ -97,7 +106,9 @@ class Import0x1(ImportHelper):
               else:
                  _person_dict[_dict["Num"]] = Person(Name=_dict["Name"], BirthDate=self.str2date(_dict["BirthDate"]),
                                                      RetirementDate=self.str2date(_dict["RetirementDate"]),
-                                                     LifeExpectancy=self.str2date(_dict["LifeExpectancy"]), Relationship=_dict["Relationship"])
+                                                     LifeExpectancy=self.str2date(_dict["LifeExpectancy"]),
+                                                     Relationship=_relationstatus)
+                                                     #Relationship=_dict["Relationship"])
                  
                   
       if _error_flag:

@@ -35,37 +35,45 @@ class BasicInfoTab(QWidget):
                 
       return """<People RelationStatus="Single">%s</People>""" % (self._clientinfo.export_xml())
         
+  def import_data(self, num, Name, Age, Retirement_Age, Lifespan_Age, Relationship):
+      if num == "1":
+         self._clientinfo.import_data(Name, Age, Retirement_Age, Lifespan_Age,
+                                      Relationship)
+      if num == "2":
+         self._spouseinfo.import_data(Name, Age, Retirement_Age, Lifespan_Age,
+                                      Relationship)
+          
 
 class PersonBasicInfo(QWidget):
   def __init__(self, person_type:str, parent):
       super(PersonBasicInfo, self).__init__(parent)
       self.parent=parent
-      _person_type=person_type
-      assert _person_type in ("Client", "Spouse")
+      self._person_type=person_type
+      assert self._person_type in ("Client", "Spouse")
       
       vlayout=QVBoxLayout()
-      vlayout.addWidget(QLabel("<b>%s Information</b>" % _person_type))
+      vlayout.addWidget(QLabel("<b>%s Information</b>" % self._person_type))
       
       formlayout=QFormLayout()
       vlayout.addLayout(formlayout)
       
       self._name=QLineEdit()
       self._name.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}")
-      formlayout.addRow(QLabel("%s Name:" % _person_type), self._name)
+      formlayout.addRow(QLabel("%s Name:" % self._person_type), self._name)
       
       self._age=AgeEntry()
       self._age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}")
-      formlayout.addRow(QLabel("%s Age:" % _person_type), self._age)
+      formlayout.addRow(QLabel("%s Age:" % self._person_type), self._age)
       
       self._retirement_age=AgeEntry()
       self._retirement_age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}")
-      formlayout.addRow(QLabel("%s Retirement Age:" % _person_type), self._retirement_age)
+      formlayout.addRow(QLabel("%s Retirement Age:" % self._person_type), self._retirement_age)
       
       self._lifespan_age=AgeEntry()
       self._lifespan_age.setStyleSheet("QLineEdit[readOnly=\"true\"] {color: #808080; background-color: #F0F0F0;}")
-      formlayout.addRow(QLabel("%s Lifespan Age:" % _person_type), self._lifespan_age)
+      formlayout.addRow(QLabel("%s Lifespan Age:" % self._person_type), self._lifespan_age)
            
-      if _person_type == "Client":
+      if self._person_type == "Client":
          self._status=QComboBox()
          self._status.addItems(["Single", "Married"])
          self._status.currentIndexChanged.connect(self.selectionchange)
@@ -100,3 +108,13 @@ class PersonBasicInfo(QWidget):
       return  """<Person Num="1" Name="%s" BirthDate="%s" Relationship="Spouse"
                  LifeExpectancy="%s" RetirementDate="%s" />
               """ % (self._name.text(), _birthdate, _lifespan, _retirement)
+    
+  def import_data(self, Name, Age, RetirementAge, LifespanAge, Relationship):
+      self._name.setText(Name)
+      self._age.setText(Age)
+      self._retirement_age.setText(RetirementAge)
+      self._lifespan_age.setText(LifespanAge)
+      
+      if self._person_type == "Client":
+          print(Relationship)
+          self._status.setCurrentText(Relationship)

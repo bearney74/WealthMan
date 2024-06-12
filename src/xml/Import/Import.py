@@ -24,6 +24,9 @@ class Import:
         
       return self._parser.get_data()
     
+  def get_gui_data(self, gui):
+      self._parser.get_gui_data(gui)
+    
 if __name__ == '__main__':
     _i=Import("../../../TestCases/JohnJaneDoe.xml")
     print(_i.get_data())
