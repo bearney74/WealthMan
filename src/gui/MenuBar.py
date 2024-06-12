@@ -1,4 +1,4 @@
-from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QFileDialog
 
 import sys
@@ -24,29 +24,29 @@ class MenuBar:
   def file_open_action(self):
       _action=QAction("&Open", self.parent)
       _action.setStatusTip("Open a file")
-      _action.triggered.connect(lambda: self.file_open())
+      _action.triggered.connect(lambda x: self.file_open())
       return _action
          
   def file_save_action(self):
       _action=QAction("&Save", self.parent)
       _action.setStatusTip("Save a file")
-      _action.triggered.connect(lambda: self.file_save())
+      _action.triggered.connect(lambda x: self.file_save())
       return _action
     
   def file_exit_action(self):
       _action=QAction("Exit", self.parent)
       _action.setStatusTip("Exit WealthMan")
-      _action.triggered.connect(lambda: self.file_exit())
+      _action.triggered.connect(lambda x: self.file_exit())
       return _action
     
   def file_open(self):
-      print("open file")
+      #print("open file")
       _fname, _type = QFileDialog.getOpenFileName(
             self.parent,
             "Open File",
             "${HOME}",
             "xml Files (*.xml)",)
-      print(_fname)
+      #print(_fname)
       with open(_fname) as _fp:
           _xml=_fp.read()
 
@@ -68,7 +68,7 @@ class MenuBar:
   def help_about_action(self):
       _action=QAction("About", self.parent)
       _action.setStatusTip("About WealthMan")
-      _action.triggered.connect(lambda: self.help_about())
+      _action.triggered.connect(lambda x: self.help_about())
 
       return _action
 
@@ -85,7 +85,7 @@ class MenuBar:
       #b1.move(50,50)
       _buttonbox=QDialogButtonBox(d)
       _buttonbox.setStandardButtons(QDialogButtonBox.StandardButton.Ok)
-      _buttonbox.accepted.connect(lambda: d.close())
+      _buttonbox.accepted.connect(d.close)
       _layout.addWidget(_buttonbox)
       d.setLayout(_layout)
       d.setModal(True)

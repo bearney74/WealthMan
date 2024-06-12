@@ -39,7 +39,6 @@ class Main(QMainWindow):
       
 if __name__ == '__main__':
    from PyQt6.QtWidgets import QApplication
-   import sys
    
    _app = QApplication(sys.argv)
    _main = Main()
