@@ -2,8 +2,8 @@ import unittest
 
 import sys
 sys.path.append("../src")
-from FederalTax import FederalTax
-from EnumTypes import FederalTaxStatusType
+from libs.FederalTax import FederalTax
+from libs.EnumTypes import FederalTaxStatusType
 
 Year=2024
 class FederalTaxTest(unittest.TestCase):

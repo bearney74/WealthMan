@@ -2,8 +2,8 @@ import unittest
 from datetime import date
 
 import sys
-sys.path.append("../src/xml/Import")
-from ImportHelper import ImportHelper
+sys.path.append("../src")
+from imports.ImportHelper import ImportHelper
 
 
 class ImportHelperTest(unittest.TestCase):

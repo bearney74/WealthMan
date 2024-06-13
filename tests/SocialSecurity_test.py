@@ -3,8 +3,9 @@ from datetime import date
 
 import sys
 sys.path.append("../src")
-from Person import Person
-from SocialSecurity import SocialSecurity
+
+from libs.Person import Person
+from libs.SocialSecurity import SocialSecurity
 
 #FRA means Full Retirement Age
 

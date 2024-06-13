@@ -3,8 +3,8 @@ from datetime import date
 
 import sys
 sys.path.append("../src")
-from Person import Person
-from RequiredMinimalDistributions import RMD
+from libs.Person import Person
+from libs.RequiredMinimalDistributions import RMD
 
 #FRA means Full Retirement Age
 
