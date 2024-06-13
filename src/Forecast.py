@@ -1,16 +1,16 @@
-# look at persons and see
 from datetime import date
-from tksheet import Sheet  #, num2alpha
-import tkinter as tk
 
-from DataTable import DataElement, DataTable
-from RequiredMinimalDistributions import RMD
-from EnumTypes import AccountType
-from FederalTax import FederalTax
+from PyQt6.QtWidgets import QWidget, QMainWindow, QTableWidget, \
+                            QTableWidgetItem, QVBoxLayout, QHeaderView
 
-import sys
-sys.path.append("xml/Import")
-from Import import Import
+#from PyQt6.QtGui import QStandardItemModel
+
+from libs.DataTable import DataElement, DataTable
+from libs.RequiredMinimalDistributions import RMD
+from libs.EnumTypes import AccountType
+from libs.FederalTax import FederalTax
+
+from imports.Import import Import
 
 class Forecast:
   def __init__(self, xml_file, begin_year: int = 2024):
@@ -89,47 +89,60 @@ class Forecast:
           
       _dt=DataTable(BeginYear=self._begin_year, EndYear=self._end_year, Data=_data) 
       return _dt
-    
-class demo(tk.Tk):
-    def __init__(self, datatable):
-        tk.Tk.__init__(self)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-        self.frame = tk.Frame(self)
-        self.frame.grid_columnconfigure(0, weight=1)
-        self.frame.grid_rowconfigure(0, weight=1)
+ 
 
-        _header, _data=datatable.get_data_sheet()
+class App(QMainWindow): 
+    def __init__(self, datatable): 
+        super().__init__() 
+        self.title = 'PyQt5 - QTableWidget'
+        self.left = 100
+        self.top = 100
+        self.width = 800
+        self.height = 600
+   
+        self.setWindowTitle(self.title) 
+        self.setGeometry(self.left, self.top, self.width, self.height) 
+   
+        self.table=QTableWidget()
+        self.createTable(datatable) 
+   
+        layout = QVBoxLayout() 
+        layout.addWidget(self.table)
         
-        # create an instance of Sheet()
-        self.sheet = Sheet(
-            # set the Sheets parent widget
-            self.frame,
-            # optional: set the Sheets data at initialization
-            #data=[[f"Row {r}, Column {c}\nnewline1\nnewline2" for c in range(20)] for r in range(100)],
-            theme="light blue",
-            height=520,
-            width=1000,
-            show_header=True,
-            show_row_index=False,
-            headers=_header,
-            align="e",
-            header_font=("Arial", 11, "bold")
-        )
+        w = QWidget()
+        w.setLayout(layout)
+        self.setCentralWidget(w)
         
-        # add some new commands to the in-built right click menu
-        # setting data
+    #Create table 
+    def createTable(self, datatable): 
+        _header, _data = datatable.get_data_sheet()
+        
+        self.table.setRowCount(len(_data))
+        self.table.setColumnCount(len(_data[0]))
+        
+        _i=0
+        for _row in _data:
+            _j=0
+            for _col in _row:
+                #print(_i, _j, _col)
+                self.table.setItem(_i, _j, QTableWidgetItem(_col))
+                _j+=1
+            _i+=1
 
-        self.sheet.set_sheet_data(_data)
-
-        self.frame.grid(row=0, column=0, sticky="nswe")
-        self.sheet.grid(row=0, column=0, sticky="nswe")
-
-
-if __name__ == "__main__":
+        #have to put data in table before setting the header, (or header won't display)
+        self.table.setHorizontalHeaderLabels(_header)
+        #Table will fit the screen horizontally 
+        self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+      
+if __name__ == '__main__':
+   import sys
+   from PyQt6.QtWidgets import QApplication
    _f = Forecast("../tests/TestCases/JohnJaneDoe.xml")
    #_f = Forecast("../tests/TestCases/ChuckJaneSmith.xml")
    _dt=_f.execute()
-   
-   app=demo(_dt)
-   app.mainloop()
+
+   app = QApplication(sys.argv) 
+   w=App(_dt)
+   w.show()
+   sys.exit(app.exec()) 

@@ -109,6 +109,7 @@ class Import0x1(ImportHelper):
                  
                   
       if _error_flag:
+          import sys
           print("Import Errors found.  Terminating program")
           sys.exit()
           

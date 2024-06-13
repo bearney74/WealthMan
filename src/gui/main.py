@@ -1,13 +1,13 @@
 from PyQt6.QtWidgets import QMainWindow, QTabWidget
 from PyQt6.QtWidgets import QToolBar, QStatusBar
 
-from MenuBar import MenuBar
-from Inputs import Inputs
-from Logs import Logs
-from Analysis import AnalysisTab
-
 import sys
 sys.path.append("../")
+
+from gui.MenuBar import MenuBar
+from gui.Inputs import Inputs
+from gui.Logs import Logs
+from gui.Analysis import AnalysisTab
 
 class Main(QMainWindow):
   def __init__(self, parent=None):
@@ -39,7 +39,7 @@ class Main(QMainWindow):
       
 if __name__ == '__main__':
    from PyQt6.QtWidgets import QApplication
-   
+
    _app = QApplication(sys.argv)
    _main = Main()
    sys.exit(_app.exec())

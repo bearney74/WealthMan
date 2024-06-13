@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QTabWidget, QVBoxLayout
 
-from BasicInfo import BasicInfoTab
-from GlobalVariables import GlobalVariablesTab
+from gui.BasicInfo import BasicInfoTab
+from gui.GlobalVariables import GlobalVariablesTab
 #from IncomeInfo import IncomeInfoFrame
 #from AssetInfo import AssetInfoFrame
 

@@ -3,10 +3,7 @@ import datetime
 from PyQt6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, \
                             QFormLayout, QLineEdit, QComboBox
 
-import sys
-sys.path.append("guihelpers")
-from Entry import AgeEntry
-
+from gui.guihelpers.Entry import AgeEntry
 
 class BasicInfoTab(QWidget):
   def __init__(self, parent=None):
@@ -116,5 +113,5 @@ class PersonBasicInfo(QWidget):
       self._lifespan_age.setText(LifespanAge)
       
       if self._person_type == "Client":
-          print(Relationship)
+          #print(Relationship)
           self._status.setCurrentText(Relationship)

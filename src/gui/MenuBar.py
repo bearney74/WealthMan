@@ -1,9 +1,7 @@
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QFileDialog
 
-import sys
-sys.path.append("../xml/Import")
-from Import import Import
+from imports.Import import Import
 
 class MenuBar:
   def __init__(self, parent):
@@ -81,14 +79,12 @@ class MenuBar:
       
       _layout=QVBoxLayout()
       _layout.addWidget(_info)
-     # b1=QDialogButtonBox(QDialogButtonBox.Ok)
-      #b1.move(50,50)
+     
       _buttonbox=QDialogButtonBox(d)
       _buttonbox.setStandardButtons(QDialogButtonBox.StandardButton.Ok)
       _buttonbox.accepted.connect(d.close)
       _layout.addWidget(_buttonbox)
+      
       d.setLayout(_layout)
       d.setModal(True)
-      #d.setWindowModality(Qt.ApplicationModal)
       d.exec()
-      

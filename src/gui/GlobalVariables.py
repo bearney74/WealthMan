@@ -1,8 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QComboBox
 
-import sys
-sys.path.append("guihelpers")
-from Entry import AgeEntry, FloatEntry
+from gui.guihelpers.Entry import AgeEntry, FloatEntry 
 
 class GlobalVariablesTab(QWidget):
   def __init__(self, parent=None):
