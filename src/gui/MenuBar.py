@@ -1,11 +1,16 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QFileDialog
+
+import sys
+sys.path.append("..")
 
 from imports.Import import Import
 
 class MenuBar:
   def __init__(self, parent):
-
       self.parent=parent
       self.menuBar=self.parent.menuBar()
       filemenu=self.menuBar.addMenu("&File")
@@ -38,13 +43,13 @@ class MenuBar:
       return _action
     
   def file_open(self):
-      #print("open file")
+      logger.debug("open file")
       _fname, _type = QFileDialog.getOpenFileName(
             self.parent,
             "Open File",
-            "${HOME}",
+            "",
             "xml Files (*.xml)",)
-      #print(_fname)
+      logger.debug(_fname)
       with open(_fname) as _fp:
           _xml=_fp.read()
 

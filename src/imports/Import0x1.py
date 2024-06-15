@@ -10,7 +10,7 @@ from libs.Person import Person
 from libs.IncomeSources import IncomeSource, SocialSecurity
 from libs.Expense import Expense
 from libs.EnumTypes import IncomeType, AmountPeriodType, AccountType, FederalTaxStatusType
-
+from PyQt6.QtWidgets import QMainWindow
 
 class Import0x1(ImportHelper):
   def __init__(self, xml):
@@ -31,13 +31,14 @@ class Import0x1(ImportHelper):
               'Assets': self._get_assets_data()
       }
   
-  def get_gui_data(self, gui):
+  def get_gui_data(self, mainWindow:QMainWindow):
+      isinstance(mainWindow, QMainWindow)
       gv=self._get_globalvars_data()
-      gv.gui_import_data(gui.Inputs.GlobalVariablesTab)
+      gv.gui_import_data(mainWindow.InputsTab.GlobalVariablesTab)
       
       b=self._get_people_data()
       for _num, _person in b.items():
-          _person.gui_import_data(gui.Inputs.BasicInfoTab, _num)
+          _person.gui_import_data(mainWindow.InputsTab.BasicInfoTab, _num)
   
   def _get_tag_text(self, xml, tag):
       _tag=xml.findall(tag)

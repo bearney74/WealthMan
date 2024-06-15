@@ -1,14 +1,13 @@
 from PyQt6.QtWidgets import QWidget, QTabWidget, QVBoxLayout
 
-from gui.BasicInfo import BasicInfoTab
-from gui.GlobalVariables import GlobalVariablesTab
-#from IncomeInfo import IncomeInfoFrame
+from .BasicInfo import BasicInfoTab
+from .GlobalVariables import GlobalVariablesTab
+from .IncomeInfo import IncomeSourceTab
 #from AssetInfo import AssetInfoFrame
 
-
-class Inputs(QWidget):
+class InputsTab(QWidget):
   def __init__(self, parent=None):
-      super(Inputs, self).__init__(parent)
+      super(InputsTab, self).__init__(parent)
       
       self.tabs = QTabWidget()
       self.tabs.setTabPosition(QTabWidget.TabPosition.South)
@@ -18,10 +17,11 @@ class Inputs(QWidget):
       #Expense_tab = ttk.Frame(tabControl)
       ##self.Asset_tab = AssetInfoFrame(tabControl, self.Basic_tab)
       self.BasicInfoTab=BasicInfoTab()
+      self.IncomeSourceTab=IncomeSourceTab(parent=parent)
       self.GlobalVariablesTab = GlobalVariablesTab()
 
       self.tabs.addTab(self.BasicInfoTab, "Basic Info")
-      self.tabs.addTab(QWidget(), "Income")
+      self.tabs.addTab(self.IncomeSourceTab, "Income")
       self.tabs.addTab(QWidget(), "Expenses")
       self.tabs.addTab(QWidget(), "Assets")
       self.tabs.addTab(self.GlobalVariablesTab, "Global Variables")

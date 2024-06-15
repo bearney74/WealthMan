@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from PyQt6.QtWidgets import QMainWindow
 
 class Import:
   def __init__(self, xml):
@@ -18,8 +19,9 @@ class Import:
         
       return self._parser.get_data()
     
-  def get_gui_data(self, gui):
-      self._parser.get_gui_data(gui)
+  def get_gui_data(self, mainWindow:QMainWindow):
+      isinstance(mainWindow, QMainWindow)
+      self._parser.get_gui_data(mainWindow)
     
 if __name__ == '__main__':
     _i=Import("../../../TestCases/JohnJaneDoe.xml")

@@ -36,8 +36,5 @@ class RMDTest(unittest.TestCase):
       #125
       self.assertEqual(_rmd.calc(date(2085,1,1)), 100.0/2.0)
       
-      
-
-
 if __name__ == '__main__':
     unittest.main()

@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from gui.BasicInfo import BasicInfoTab
+from gui.Inputs.BasicInfo import BasicInfoTab
 
 class Person:
   def __init__(self, Name, BirthDate, RetirementDate=None, LifeExpectancy=None,
@@ -41,10 +41,10 @@ class Person:
   def gui_import_data(self, b:BasicInfoTab, num):
       # num == "1" Client
       # num == "2" Spouse
-      assert isinstance(b, BasicInfoTab)
-      _year=datetime.now().year      
+      #assert isinstance(b, BasicInfoTab)
+      _now=datetime.now()      
       b.import_data(num, self.Name,
-                    str(abs(_year - self.BirthDate.year)),
-                    str(self.RetirementDate.year - self.BirthDate.year),
-                    str(self.LifeExpectancy.year - self.BirthDate.year),
+                    str(self.calc_age_by_date(date(_now.year, _now.month, _now.day))), #str(abs(_year - self.BirthDate.year)),
+                    str(self.calc_age_by_date(self.RetirementDate)), #str(self.RetirementDate.year - self.BirthDate.year),
+                    str(self.calc_age_by_date(self.LifeExpectancy)), #str(self.LifeExpectancy.year - self.BirthDate.year),
                     self.Relationship)
