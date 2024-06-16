@@ -1,5 +1,6 @@
 import logging
 logger = logging.getLogger(__name__)
+
 from PyQt6.QtWidgets import QMainWindow, QTabWidget
 from PyQt6.QtWidgets import QToolBar, QStatusBar
 
@@ -26,9 +27,6 @@ class Main(QMainWindow):
       
       self.setWindowTitle("Wealth Manager v0.1 alpha")
       self.resize(800, 600)
-      
-      #_toolbar=QToolBar("My main toolbar")
-      #self.addToolBar(_toolbar)
       
       _statusbar=QStatusBar(self)
       self.setStatusBar(_statusbar)

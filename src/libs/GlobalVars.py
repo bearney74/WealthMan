@@ -14,7 +14,7 @@ class GlobalVars:
       self.FederalTaxStatus=FederalTaxStatus  #does this need to be here??
     
   def gui_import_data(self, gvt:GlobalVariables.GlobalVariablesTab):
-      print(gvt)
+      #print(gvt)
       #assert isinstance(gvt, GlobalVariables.GlobalVariablesTab)
       gvt.import_data(str(self.InflationRate), str(self.SocialSecurityCOLA),
                       str(self.AssetWithdrawOrderByType),

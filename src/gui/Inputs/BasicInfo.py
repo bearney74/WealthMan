@@ -25,7 +25,12 @@ class BasicInfoTab(QWidget):
           return self._clientinfo.is_valid()
         
       return self._clientinfo.is_valid() and self._spouse_info.is_valid()
-      
+  
+  def clear_form(self):
+      self._clientinfo.clear_form()
+      if self._spouseinfo is not None:
+          self._spouseinfo.clear_form()
+  
   def export_xml(self):
       if self._clientinfo._status.currentText() == "Married":
          return """<People RelationStatus="Married">%s %s</People>""" % (self._clientinfo.export_xml(), self._spouseinfo.export_xml()) 
@@ -95,6 +100,15 @@ class PersonBasicInfo(QWidget):
          return False
       
       return self._age.is_valid() and self._life_span.is_valid() and self._retirement_age.is_valid()
+      
+  def clear_form(self):
+      self._name.setText("")
+      self._age.setText("")
+      self._retirement_age.setText("")
+      self._lifespan_age.setText("")
+      
+      if self._person_type == "Client":
+         self._status.setCurrentText("Single")
       
   def export_xml(self):
       _current_year=datetime.now().year

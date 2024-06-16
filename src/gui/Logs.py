@@ -1,4 +1,10 @@
-import sys, datetime, platform, logging
+import sys, platform, datetime
+
+import logging
+logger = logging.getLogger(__name__)
+
+from logging.handlers import RotatingFileHandler
+
 from PyQt6.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout, QComboBox, QHBoxLayout, QLabel, QPushButton
 from PyQt6.QtCore import QT_VERSION_STR, PYQT_VERSION_STR, Qt
 
@@ -17,8 +23,15 @@ class Logs(QWidget):
       super(Logs, self).__init__(parent)
       
       self.logger=QTextEditLogger(self)
-      self.logger.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+      self._formatter=logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s;%(module)s.%(funcName)s:%(lineno)s - %(message)s')
+      self.logger.setFormatter(self._formatter)
+      
       logging.getLogger().addHandler(self.logger)
+      
+      #also log to file just in case there is a segfault, etc..
+      _file=RotatingFileHandler("logs.log", maxBytes=1024*1024, backupCount=9)
+      _file.setFormatter(self._formatter)
+      logging.getLogger().addHandler(_file)
       
       # You can control the logging level
       logging.getLogger().setLevel(logging.ERROR)
@@ -57,5 +70,6 @@ class Logs(QWidget):
      
   def reset_log(self):
       self.logger.widget.clear()
-      self.logger.widget.appendPlainText("OS=%s\nPython Version=%s\nQt Version=%s\nPyQt Version=%s\n" % (platform.uname(), sys.version, QT_VERSION_STR, PYQT_VERSION_STR))
+      _system_info="OS=%s\nPython Version=%s\nQt Version=%s\nPyQt Version=%s\n" % (platform.uname(), sys.version, QT_VERSION_STR, PYQT_VERSION_STR)
+      logger.log(99, _system_info)
       
