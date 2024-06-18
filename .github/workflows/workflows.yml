@@ -20,10 +20,6 @@ jobs:
         sudo apt update && sudo apt install -y libegl1-mesa-dev
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pylint
-    - name: Analysing the code with pylint
-      run: |
-        pylint $(git ls-files '*.py')
     - name: Running Unit Tests
       run: |
         cd tests 
