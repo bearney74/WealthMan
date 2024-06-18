@@ -5,7 +5,7 @@ from PyQt6.QtCore import Qt
 
 #import sys
 #sys.path.append("guihelpers")
-from gui.guihelpers.Entry import IntegerEntry, FloatEntry, AgeEntry
+from gui.guihelpers.Entry import MoneyEntry, PercentEntry, AgeEntry
 
 class IncomeSourceTab(QWidget):
   def __init__(self, parent):
@@ -42,14 +42,15 @@ class IncomeSourceTab(QWidget):
          self.gridLayout.addWidget(QLabel("End Age"), 0, 4)
 
       _descr=QLineEdit()
+      _descr.setMaximumWidth(300)
       self._descrs.append(_descr)
       self.gridLayout.addWidget(_descr, len(self._descrs), 0)
       
-      _amount=IntegerEntry(self.parent, limit_size=False)
+      _amount=MoneyEntry(self.parent)
       self._amounts.append(_amount)
       self.gridLayout.addWidget(_amount, len(self._amounts), 1)
       
-      _percent=FloatEntry(self.parent, min=0.0, max=9.9, num_decimal_places=1)
+      _percent=PercentEntry(self.parent)
       self._percents.append(_percent)
       self.gridLayout.addWidget(_percent, len(self._percents), 2)
       

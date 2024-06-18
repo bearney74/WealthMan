@@ -8,6 +8,7 @@ class AnalysisTab(QWidget):
       
       self.tabs.setTabPosition(QTabWidget.TabPosition.South)
       
+      self.tabs.addTab(QWidget(), "Dashboard")
       self.tabs.addTab(QWidget(), "Details")
       self.tabs.addTab(QWidget(), "Charts")
       

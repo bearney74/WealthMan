@@ -1,69 +1,52 @@
-import tkinter as tk
-#from tkinter import Tk, StringVar, IntVar, Button
-from tkinter import ttk
+from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout
+from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout
 
-import sys
-sys.path.append("guihelpers")
-from IntegerEntry import IntegerEntry
+from gui.guihelpers.Entry import MoneyEntry
 
-
-class AssetInfoFrame(tk.Frame):
-  def __init__(self, parent, BasicInfo):
-      tk.Frame.__init__(self, parent)
+class AssetInfoTab(QWidget):
+  def __init__(self, BasicInfo, parent=None):
+      super(AssetInfoTab, self).__init__(parent)
       
       self.BasicInfo=BasicInfo
 
-      self.tk_ira=tk.IntVar()
-      self.tk_roth=tk.IntVar()
-      self.tk_taxable=tk.IntVar()
+      _layout=QHBoxLayout()
+
+      self._clientinfo=AssetInfoForm(parent, "Client")
+      self._spouseinfo=AssetInfoForm(parent, "Spouse")
+      self._spouseinfo.setEnable(self.BasicInfo._clientinfo._status.currentText() == "Married")
+
+      _layout.addWidget(self._clientinfo)
+      _layout.addWidget(self._spouseinfo)
       
-      _row=0
-      tk.Label(self, text="Client Information").grid(row=_row, column=0, columnspan=2, sticky='w')
+      self.setLayout(_layout)
+
+class AssetInfoForm(QWidget):
+  def __init__(self, parent, person_type):
+      super(AssetInfoForm, self).__init__(parent)
       
-      _row+=1
-      tk.Label(self, text="IRA:").grid(row=_row, column=0, sticky='w')
-      IntegerEntry(self, length=7, textvariable=self.tk_ira, width=7).grid(row=_row, column=1, sticky='w')
-
-      _row+=1
-      tk.Label(self, text="Roth IRA:").grid(row=_row, column=0, sticky='w')
-      IntegerEntry(self, length=7, textvariable=self.tk_roth, width=7).grid(row=_row, column=1, sticky='w')
-
-      _row+=1
-      tk.Label(self, text="Taxable (Regular):").grid(row=_row, column=0, sticky='w')
-      IntegerEntry(self, length=7, textvariable=self.tk_taxable, width=7).grid(row=_row, column=1, sticky='w')
-
-      _row+=1
-      ttk.Separator(self, orient=tk.HORIZONTAL).grid(row=_row, column=0, columnspan=2, sticky="ew")
+      self._person_type=person_type
+      #tk.Label(self, text="Client Information").grid(row=_row, column=0, columnspan=2, sticky='w')
       
-      _row+=1
-      self.spouse_frame_row=_row
-      self.spouse_frame=AssetInfoSpouseFrame(self)
-
-  def show_spouse_frame(self):
-      self.spouse_frame.grid(row=self.spouse_frame_row, column=0, columnspan=2)
+      _vlayout=QVBoxLayout()
+      _vlayout.addWidget(QLabel("<b>%s Asset Information</b>" % self._person_type))
       
-  def hide_spouse_frame(self):
-      self.spouse_frame.grid_forget()
-
-class AssetInfoSpouseFrame(tk.Frame):
-  def __init__(self, parent):
-      tk.Frame.__init__(self, parent)
-
-      self.tk_ira=tk.IntVar()
-      self.tk_roth=tk.IntVar()
-      self.tk_taxable=tk.IntVar()
+      _layout=QFormLayout()
+      self.IRA=MoneyEntry()
+      _layout.addRow(QLabel("IRA:"), self.IRA)
       
-      _row=0
-      tk.Label(self, text="Spouse Asset Information").grid(row=_row, column=0, columnspan=2, sticky='w')
+      self.RothIRA=MoneyEntry()
+      _layout.addRow(QLabel("Roth IRA:"), self.RothIRA)
       
-      _row+=1
-      tk.Label(self, text="IRA:").grid(row=_row, column=0, sticky='w')
-      IntegerEntry(self, length=7, textvariable=self.tk_ira, width=7).grid(row=_row, column=1, sticky='w')
-
-      _row+=1
-      tk.Label(self, text="Roth IRA:").grid(row=_row, column=0, sticky='w')
-      IntegerEntry(self, length=7, textvariable=self.tk_roth, width=7).grid(row=_row, column=1, sticky='w')
-
-      _row+=1
-      tk.Label(self, text="Taxable (Regular):").grid(row=_row, column=0, sticky='w')
-      IntegerEntry(self, length=7, textvariable=self.tk_taxable, width=7).grid(row=_row, column=1, sticky='w')
+      self.Regular=MoneyEntry()
+      _layout.addRow(QLabel("Taxable (Regular):"), self.Regular)
+      
+      _vlayout.addLayout(_layout)
+      _vlayout.addStretch()
+      
+      self.setLayout(_vlayout)
+      
+  def setEnable(self, value: bool):
+      assert isinstance(value, bool)
+      self.IRA.setReadOnly(value)
+      self.RothIRA.setReadOnly(value)
+      self.Regular.setReadOnly(value)
