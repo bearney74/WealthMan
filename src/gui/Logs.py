@@ -1,12 +1,12 @@
-import sys, platform, datetime
-
-import logging
-logger = logging.getLogger(__name__)
-
 from logging.handlers import RotatingFileHandler
+import platform
+import sys
 
 from PyQt6.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout, QComboBox, QHBoxLayout, QLabel, QPushButton
 from PyQt6.QtCore import QT_VERSION_STR, PYQT_VERSION_STR, Qt
+
+import logging
+logger = logging.getLogger(__name__)
 
 class QTextEditLogger(logging.Handler):
     def __init__(self, parent):

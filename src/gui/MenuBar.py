@@ -1,6 +1,3 @@
-import logging
-logger = logging.getLogger(__name__)
-
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QFileDialog
 
@@ -8,6 +5,9 @@ import sys
 sys.path.append("..")
 
 from imports.Import import Import
+
+import logging
+logger = logging.getLogger(__name__)
 
 class MenuBar:
   def __init__(self, parent):

@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout
-from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout
+from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
 
 from gui.guihelpers.Entry import MoneyEntry
 

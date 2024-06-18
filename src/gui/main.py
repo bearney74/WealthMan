@@ -1,13 +1,13 @@
-import logging
-logger = logging.getLogger(__name__)
-
 from PyQt6.QtWidgets import QMainWindow, QTabWidget
-from PyQt6.QtWidgets import QToolBar, QStatusBar
+from PyQt6.QtWidgets import QStatusBar
 
 from MenuBar import MenuBar
 from Inputs import InputsTab
 from Logs import Logs
 from Analysis import AnalysisTab
+
+import logging
+logger = logging.getLogger(__name__)
 
 class Main(QMainWindow):
   def __init__(self, parent=None):

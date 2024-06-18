@@ -1,6 +1,6 @@
-from PyQt6.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QToolBar
+from PyQt6.QtWidgets import QWidget, QTabWidget, QToolBar
 from PyQt6.QtWidgets import QMainWindow
-from PyQt6.QtGui import QIcon, QAction
+from PyQt6.QtGui import QAction
 
 from .BasicInfo import BasicInfoTab
 from .GlobalVariables import GlobalVariablesTab
