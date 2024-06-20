@@ -71,7 +71,7 @@ class FloatEntry(Entry):
             return False
 
     def get_float(self):
-        if is_valid():
+        if self.is_valid():
            return float(self.text())
         return None
 

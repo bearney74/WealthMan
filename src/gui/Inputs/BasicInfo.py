@@ -137,7 +137,7 @@ class PersonBasicInfo(QWidget):
             return True
         
         #if we got here we have a lifespan and age.. so lets compare
-        if _age >= _lifespan_age:
+        if _age >= _lage:
             return False
         
         _rage = self._retirement_age.get_int()
