@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QComboBox
 
-from gui.guihelpers.Entry import AgeEntry, FloatEntry
+from gui.guihelpers.Entry import AgeEntry, PercentEntry
 
 
 class GlobalVariablesTab(QWidget):
@@ -12,10 +12,10 @@ class GlobalVariablesTab(QWidget):
         self._forecast_years = AgeEntry()  # 2 digit integer
         formlayout.addRow(QLabel("Years to Forecast:"), self._forecast_years)
 
-        self._Inflation = FloatEntry(min=-10.0, max=10.0, num_decimal_places=1)
+        self._Inflation = PercentEntry(min=-10.0, max=10.0, num_decimal_places=1)
         formlayout.addRow(QLabel("Inflation:"), self._Inflation)
 
-        self._SS_Cola = FloatEntry(min=0, max=10.0, num_decimal_places=1)
+        self._SS_Cola = PercentEntry(min=0, max=10.0, num_decimal_places=1)
         formlayout.addRow(QLabel("Social Security Cola:"), self._SS_Cola)
 
         self._WithdrawOrder = QComboBox()

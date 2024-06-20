@@ -5,17 +5,18 @@ from gui.guihelpers.Entry import MoneyEntry
 
 
 class AssetInfoTab(QWidget):
-    def __init__(self, BasicInfo, parent=None):
+    def __init__(self, parent, BasicInfoTab):
         super(AssetInfoTab, self).__init__(parent)
 
-        self.BasicInfo = BasicInfo
+        self.BasicInfoTab = BasicInfoTab
 
         _layout = QHBoxLayout()
 
         self._clientinfo = AssetInfoForm(parent, "Client")
         self._spouseinfo = AssetInfoForm(parent, "Spouse")
-        self._spouseinfo.setEnable(
-            self.BasicInfo._clientinfo._status.currentText() == "Married"
+        self._spouseinfo.setEnabled(
+            self.BasicInfoTab.client_is_married()
+            #self.BasicInfoTab._clientinfo._status.currentText() == "Married"
         )
 
         _layout.addWidget(self._clientinfo)
@@ -49,8 +50,8 @@ class AssetInfoForm(QWidget):
 
         self.setLayout(_vlayout)
 
-    def setEnable(self, value: bool):
-        assert isinstance(value, bool)
-        self.IRA.setReadOnly(value)
-        self.RothIRA.setReadOnly(value)
-        self.Regular.setReadOnly(value)
+    #def setEnable(self, value: bool):
+    #    assert isinstance(value, bool)
+    #    self.IRA.setReadOnly(value)
+    #    self.RothIRA.setReadOnly(value)
+    #    self.Regular.setReadOnly(value)
