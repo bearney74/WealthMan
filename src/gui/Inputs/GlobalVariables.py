@@ -34,6 +34,7 @@ class GlobalVariablesTab(QWidget):
 
         self.setLayout(formlayout)
 
+
     def is_valid(self) -> bool:
         return (
             self._forecast_years.is_valid()
@@ -41,6 +42,12 @@ class GlobalVariablesTab(QWidget):
             and self._SS_Cola.is_valid()
         )
 
+    def clear_form(self):
+        self._WithdrawOrder.setCurrentIndex(0)
+        self._forecast_years.setText("")
+        self._Inflation.setText("")
+        self._SS_Cola.setText("")
+        
     def export_xml(self) -> str:
         return """<GlobalVars>
                  <InflationRate>%s</InflationRate>

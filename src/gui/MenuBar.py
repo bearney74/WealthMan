@@ -17,6 +17,7 @@ class MenuBar:
         self.parent = parent
         self.menuBar = self.parent.menuBar()
         filemenu = self.menuBar.addMenu("&File")
+        filemenu.addAction(self.file_new_action())
         filemenu.addAction(self.file_open_action())
         filemenu.addAction(self.file_save_action())
         filemenu.addAction(self.file_exit_action())
@@ -26,6 +27,12 @@ class MenuBar:
 
     def get_menubar(self):
         return self.menuBar
+
+    def file_new_action(self):
+        _action = QAction("&New", self.parent)
+        _action.setStatusTip("Create a new file")
+        _action.triggered.connect(lambda x: self.file_new())
+        return _action
 
     def file_open_action(self):
         _action = QAction("&Open", self.parent)
@@ -59,15 +66,18 @@ class MenuBar:
 
         _import = Import(_xml)
         _import.get_gui_data(self.parent)
+        self._filename=_fname
 
     def file_new(self):
-        pass
+        self._filename=None
+        self.parent.InputsTab.clear_forms()
 
     def file_save(self):
         """this will retrieve the xml from the widgets and will save in an xml file somewhere"""
 
         # for every tab in the inputs, we need to retrieve the xml and save them.
-        print(self.parent.Inputs.GlobalVars_tab.export_xml())
+        with open(self._filename, 'w') as _fp:
+            _fp.write(self.parent.InputsTab.GlobalVars_tab.export_xml())
 
     def file_exit(self):
         self.parent.close()

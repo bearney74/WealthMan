@@ -60,3 +60,7 @@ class InputsTab(QMainWindow):
 
     def clear_forms(self):
         self.BasicInfoTab.clear_form()
+        self.AssetTab.clear_form()
+        self.IncomeSourceTab.clear_form()
+        self.ExpenseTab.clear_form()
+        self.GlobalVariablesTab.clear_form()

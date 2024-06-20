@@ -44,7 +44,7 @@ class AgeEntry(IntegerEntry):
 class MoneyEntry(IntegerEntry):
     def __init__(self, parent=None):
         super(MoneyEntry, self).__init__(parent, limit_size=80)
-
+        self.setFixedWidth(80)
 
 class FloatEntry(Entry):
     def __init__(

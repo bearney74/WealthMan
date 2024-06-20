@@ -12,23 +12,24 @@ class IncomeSourceTab(QWidget):
 
         self.BasicInfoTab = BasicInfoTab
         self.parent = parent
-        self._records = []
+        #self._records = []
 
         _layout = QVBoxLayout()
         _layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self._add_income_button = QPushButton("Add Income", self)
-        self._add_income_button.setFixedSize(120, 60)
+        self._add_income_button.setFixedSize(90, 30)
         self._add_income_button.clicked.connect(self.add_row)
         _layout.addWidget(self._add_income_button)
 
         # Table will fit the screen horizontally
 
+        #self._num_rows=0
         self.gridLayout = QGridLayout()
         _layout.addLayout(self.gridLayout)
         self.setLayout(_layout)
 
     def add_row(self):
-        if self._records == []:
+        if self.gridLayout.count() == 0:
             self.gridLayout.addWidget(QLabel("Description"), 0, 0)
             self.gridLayout.addWidget(QLabel("Annual Amount"), 0, 1)
             _temp = QLabel("Annual\nPercent\nIncrease", wordWrap=True)
@@ -40,7 +41,7 @@ class IncomeSourceTab(QWidget):
             self.gridLayout.addWidget(QLabel("Begin Age"), 0, 4)
             self.gridLayout.addWidget(QLabel("End Age"), 0, 5)
 
-        _len = len(self._records) + 1
+        _len = self.gridLayout.count()
 
         _descr = QLineEdit()
         _descr.setMaximumWidth(300)
@@ -63,17 +64,13 @@ class IncomeSourceTab(QWidget):
         _end_age = AgeEntry(self.parent)
         self.gridLayout.addWidget(_end_age, _len, 5)
 
-        self._records.append(
-            IncomeRecord(
-                _descr.text(),
-                _amount.text(),
-                _percent.text(),
-                _person.currentText() if self.BasicInfoTab.client_is_married() else "Client",
-                _begin_age.text(),
-                _end_age.text(),
-            )
-        )
-
+    def clear_form(self):
+         
+        for _i in reversed(range(self.gridLayout.count())):
+            _item=self.gridLayout.itemAt(_i)
+            self.gridLayout.removeItem(_item)
+            _item.widget().setParent(None)
+            del _item
 
 class IncomeRecord:
     def __init__(self, descr, amount, percent, person, begin_age, end_age):
@@ -83,3 +80,38 @@ class IncomeRecord:
         self._person = person
         self._begin_age = begin_age
         self._end_age = end_age
+
+    def clear_form(self):
+        self._descr=""
+        self._amount.setText("")
+        self._percent.setText("")
+        self._person.setIndex(0)
+        self._begin_age.setIndex("")
+        self._end_age.setIndex("")
+        
+    def export_xml(self):
+        _owner="0"
+        if self._person == "Client":
+            _owner="1"
+        if self._person == "Spouse":
+            _owner="2"
+        _begin_dt=""
+        _end_dt=""
+        _str='<Income Name="%s" Amount="%s" AmountPeriod="Annual" ' % (self._descr, self._amount) 
+        _str+='       BeginDate="%s" EndDate="%s" COLA="%s" Taxable="Yes" Owner="%s"/>' % (_begin_dt, _end_dt, self._percent, _owner)
+                                                                                          
+        return _str
+    
+    def import_data(self, descr, amount, percent, person, begin_dt, end_dt):
+        self._descr.setText(descr)
+        self._amount.setText(amount)
+        self._percent.setText(percent)
+        
+        if person == "1":
+            self._person.setText("Client")
+        elif person == "2":
+            self._person.setText("Spouse")
+            
+        self._begin_age.setText("") #begin_dt
+        self._end_age.setText("")   #end_dt
+        pass

@@ -12,6 +12,9 @@ class RelationStatus(Enum):
     Single = 1
     Married = 2
 
+class PersonType(Enum):
+    Client=0
+    Spouse=1
 
 class Relationship(Enum):
     Spouse = 1
