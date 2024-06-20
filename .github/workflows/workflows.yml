@@ -1,6 +1,6 @@
-name: format, unittests, coverage
+name: workflow
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -18,13 +18,15 @@ jobs:
       run: |
         sudo apt update && sudo apt install -y libegl1-mesa-dev
         python -m pip install --upgrade pip
-        pip install ruff
         pip install -r requirements.txt
-    - name: Ruff
+    - name: Installing Ruff
+      run: |
+         pip install ruff
+    - name: Running Ruff
       uses: chartboost/ruff-action@v1
     - name: Running Unit Tests
       run: |
-        cd tests 
+        cd tests
         python -m unittest discover -p "*_test.py"
     - name: Installing Coverage
       run: |
