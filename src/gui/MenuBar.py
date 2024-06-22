@@ -1,11 +1,12 @@
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QFileDialog
 
+import pickle
 import sys
 
 sys.path.append("..")
 
-from imports.Import import Import
+from libs.DataVariables import DataVariables
 
 import logging
 
@@ -15,6 +16,8 @@ logger = logging.getLogger(__name__)
 class MenuBar:
     def __init__(self, parent):
         self.parent = parent
+        self._filename = None
+
         self.menuBar = self.parent.menuBar()
         filemenu = self.menuBar.addMenu("&File")
         filemenu.addAction(self.file_new_action())
@@ -58,28 +61,54 @@ class MenuBar:
             self.parent,
             "Open File",
             "",
-            "xml Files (*.xml)",
+            "WealthMan Data Files (*.wmd)",
         )
         logger.debug(_fname)
-        with open(_fname) as _fp:
-            _xml = _fp.read()
+        with open(_fname, "rb") as _fp:
+            dv = pickle.load(_fp)
 
-        _import = Import(_xml)
-        _import.get_gui_data(self.parent)
-        self._filename=_fname
+        self.parent.InputsTab.BasicInfoTab.import_data(dv)
+        self.parent.InputsTab.IncomeInfoTab.import_data(dv)
+        self.parent.InputsTab.ExpenseInfoTab.import_data(dv)
+        self.parent.InputsTab.AssetInfoTab.import_data(dv)
+        self.parent.InputsTab.GlobalVariablesTab.import_data(dv)
+
+        # _import.get_gui_data(self.parent)
+        self._filename = _fname
 
     def file_new(self):
-        self._filename=None
+        logger.debug("new file")
+        self._filename = None
         self.parent.InputsTab.clear_forms()
+
+    def file_save_as(self):
+        self._filename = None
+        self.file_save()
 
     def file_save(self):
         """this will retrieve the xml from the widgets and will save in an xml file somewhere"""
 
+        logger.debug("save file '%s'" % self._filename)
+        if self._filename is None:
+            self._filename, _x = QFileDialog.getSaveFileName(self.parent, "Save File")
+            print(self._filename)
+            print(_x)
+            logger.debug("using '%s' as filename.." % self._filename)
+
         # for every tab in the inputs, we need to retrieve the xml and save them.
-        with open(self._filename, 'w') as _fp:
-            _fp.write(self.parent.InputsTab.GlobalVars_tab.export_xml())
+        dv = DataVariables()
+
+        self.parent.InputsTab.BasicInfoTab.export_data(dv)
+        self.parent.InputsTab.IncomeInfoTab.export_data(dv)
+        self.parent.InputsTab.ExpenseInfoTab.export_data(dv)
+        self.parent.InputsTab.AssetInfoTab.export_data(dv)
+        self.parent.InputsTab.GlobalVariablesTab.export_data(dv)
+
+        with open(self._filename, "wb") as _fp:
+            pickle.dump(dv, _fp)
 
     def file_exit(self):
+        logger.debug("file exit")
         self.parent.close()
 
     def help_about_action(self):

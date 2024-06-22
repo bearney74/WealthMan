@@ -78,10 +78,9 @@ class Logs(QWidget):
             logging.getLogger().setLevel("NOTSET")
         else:
             logging.getLogger().setLevel(_value)
-        
+
         logger.log(logger.getEffectiveLevel(), "Logging Level set to %s" % _value)
 
- 
     def reset_log(self):
         self.logger.widget.clear()
         _system_info = "OS=%s\nPython Version=%s\nQt Version=%s\nPyQt Version=%s\n" % (

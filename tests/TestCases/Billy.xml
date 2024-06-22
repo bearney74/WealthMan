@@ -1,0 +1,16 @@
+<WealthMan version="0.1">
+ <People RelationStatus="Single">
+  <Person Num="1" Name="" BirthDate="" Relationship="Spouse" LifeExpectancy="" RetirementDate="" /> 
+ </People>
+ <IncomeSources>
+ </IncomeSources>
+ <ExpenseSources>
+ </ExpenseSources>
+ <Assets>
+ </Assets>
+ <GlobalVars>
+  <InflationRate>2</InflationRate>
+  <AssetWithdrawOrderByType>TaxDeferred,Regular,TaxFree</AssetWithdrawOrderByType>
+  <YearsToForecast>1</YearsToForecast>
+ </GlobalVars>
+</WealthMan>

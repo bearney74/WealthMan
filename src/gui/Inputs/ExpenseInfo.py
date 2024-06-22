@@ -5,6 +5,8 @@ from PyQt6.QtCore import Qt
 
 from gui.guihelpers.Entry import MoneyEntry, PercentEntry, AgeEntry
 
+from libs.DataVariables import DataVariables, ExpenseRecord
+
 
 class ExpenseInfoTab(QWidget):
     def __init__(self, parent, BasicInfoTab):
@@ -12,7 +14,7 @@ class ExpenseInfoTab(QWidget):
 
         self.BasicInfoTab = BasicInfoTab
         self.parent = parent
-        
+
         _layout = QVBoxLayout()
         _layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self._add_expense_button = QPushButton("Add Expense", self)
@@ -27,20 +29,23 @@ class ExpenseInfoTab(QWidget):
         self.setLayout(_layout)
 
     def add_row(self):
-        if self.gridLayout.count() ==0:
+        if self.gridLayout.count() == 0:
             self.gridLayout.addWidget(QLabel("Description"), 0, 0)
             self.gridLayout.addWidget(QLabel("Annual Amount"), 0, 1)
             _temp = QLabel("Annual\nPercent\nIncrease", wordWrap=True)
             # _temp.setWordWrap(True)
             self.gridLayout.addWidget(_temp, 0, 2)
-            
-            if self.BasicInfoTab.client_is_married():
-               self.gridLayout.addWidget(QLabel("Person"), 0, 3)
-            
-            self.gridLayout.addWidget(QLabel("Begin Age"), 0, 4)
-            self.gridLayout.addWidget(QLabel("End Age"), 0, 5)
 
-        _len = self.gridLayout.count()
+            if self.BasicInfoTab.client_is_married():
+                self.gridLayout.addWidget(QLabel("Person"), 0, 3)
+
+                self.gridLayout.addWidget(QLabel("Begin Age"), 0, 4)
+                self.gridLayout.addWidget(QLabel("End Age"), 0, 5)
+            else:
+                self.gridLayout.addWidget(QLabel("Begin Age"), 0, 3)
+                self.gridLayout.addWidget(QLabel("End Age"), 0, 4)
+
+        _len = self.gridLayout.rowCount()
         _descr = QLineEdit()
         _descr.setMaximumWidth(300)
         self.gridLayout.addWidget(_descr, _len, 0)
@@ -48,36 +53,103 @@ class ExpenseInfoTab(QWidget):
         _amount = MoneyEntry(self.parent)
         self.gridLayout.addWidget(_amount, _len, 1)
 
-        _percent = PercentEntry(self.parent)
-        self.gridLayout.addWidget(_percent, _len, 2)
+        _COLA = PercentEntry(self.parent)
+        self.gridLayout.addWidget(_COLA, _len, 2)
 
         if self.BasicInfoTab.client_is_married():
-           _person = QComboBox()
-           _person.addItems(["Client", "Spouse"])
-           self.gridLayout.addWidget(_person, _len, 3)
+            _person = QComboBox()
+            _person.addItems(["Client", "Spouse"])
+            self.gridLayout.addWidget(_person, _len, 3)
 
-        _begin_age = AgeEntry(self.parent)
-        self.gridLayout.addWidget(_begin_age, _len, 4)
+            _begin_age = AgeEntry(self.parent)
+            self.gridLayout.addWidget(_begin_age, _len, 4)
 
-        _end_age = AgeEntry(self.parent)
-        self.gridLayout.addWidget(_end_age, _len, 5)
+            _end_age = AgeEntry(self.parent)
+            self.gridLayout.addWidget(_end_age, _len, 5)
+        else:
+            _begin_age = AgeEntry(self.parent)
+            self.gridLayout.addWidget(_begin_age, _len, 3)
 
-        
+            _end_age = AgeEntry(self.parent)
+            self.gridLayout.addWidget(_end_age, _len, 4)
+
     def clear_form(self):
-         
         for _i in reversed(range(self.gridLayout.count())):
-            _item=self.gridLayout.itemAt(_i)
+            _item = self.gridLayout.itemAt(_i)
             self.gridLayout.removeItem(_item)
             _item.widget().setParent(None)
             del _item
 
+        assert self.gridLayout.count() == 0
 
+    def export_data(self, d: DataVariables):
+        for _i in range(1, self.gridLayout.rowCount()):
+            _item = self.gridLayout.itemAtPosition(_i, 0)
+            _descr = _item.widget().text()
 
-class ExpenseRecord:
-    def __init__(self, descr, amount, percent, person, begin_age, end_age):
-        self._descr = descr
-        self._amount = amount
-        self._percent = percent
-        self._person = person
-        self._begin_age = begin_age
-        self._end_age = end_age
+            _item = self.gridLayout.itemAtPosition(_i, 1)
+            _amount = _item.widget().text()
+
+            _item = self.gridLayout.itemAtPosition(_i, 2)
+            _cola = _item.widget().text()
+
+            if self.BasicInfoTab.client_is_married():
+                _item = self.gridLayout.itemAtPosition(_i, 3)
+                _person = _item.widget().currentText()
+
+                _item = self.gridLayout.itemAtPosition(_i, 4)
+                _begin_age = _item.widget().text()
+
+                _item = self.gridLayout.itemAtPosition(_i, 5)
+                _end_age = _item.widget().text()
+            else:
+                _item = self.gridLayout.itemAtPosition(_i, 3)
+                _begin_age = _item.widget().text()
+
+                _item = self.gridLayout.itemAtPosition(_i, 4)
+                _end_age = _item.widget().text()
+
+            _owner = "1"
+            if self.BasicInfoTab.client_is_married():
+                if _person == "Spouse":
+                    _owner = "2"
+
+            d._expenses.append(
+                ExpenseRecord(_descr, _amount, _cola, _owner, _begin_age, _end_age)
+            )
+
+    def import_data(self, d: DataVariables):
+        for _record in d._expenses:
+            self.add_row()
+
+            _i = self.gridLayout.rowCount() - 1
+
+            _item = self.gridLayout.itemAtPosition(_i, 0)
+            _item.widget().setText(_record._descr)
+
+            _item = self.gridLayout.itemAtPosition(_i, 1)
+            _item.widget().setText(_record._amount)
+
+            _item = self.gridLayout.itemAtPosition(_i, 2)
+            _item.widget().setText(_record._COLA)
+
+            if self.BasicInfoTab.client_is_married():
+                if _record._owner == "2":
+                    _owner = "Spouse"
+                else:
+                    _owner = "Client"
+                _item = self.gridLayout.itemAtPosition(_i, 3)
+                _item.widget().setCurrentText(_owner)
+
+                _item = self.gridLayout.itemAtPosition(_i, 4)
+                _item.widget().setText(_record._begin_age)
+
+                _item = self.gridLayout.itemAtPosition(_i, 5)
+                _item.widget().setText(_record._end_age)
+
+            else:
+                _item = self.gridLayout.itemAtPosition(_i, 3)
+                _item.widget().setText(_record._begin_age)
+
+                _item = self.gridLayout.itemAtPosition(_i, 4)
+                _item.widget().setText(_record._end_age)

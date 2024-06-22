@@ -1,16 +1,31 @@
 from PyQt6.QtWidgets import QLineEdit
 from PyQt6.QtGui import QIntValidator, QDoubleValidator
 
+
 class Entry(QLineEdit):
     def __init__(self, parent, limit_size: int = None):
         super(Entry, self).__init__(parent)
-                
+
         if limit_size is not None:
-           self.setFixedWidth(limit_size)
-                 
-        self.setStyleSheet('QLineEdit[readOnly="true"] {color: #808080; background-color: #F0F0F0;}')
+            self.setFixedWidth(limit_size)
+
+        self.setStyleSheet(
+            'QLineEdit[readOnly="true"] {color: #808080; background-color: #F0F0F0;}'
+        )
         self.setStyleSheet('*[invalid="true"]{background-color:red;}')
-      
+
+    def text(self):
+        if super().text() is None:
+            return ""
+
+        return super().text()
+
+    def setText(self, t):
+        if t is None:
+            super().setText("")
+        else:
+            super().setText(t)
+
 
 class IntegerEntry(Entry):
     def __init__(self, parent=None, limit_size: int = None):
@@ -27,9 +42,10 @@ class IntegerEntry(Entry):
 
     def get_int(self):
         if self.is_valid():
-           return int(self.text())
+            return int(self.text())
 
         return None
+
 
 class AgeEntry(IntegerEntry):
     def __init__(self, parent=None):
@@ -39,12 +55,13 @@ class AgeEntry(IntegerEntry):
         self.setValidator(QIntValidator(0, 99))
 
         self.setStyleSheet('*[invalid="true"] {background-color:red;}')
-      
+
 
 class MoneyEntry(IntegerEntry):
     def __init__(self, parent=None):
         super(MoneyEntry, self).__init__(parent, limit_size=80)
         self.setFixedWidth(80)
+
 
 class FloatEntry(Entry):
     def __init__(
@@ -57,7 +74,6 @@ class FloatEntry(Entry):
     ):
         super(FloatEntry, self).__init__(parent)
 
-        #self.setMaxLength(4)
         if limit_size is not None:
             self.setFixedWidth(limit_size)
 
@@ -72,8 +88,9 @@ class FloatEntry(Entry):
 
     def get_float(self):
         if self.is_valid():
-           return float(self.text())
+            return float(self.text())
         return None
+
 
 class PercentEntry(FloatEntry):
     def __init__(self, parent=None, min=0.0, max=9.9, num_decimal_places: int = 1):
