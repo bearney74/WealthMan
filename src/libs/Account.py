@@ -54,8 +54,12 @@ class Account:
 
         self.AssetClasses = classes
 
-    def calc_balance_by_year(self, year):
+    def calc_balance_by_year(self, year) -> int:
         # find the appropriate allocation period...
+        if self.COLA is not None:
+            self.Balance *= 1.0 + self.COLA / 100.0
+            return int(self.Balance)
+
         _ap = self._get_correct_allocation_period(year)
         assert isinstance(_ap, AllocationPeriod)
 

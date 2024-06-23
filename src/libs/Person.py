@@ -1,7 +1,5 @@
 from datetime import date, datetime
 
-from gui.Inputs.BasicInfo import BasicInfoTab
-
 
 class Person:
     def __init__(
@@ -31,16 +29,22 @@ class Person:
     def set_LifeExpectancy_by_age(self, age: int):  # DOD = Date of Death
         assert isinstance(age, int)
         assert isinstance(self.BirthDate, date)
-        self.LifeExpectancy = date(
-            self.BirthDate + age, 12, 31
-        )  # set to Dec 31st of year
+        if age is not None:
+            self.LifeExpectancy = date(
+                self.BirthDate.year + age, 12, 31
+            )  # set to Dec 31st of year
+        else:
+            self.LifeExpectancy = None
 
     def set_Retirement_by_age(self, age: int):
         assert isinstance(age, int)
         assert isinstance(self.BirthDate, date)
-        self.LifeExpectancy = date(
-            self.BirthDate + age, 12, 31
-        )  # set to Dec 31st of year
+        if age is not None:
+            self.RetirementDate = date(
+                self.BirthDate.year + age, 12, 31
+            )  # set to Dec 31st of year
+        else:
+            self.Retirementdate = None
 
     def calc_age_by_date(self, dt: date) -> int:
         """returns the number of years between two dates"""
@@ -51,28 +55,6 @@ class Person:
             - ((dt.month, dt.day) < (self.BirthDate.month, self.BirthDate.day))
         )
 
-    def calc_age_by_year(
-        self, year: int
-    ) -> int:  # get age of person on Dec 31st of year
+    def calc_age_by_year(self, year: int) -> int:
         """returns the age of person on Dec 31st of year"""
         return self.calc_age_by_date(dt=date(year, 12, 31))
-
-    def gui_import_data(self, b: BasicInfoTab, num):
-        # num == "1" Client
-        # num == "2" Spouse
-        # assert isinstance(b, BasicInfoTab)
-        _now = datetime.now()
-        b.import_data(
-            num,
-            self.Name,
-            str(
-                self.calc_age_by_date(date(_now.year, _now.month, _now.day))
-            ),  # str(abs(_year - self.BirthDate.year)),
-            str(
-                self.calc_age_by_date(self.RetirementDate)
-            ),  # str(self.RetirementDate.year - self.BirthDate.year),
-            str(
-                self.calc_age_by_date(self.LifeExpectancy)
-            ),  # str(self.LifeExpectancy.year - self.BirthDate.year),
-            self.Relationship,
-        )

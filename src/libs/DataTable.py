@@ -35,7 +35,8 @@ class DataTable:
                         if _de.Name in ("Year", "Age"):
                             _list.append(_de.Value)
 
-            for _category in ("Income", "Taxes", "Expense", "Cash Flow", "Asset"):
+            for _category in ("Income", "Taxes", "Expense", "Cash Flow",
+                              "Pulled from Assets", "Asset"):
                 for _de in self.Data:
                     if _de.Year == _year and _category == _de.Category:
                         if _year == self.BeginYear:

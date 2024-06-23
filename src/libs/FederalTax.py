@@ -21,7 +21,7 @@ class FederalTax(ImportHelper):
         self.Brackets = dict(sorted(self.Brackets.items()))
 
     def _import_data(self):
-        _xml = ET.parse("../data/FederalTaxBrackets.xml")
+        _xml = ET.parse("../../data/FederalTaxBrackets.xml")
         self._root = _xml.getroot()
 
         assert self._root.tag == "xml"
