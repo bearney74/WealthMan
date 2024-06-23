@@ -1,9 +1,10 @@
-from PyQt6.QtWidgets import QLineEdit
+from datetime import datetime, date
+from PyQt6.QtWidgets import QLineEdit, QWidget, QComboBox, QHBoxLayout
 from PyQt6.QtGui import QIntValidator, QDoubleValidator
 
 
 class Entry(QLineEdit):
-    def __init__(self, parent, limit_size: int = None):
+    def __init__(self, parent=None, limit_size: int = None):
         super(Entry, self).__init__(parent)
 
         if limit_size is not None:
@@ -24,7 +25,7 @@ class Entry(QLineEdit):
         if t is None:
             super().setText("")
         else:
-            super().setText(t)
+            super().setText(str(t))
 
 
 class IntegerEntry(Entry):
@@ -98,3 +99,52 @@ class PercentEntry(FloatEntry):
 
         self.setMaxLength(4)
         self.setFixedWidth(30)
+
+
+class DateEntry(QWidget):
+    def __init__(self, parent):
+        super(DateEntry, self).__init__(parent)
+
+        _layout = QHBoxLayout()
+        self._month = QComboBox()
+        self._month.addItems(
+            [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+            ]
+        )
+        _layout.addWidget(self._month)
+
+        _now = datetime.now()
+
+        self._year = QComboBox()
+        for _i in range(_now.year - 90, _now.year - 20):
+            self._year.addItem(str(_i))
+        self._year.setCurrentIndex(45)
+        _layout.addWidget(self._year)
+
+        self.setLayout(_layout)
+
+    def get_date(self) -> date:
+        _month = self._month.currentIndex() + 1
+        _year = self._year.currentText()
+
+        return date(int(_year), int(_month), 15)
+
+    def set_date(self, dt: date):
+        self._month.setCurrentIndex(dt.month - 1)
+        self._year.setCurrentText(str(dt.year))
+
+    def clear(self):
+        self._month.setCurrentIndex(0)
+        self._year.setCurrentIndex(45)

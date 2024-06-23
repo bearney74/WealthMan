@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
     QComboBox,
 )
 
-from gui.guihelpers.Entry import AgeEntry
+from gui.guihelpers.Entry import AgeEntry, DateEntry
 from libs.EnumTypes import RelationStatus
 from libs.DataVariables import DataVariables
 
@@ -52,16 +52,16 @@ class BasicInfoTab(QWidget):
 
     def export_data(self, d: DataVariables):
         d._clientName = self._clientinfo._name.text()
-        d._clientBirthDate = self._clientinfo._birthDate.text()
-        d._clientLifeSpanAge = self._clientinfo._lifespan_age.text()
-        d._clientRetirementAge = self._clientinfo._retirement_age.text()
+        d._clientBirthDate = self._clientinfo._birthDate.get_date()
+        d._clientLifeSpanAge = self._clientinfo._lifespan_age.get_int()
+        d._clientRetirementAge = self._clientinfo._retirement_age.get_int()
         d._relationStatus = self._clientinfo._status.currentText()
 
         if self.client_is_married():
             d._spouseName = self._spouseinfo._name.text()
-            d._spouseBirthDate = self._spouseinfo._birthDate.text()
-            d._spouseLifeSpanAge = self._spouseinfo._lifespan_age.text()
-            d._spouseRetirementAge = self._spouseinfo._retirement_age.text()
+            d._spouseBirthDate = self._spouseinfo._birthDate.get_date()
+            d._spouseLifeSpanAge = self._spouseinfo._lifespan_age.get_int()
+            d._spouseRetirementAge = self._spouseinfo._retirement_age.get_int()
         else:
             d._spouseName = None
             d._spouseBirthDate = None
@@ -70,16 +70,16 @@ class BasicInfoTab(QWidget):
 
     def import_data(self, d: DataVariables):
         self._clientinfo._name.setText(d._clientName)
-        self._clientinfo._birthDate.setText(d._clientBirthDate)
+        self._clientinfo._birthDate.set_date(d._clientBirthDate)
         self._clientinfo._lifespan_age.setText(d._clientLifeSpanAge)
         self._clientinfo._retirement_age.setText(d._clientRetirementAge)
         self._clientinfo._status.setCurrentText(d._relationStatus)
 
         if self.client_is_married():
-            self._clientinfo._name.setText(d._clientName)
-            self._clientinfo._birthDate.setText(d._clientBirthDate)
-            self._clientinfo._lifespan_age.setText(d._clientLifeSpanAge)
-            self._clientinfo._retirement_age.setText(d._clientRetirementAge)
+            self._spouseinfo._name.setText(d._spouseName)
+            self._spouseinfo._birthDate.set_date(d._spouseBirthDate)
+            self._spouseinfo._lifespan_age.setText(d._spouseLifeSpanAge)
+            self._spouseinfo._retirement_age.setText(d._spouseRetirementAge)
 
 
 class PersonBasicInfo(QWidget):
@@ -98,7 +98,7 @@ class PersonBasicInfo(QWidget):
         self._name = QLineEdit()
         formlayout.addRow(QLabel("%s Name:" % self._person_type), self._name)
 
-        self._birthDate = QLineEdit()
+        self._birthDate = DateEntry(self.parent)
         formlayout.addRow(QLabel("%s BirthDate:" % self._person_type), self._birthDate)
 
         self._retirement_age = AgeEntry()
@@ -166,7 +166,7 @@ class PersonBasicInfo(QWidget):
 
     def clear_form(self):
         self._name.setText("")
-        self._birthDate.setText("")
+        self._birthDate.clear()
         self._retirement_age.setText("")
         self._lifespan_age.setText("")
 

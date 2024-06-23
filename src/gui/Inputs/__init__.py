@@ -43,7 +43,7 @@ class InputsTab(QMainWindow):
             )
 
         self._previous_tab_name = _tabName
-        
+
     def clear_forms_action(self):
         _action = QAction("Clear forms", self)
         _action.setStatusTip("Clear Forms")

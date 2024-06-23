@@ -18,7 +18,7 @@ class Main(QMainWindow):
         logger.debug("starting Main Window")
         tabWidget = QTabWidget()
         self.InputsTab = InputsTab()
-        self.AnalysisTab = AnalysisTab()
+        self.AnalysisTab = AnalysisTab(self)
         self.LogsTab = Logs()
 
         tabWidget.addTab(self.InputsTab, "Input")
@@ -28,7 +28,7 @@ class Main(QMainWindow):
         self.setCentralWidget(tabWidget)
 
         self.setWindowTitle("Wealth Manager v0.1 alpha")
-        self.resize(800, 600)
+        self.resize(1024, 800)
 
         _statusbar = QStatusBar(self)
         self.setStatusBar(_statusbar)

@@ -14,7 +14,7 @@ class IncomeInfoTab(QWidget):
 
         self.BasicInfoTab = BasicInfoTab
         self.parent = parent
-        
+
         _layout = QVBoxLayout()
         _layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self._add_income_button = QPushButton("Add Income", self)
@@ -44,7 +44,7 @@ class IncomeInfoTab(QWidget):
                 self.gridLayout.addWidget(QLabel("End Age"), 0, 4)
 
         _len = self.gridLayout.rowCount()
-        
+
         _descr = QLineEdit()
         _descr.setMaximumWidth(300)
         self.gridLayout.addWidget(_descr, _len, 0)
@@ -88,26 +88,26 @@ class IncomeInfoTab(QWidget):
             _descr = _item.widget().text()
 
             _item = self.gridLayout.itemAtPosition(_i, 1)
-            _amount = _item.widget().text()
+            _amount = _item.widget().get_int()
 
             _item = self.gridLayout.itemAtPosition(_i, 2)
-            _cola = _item.widget().text()
+            _cola = _item.widget().get_float()
 
             if self.BasicInfoTab.client_is_married():
                 _item = self.gridLayout.itemAtPosition(_i, 3)
                 _person = _item.widget().currentText()
 
                 _item = self.gridLayout.itemAtPosition(_i, 4)
-                _begin_age = _item.widget().text()
+                _begin_age = _item.widget().get_int()
 
                 _item = self.gridLayout.itemAtPosition(_i, 5)
-                _end_age = _item.widget().text()
+                _end_age = _item.widget().get_int()
             else:
                 _item = self.gridLayout.itemAtPosition(_i, 3)
-                _begin_age = _item.widget().text()
+                _begin_age = _item.widget().get_int()
 
                 _item = self.gridLayout.itemAtPosition(_i, 4)
-                _end_age = _item.widget().text()
+                _end_age = _item.widget().get_int()
 
             _owner = "1"
             if self.BasicInfoTab.client_is_married():
@@ -123,7 +123,7 @@ class IncomeInfoTab(QWidget):
             self.add_row()
 
             _i = self.gridLayout.rowCount() - 1
-        
+
             _item = self.gridLayout.itemAtPosition(_i, 0)
             _item.widget().setText(_record._descr)
 

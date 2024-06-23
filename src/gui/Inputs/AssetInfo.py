@@ -16,9 +16,7 @@ class AssetInfoTab(QWidget):
 
         self._clientinfo = AssetInfoForm(parent, "Client")
         self._spouseinfo = AssetInfoForm(parent, "Spouse")
-        self._spouseinfo.setEnabled(
-            self.BasicInfoTab.client_is_married()
-        )
+        self._spouseinfo.setEnabled(self.BasicInfoTab.client_is_married())
 
         _layout.addWidget(self._clientinfo)
         _layout.addWidget(self._spouseinfo)
@@ -30,12 +28,12 @@ class AssetInfoTab(QWidget):
         self._spouseinfo.clear_form()
 
     def export_data(self, d: DataVariables):
-        d._clientIRA = self._clientinfo.IRA.text()
-        d._clientRothIRA = self._clientinfo.RothIRA.text()
-        d._Regular = self._clientinfo.Regular.text()
+        d._clientIRA = self._clientinfo.IRA.get_int()
+        d._clientRothIRA = self._clientinfo.RothIRA.get_int()
+        d._Regular = self._clientinfo.Regular.get_int()
 
-        d._spouseIRA = self._spouseinfo.IRA.text()
-        d._spouseRothIRA = self._spouseinfo.RothIRA.text()
+        d._spouseIRA = self._spouseinfo.IRA.get_int()
+        d._spouseRothIRA = self._spouseinfo.RothIRA.get_int()
         # d._spouseRegular=self._spouseinfo._Regular.text()
 
     def import_data(self, d: DataVariables):
@@ -43,7 +41,7 @@ class AssetInfoTab(QWidget):
         self._clientinfo.RothIRA.setText(d._clientRothIRA)
         self._clientinfo.Regular.setText(d._Regular)
 
-        self._spouseinfo.IRA.setText(d._clientIRA)
+        self._spouseinfo.IRA.setText(d._spouseIRA)
         self._spouseinfo.RothIRA.setText(d._spouseRothIRA)
         # self._spouseinfo._Regular.setText(d._spouseRegular)
 
