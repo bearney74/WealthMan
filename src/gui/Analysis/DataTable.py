@@ -221,24 +221,30 @@ class Forecast:
             _data.append(DataElement("Expense", "Total", _year, _expense_total))
 
             _cash_flow = _income_total - _expense_total - _taxes
-            #_data.append(DataElement("Cash Flow", "Total", _year, _cash_flow))
+            # _data.append(DataElement("Cash Flow", "Total", _year, _cash_flow))
             # TODO: if _income - _expense is negative, we need to pull resources from savings...
 
-            if _cash_flow >=0:
+            if _cash_flow >= 0:
                 _data.append(DataElement("Pulled from Assets", "Total", _year, 0))
             else:
-                _beginning_cash_flow=abs(_cash_flow)
-                #_data.append(DataElement("Pulled from Assets", "Total", _year, ))
+                _beginning_cash_flow = abs(_cash_flow)
+                # _data.append(DataElement("Pulled from Assets", "Total", _year, ))
                 # we need to pull money from Assets..
                 # define a new class that takes care of this logic, etc
-                _ws=WithdrawStrategy(self._withdrawOrder, self._Assets)
-                _cash_flow=_ws.reconcile_deficit(abs(_cash_flow))
-                
-                _data.append(DataElement("Pulled from Assets", "Total", _year, _beginning_cash_flow - _cash_flow))
-                _cash_flow=-_cash_flow  # needs to be negative
+                _ws = WithdrawStrategy(self._withdrawOrder, self._Assets)
+                _cash_flow = _ws.reconcile_deficit(abs(_cash_flow))
+
+                _data.append(
+                    DataElement(
+                        "Pulled from Assets",
+                        "Total",
+                        _year,
+                        _beginning_cash_flow - _cash_flow,
+                    )
+                )
+                _cash_flow = -_cash_flow  # needs to be negative
 
             _data.append(DataElement("Cash Flow", "Total", _year, _cash_flow))
-            
 
             _total = 0
             _ira_total = 0
