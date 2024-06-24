@@ -6,6 +6,9 @@ from Inputs import InputsTab
 from Logs import Logs
 from Analysis import AnalysisTab
 
+from libs.DataVariables import DataVariables
+from libs.Projections import Projections
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,17 +18,20 @@ class Main(QMainWindow):
     def __init__(self, parent=None):
         super(Main, self).__init__(parent)
 
+        self.tableData=None
+
         logger.debug("starting Main Window")
-        tabWidget = QTabWidget()
-        self.InputsTab = InputsTab()
+        self.tabs = QTabWidget()
+        self.InputsTab = InputsTab(self)
         self.AnalysisTab = AnalysisTab(self)
-        self.LogsTab = Logs()
+        self.LogsTab = Logs(self)
 
-        tabWidget.addTab(self.InputsTab, "Input")
-        tabWidget.addTab(self.AnalysisTab, "Analysis")
-        tabWidget.addTab(self.LogsTab, "Logs")
+        self.tabs.currentChanged.connect(self.onTabChange)
+        self.tabs.addTab(self.InputsTab, "Input")
+        self.tabs.addTab(self.AnalysisTab, "Analysis")
+        self.tabs.addTab(self.LogsTab, "Logs")
 
-        self.setCentralWidget(tabWidget)
+        self.setCentralWidget(self.tabs)
 
         self.setWindowTitle("Wealth Manager v0.1 alpha")
         self.resize(1024, 800)
@@ -40,6 +46,23 @@ class Main(QMainWindow):
     def _createMenuBar(self):
         _mb = MenuBar(self)
         self.menubar = _mb.get_menubar()
+
+
+    def onTabChange(self, i):
+        _tabName = self.tabs.tabText(i)
+        #print(_tabName)
+        if _tabName == "Analysis":
+            dv = DataVariables()
+
+            self.InputsTab.BasicInfoTab.export_data(dv)
+            self.InputsTab.IncomeInfoTab.export_data(dv)
+            self.InputsTab.ExpenseInfoTab.export_data(dv)
+            self.InputsTab.AssetInfoTab.export_data(dv)
+            self.InputsTab.GlobalVariablesTab.export_data(dv)
+            _p=Projections(dv)
+            self.tableData=_p.execute()
+            
+        self._previous_tab_name = _tabName
 
 
 if __name__ == "__main__":

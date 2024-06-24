@@ -6,7 +6,7 @@ class DataElement:
         self.Value = Value
 
 
-class DataTable:
+class TableData:
     def __init__(self, BeginYear: int, EndYear: int, Data: list):
         self.BeginYear = BeginYear
         self.EndYear = EndYear
@@ -68,7 +68,25 @@ class DataTable:
     def get_totals_data(self):
         _list = []
         for _de in self.Data:
+            #print(_de.Name)
             if _de.Name == "Total":
                 _list.append(_de)
 
         return _list
+
+    def getFields(self):
+        _fields=[]
+        for _de in self.Data:
+            _field = "%s %s" % (_de.Category, _de.Name)
+            if _field not in _fields:
+                _fields.append(_field)
+                
+        return _fields
+    
+    def getCategories(self):
+        _cats=[]
+        for _de in self.Data:
+            if _de.Category not in _cats:
+                _cats.append(_de.Category)
+                
+        return _cats
