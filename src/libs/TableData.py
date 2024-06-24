@@ -1,92 +1,91 @@
-class DataElement:
-    def __init__(self, Category: str, Name: str, Year: int, Value: str):
-        self.Category = Category
-        self.Name = Name
-        self.Year = Year
-        self.Value = Value
+from .Projections import ProjectionYearData
 
 
 class TableData:
-    def __init__(self, BeginYear: int, EndYear: int, Data: list):
-        self.BeginYear = BeginYear
-        self.EndYear = EndYear
-        self.Data = Data
+    def __init__(self, Data: [ProjectionYearData]):
+        assert Data is not None
+        self.projectionData = Data
 
-        self.Categories = []
+        self.categories = None
+        self.data = None
 
-    # def analyze(self):
-    #    for element in self.data:
-    #        if element.Category not in self.Categories:
-    #           self.Categories.append(element.Category)
+    def getCategories(self):
+        if self.categories is None:
+            self.categories, self.data = self._get_data_sheet()
+
+        return self.categories
 
     def get_data_sheet(self):
-        # if len(self.Categories) == 0:
-        #   self.analyze()
+        if self.data is None:
+            self.categories, self.data = self._get_data_sheet()
 
+        return self.categories, self.data
+
+    def _get_data_sheet(self):
         _header = ["Year", "Age(s)"]
         _data = []
 
-        for _year in range(self.BeginYear, self.EndYear + 1):
+        for _record in self.projectionData:
             # get year header (year, age1, age2)
-            _list = []
-            for _de in self.Data:
-                if _de.Year == _year:
-                    if _de.Category == "Header":
-                        if _de.Name in ("Year", "Age"):
-                            _list.append(_de.Value)
+            _list = [_record.projectionYear]
 
-            for _category in (
-                "Income",
-                "Taxes",
-                "Expense",
-                "Cash Flow",
-                "Pulled from Assets",
-                "Asset",
-            ):
-                for _de in self.Data:
-                    if _de.Year == _year and _category == _de.Category:
-                        if _year == self.BeginYear:
-                            if _de.Name == "Total":
-                                _header.append("%s Total" % _category)
-                            else:
-                                _header.append(_de.Name)
-                        _list.append("%s" % _de.Value)
-                        # print(_de.Value)
+            _ages = ""
+            if _record.clientIsAlive:
+                _ages += "%s" % _record.clientAge
+            else:
+                _ages += "--"
+
+            if _record.spouseAge is not None:
+                _ages += "/"
+                if _record.spouseIsAlive:
+                    _ages += "%s" % _record.spouseAge
+                else:
+                    _ages += "--"
+            _list.append(_ages)
+
+            for _name, _balance in _record.incomeSources.items():
+                if _data == []:
+                    _header.append(_name)
+                _list.append(_balance)
+
+            if _data == []:
+                _header.append("Income Total")
+            _list.append(_record.incomeTotal)
+
+            for _name, _balance in _record.expenseSources.items():
+                if _data == []:
+                    _header.append(_name)
+                _list.append(_balance)
+
+            if _data == []:
+                _header.append("Expense Total")
+            _list.append(_record.expenseTotal)
+
+            if _data == []:
+                _header.append("Federal Taxes")
+            _list.append(_record.federalTaxes)
+
+            if _data == []:
+                _header.append("Asset Withdraw")
+            _list.append(_record.assetWithdraw)
+
+            for _name, _balance in _record.assetSources.items():
+                if _data == []:
+                    _header.append(_name)
+                _list.append(_balance)
+
+            if _data == []:
+                _header.append("AssetTotal")
+            _list.append(_record.assetTotal)
+
+            if _data == []:
+                _header.append("RMD")
+            _list.append(_record.RMD)
+
+            if _data == []:
+                _header.append("RMD %")
+            _list.append(_record.RMDPercent)
 
             _data.append(_list)
         # print(_data)
         return _header, _data
-
-    def get_asset_data(self):
-        _list = []
-        for _de in self.Data:
-            if _de.Category == "Asset" and _de.Name not in ("Total", "RMD", "RMD %"):
-                _list.append(_de)
-
-        return _list
-
-    def get_totals_data(self):
-        _list = []
-        for _de in self.Data:
-            #print(_de.Name)
-            if _de.Name == "Total":
-                _list.append(_de)
-
-        return _list
-
-    def getFields(self):
-        _fields=[]
-        for _de in self.Data:
-            _field = "%s %s" % (_de.Category, _de.Name)
-            if _field not in _fields:
-                _fields.append(_field)
-                
-        return _fields
-    
-    def getCategories(self):
-        _cats=[]
-        for _de in self.Data:
-            if _de.Category not in _cats:
-                _cats.append(_de.Category)
-                
-        return _cats

@@ -18,7 +18,7 @@ class Main(QMainWindow):
     def __init__(self, parent=None):
         super(Main, self).__init__(parent)
 
-        self.tableData=None
+        self.projectionData = None
 
         logger.debug("starting Main Window")
         self.tabs = QTabWidget()
@@ -47,10 +47,9 @@ class Main(QMainWindow):
         _mb = MenuBar(self)
         self.menubar = _mb.get_menubar()
 
-
     def onTabChange(self, i):
         _tabName = self.tabs.tabText(i)
-        #print(_tabName)
+        # print(_tabName)
         if _tabName == "Analysis":
             dv = DataVariables()
 
@@ -59,9 +58,9 @@ class Main(QMainWindow):
             self.InputsTab.ExpenseInfoTab.export_data(dv)
             self.InputsTab.AssetInfoTab.export_data(dv)
             self.InputsTab.GlobalVariablesTab.export_data(dv)
-            _p=Projections(dv)
-            self.tableData=_p.execute()
-            
+            _p = Projections(dv)
+            self.projectionData = _p.execute()
+
         self._previous_tab_name = _tabName
 
 

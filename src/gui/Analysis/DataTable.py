@@ -1,4 +1,3 @@
-
 from PyQt6.QtWidgets import (
     QWidget,
     QTableWidget,
@@ -10,11 +9,6 @@ from PyQt6.QtWidgets import (
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
-
-#from libs.DataVariables import DataVariables
-from libs.TableData import TableData
-
-#from .Projections import Projections
 
 import logging
 
@@ -38,35 +32,42 @@ class InitialDelegate(QStyledItemDelegate):
             option.text = text
         else:
             try:
-                number = int(text)
-                if number < 0:
-                    option.text = f"(${number:,d})"
+                if "." in text:
+                    number = float(text)
+                    option.text = f"{number:.1f}%"
                 else:
-                    option.text = f"${number:,d}"
+                    number = int(text)
+                    if number < 0:
+                        option.text = f"(${number:,d})"
+                    else:
+                        option.text = f"${number:,d}"
             except Exception as e:
                 logger.error(e)
                 print(e)
+                option.text = text
 
 
 class DataTableTab(QWidget):
     def __init__(self, parent=None):
         super(DataTableTab, self).__init__(parent)
 
+        self.parent = parent
+
         self.table = QTableWidget()
         self.table.setItemDelegate(InitialDelegate(self.table))
         self.table.setItemDelegateForColumn(0, QStyledItemDelegate(self.table))
         self.table.setItemDelegateForColumn(1, QStyledItemDelegate(self.table))
-        
+
         layout = QVBoxLayout()
         layout.addWidget(self.table)
         self.setLayout(layout)
 
     # Create table
-    def createTable(self, dt: TableData):
-        assert isinstance(dt, TableData)
-        #_f = Forecast(dv)
-        #datatable = p.execute()
-        _header, _data = dt.get_data_sheet()
+    def createTable(self):
+        # assert isinstance(td, TableData)
+        # _f = Forecast(dv)
+        # datatable = p.execute()
+        _header, _data = self.parent.tableData.get_data_sheet()
 
         self.table.hide()
         self.table.clear()
@@ -78,11 +79,14 @@ class DataTableTab(QWidget):
         for _row in _data:
             _j = 0
             for _col in _row:
-                # print(_i, _j, _col)
-                _value = QTableWidgetItem(_col)
-                if _col.strip().startswith("-"):
-                    _value.setForeground(QBrush(QColor(255, 0, 0)))
-                self.table.setItem(_i, _j, _value)
+                if isinstance(_col, (float, int)):
+                    _col = str(_col)
+                    _value = QTableWidgetItem(_col)
+                    if _col.strip().startswith("-"):
+                        _value.setForeground(QBrush(QColor(255, 0, 0)))
+                    self.table.setItem(_i, _j, _value)
+                else:
+                    self.table.setItem(_i, _j, QTableWidgetItem(_col))
                 _j += 1
             _i += 1
         # print("done populating table")

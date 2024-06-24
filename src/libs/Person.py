@@ -1,13 +1,13 @@
-from datetime import date, datetime
+from datetime import date
 
 
 class Person:
     def __init__(
         self,
-        name:str,
-        birthDate:date,
-        retirementAge:int=None,
-        lifeSpanAge:int=None,
+        name: str,
+        birthDate: date,
+        retirementAge: int = None,
+        lifeSpanAge: int = None,
         relationship=None,
     ):
         assert isinstance(name, str)
@@ -18,22 +18,22 @@ class Person:
 
         assert isinstance(retirementAge, int)
         self.retirementAge = retirementAge
-        
+
         assert isinstance(lifeSpanAge, int)
-        self.lifeSpanAge= lifeSpanAge  # date of death (Dec 31st of year)
-        #todo..
+        self.lifeSpanAge = lifeSpanAge  # date of death (Dec 31st of year)
+        # todo..
         self.relationship = relationship
 
-    #def set_BirthDate_by_age(self, age: int):
+    # def set_BirthDate_by_age(self, age: int):
     #    assert isinstance(age, int)
     #    _now = datetime.now()
     #    self.BirthDate = date(
     #        _now.year - age, _now.month, _now.day
     #    )  # set to today - age
 
-    def calc_date_by_age(self, age:int) -> date:
+    def calc_date_by_age(self, age: int) -> date:
         return date(self.birthdate.year + age, self.birthdate.month, self.birthdate.day)
-    
+
     def calc_age_by_date(self, dt: date) -> int:
         """returns the number of years between two dates"""
         assert isinstance(self.birthDate, date)

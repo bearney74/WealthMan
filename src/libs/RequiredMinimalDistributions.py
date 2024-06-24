@@ -61,7 +61,8 @@ def calc_age(date1: date, date2: date) -> int:
     _diff = date1 - date2
     return int(abs(_diff.days) / 365.2466)
 
-#todo..  should we only deal with one person at a time? 
+
+# todo..  should we only deal with one person at a time?
 class RMD:
     def __init__(self, person1: Person, person2: Person):
         self.Person1 = person1
