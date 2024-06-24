@@ -231,14 +231,14 @@ class Projections:
             _pyd = ProjectionYearData(_year)
 
             _clientage = self._client.calc_age_by_year(_year)
-            _clientIsAlive = _clientage < self._client.lifeSpanAge
+            _clientIsAlive = _clientage <= self._client.lifeSpanAge
             _pyd.clientAge = _clientage
             _pyd.clientIsAlive = _clientIsAlive
             _spouseage = None
             _spouseIsAlive = None
             if self._spouse is not None:
                 _spouseage = self._spouse.calc_age_by_year(_year)
-                _spouseIsAlive = _spouseage < self._spouse.lifeSpanAge
+                _spouseIsAlive = _spouseage <= self._spouse.lifeSpanAge
                 _pyd.spouseAge = _spouseage
                 _pyd.spouseIsAlive = _spouseIsAlive
 
