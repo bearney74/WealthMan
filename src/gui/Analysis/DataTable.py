@@ -101,12 +101,14 @@ class DataTableTab(QWidget):
 
     def to_csv(self, filename):
         _columns = range(self.tableWidget.columnCount())
-        _header = [self.table.horizontalHeaderItem(column).text()
-                   for column in _columns]
-        
-        with open(filename, 'w') as _fp:
-            _csv = csv.writer(_fp, dialect='excel', lineterminator='\n')
+        _header = [
+            self.table.horizontalHeaderItem(column).text() for column in _columns
+        ]
+
+        with open(filename, "w") as _fp:
+            _csv = csv.writer(_fp, dialect="excel", lineterminator="\n")
             _csv.writerow(_header)
             for _row in range(self.table.rowCount()):
-                _csv.writerow([self.table.item(_row, _column).text()
-                                for _column in _columns])
+                _csv.writerow(
+                    [self.table.item(_row, _column).text() for _column in _columns]
+                )
