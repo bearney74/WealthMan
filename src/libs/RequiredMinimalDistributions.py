@@ -61,7 +61,7 @@ def calc_age(date1: date, date2: date) -> int:
     _diff = date1 - date2
     return int(abs(_diff.days) / 365.2466)
 
-
+#todo..  should we only deal with one person at a time? 
 class RMD:
     def __init__(self, person1: Person, person2: Person):
         self.Person1 = person1
@@ -74,7 +74,7 @@ class RMD:
         if self.Person2 is None:
             self._table = ULT
         else:  # need to check for age difference  (< 10 or > 10)?
-            if calc_age(self.Person1.BirthDate, self.Person2.BirthDate) <= 10:
+            if calc_age(self.Person1.birthDate, self.Person2.birthDate) <= 10:
                 self._table = ULT
             else:
                 # TODO
@@ -92,7 +92,7 @@ class RMD:
         # self._calc_init()
 
     def calc(self, currdate: date) -> float:
-        _age = calc_age(self.Person1.BirthDate, currdate)
+        _age = calc_age(self.Person1.birthDate, currdate)
         # print(_age)
         if _age <= 72:
             return 0.0

@@ -6,10 +6,9 @@ from libs.IncomeSources import IncomeSource
 from libs.Expense import Expense
 from libs.TableData import DataElement, TableData
 from libs.RequiredMinimalDistributions import RMD
-from libs.EnumTypes import AccountType, AmountPeriodType, FederalTaxStatusType
+from libs.EnumTypes import AccountType, AccountOwnerType, AmountPeriodType, FederalTaxStatusType
 from libs.FederalTax import FederalTax
 
-# from imports.Import import Import
 from libs.Person import Person
 from libs.DataVariables import DataVariables
 from libs.WithdrawStrategy import WithdrawStrategy
@@ -19,9 +18,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 class ProjectionYearData:
-    """ This is a single years projection data """
-  self.__init__(self, year:int):
-      assert isinstance(year int)
+  def __init__(self, year:int):
+      """ This is a single years projection data """
+      assert isinstance(year, int)
       self.projectionYear:int=year
 
       self.clientAge:int=None
@@ -57,23 +56,24 @@ class Projections:
 
         self._withdrawOrder = dv._withdrawOrder
 
-        self._client = Person(
-            dv._clientName, dv._clientBirthDate, Relationship=dv._relationStatus
-        )
-        self._client.set_LifeExpectancy_by_age(dv._clientLifeSpanAge)
-        self._client.set_Retirement_by_age(dv._clientRetirementAge)
-
+        self._client = Person(name= dv._clientName,
+                              birthDate=dv._clientBirthDate,
+                              lifeSpanAge=dv._clientLifeSpanAge,
+                              retirementAge=dv._clientRetirementAge,
+                              relationship=dv._relationStatus)
+        
         self._spouse = None
         if dv._relationStatus == "Married":
-            self._spouse = Person(dv._spouseName, dv._spouseBirthDate)
-            self._spouse.set_LifeExpectancy_by_age(dv._spouseLifeSpanAge)
-            self._spouse.set_Retirement_by_age(dv._spouseRetirementAge)
-
+            self._spouse = Person(name=dv._spouseName,
+                                  birthDate=dv._spouseBirthDate,
+                                  retirementAge=dv._spouseRetirementAge,
+                                  lifeSpanAge=dv._spouseLifeSpanAge)
+       
         self._IncomeSources = []
         for _record in dv._incomes:
-            _birthdate = self._client.BirthDate
+            _birthdate = self._client.birthDate
             if _record._owner == "2":
-                _birthdate = self._spouse.BirthDate
+                _birthdate = self._spouse.birthDate
 
             if _record._begin_age is None:
                 _record._begin_age=0
@@ -113,9 +113,9 @@ class Projections:
 
         self._Expenses = []
         for _record in dv._expenses:
-            _birthdate = self._client.BirthDate
+            _birthdate = self._client.birthDate
             if _record._owner == "2":
-                _birthdate = self._spouse.BirthDate
+                _birthdate = self._spouse.birthDate
 
             if _record._begin_age is None:
                 _record._begin_age = 0
@@ -159,7 +159,8 @@ class Projections:
         if dv._clientIRA is not None:
             self._Assets.append(
                 Account(
-                    "Client IRA", AccountType.TaxDeferred, "1", dv._clientIRA, _cola
+                    "Client IRA", AccountType.TaxDeferred,
+                    AccountOwnerType.Client, dv._clientIRA, _cola
                 )
             )
         if dv._clientRothIRA is not None:
@@ -167,7 +168,7 @@ class Projections:
                 Account(
                     "Client Roth IRA",
                     AccountType.TaxFree,
-                    "1",
+                    AccountOwnerType.Client,
                     dv._clientRothIRA,
                     _cola,
                 )
@@ -175,13 +176,15 @@ class Projections:
 
         if dv._Regular is not None:
             self._Assets.append(
-                Account("Regular", AccountType.Regular, "1", dv._Regular, _cola)
+                Account("Regular", AccountType.Regular,
+                        AccountOwnerType.Both, dv._Regular, _cola)
             )
 
         if dv._spouseIRA is not None:
             self._Assets.append(
                 Account(
-                    "Spouse IRA", AccountType.TaxDeferred, "2", dv._spouseIRA, _cola
+                    "Spouse IRA", AccountType.TaxDeferred,
+                    AccountOwnerType.Spouse, dv._spouseIRA, _cola
                 )
             )
 
@@ -190,7 +193,7 @@ class Projections:
                 Account(
                     "Spouse Roth IRA",
                     AccountType.TaxFree,
-                    "1",
+                    AccountOwnerType.Spouse,
                     dv._spouseRothIRA,
                     _cola,
                 )
@@ -207,14 +210,18 @@ class Projections:
         for _year in range(self._begin_year, self._end_year + 1):
             _data.append(DataElement("Header", "Year", _year, "%s" % _year))
 
-            _age1 = self._client.calc_age_by_year(_year)
+            _clientage = self._client.calc_age_by_year(_year)
+            _clientIsAlive=_clientage < self._client.lifeSpanAge
+            _spouseage=None
+            _spouseIsAlive=None
             if self._spouse is not None:
-                _age2 = self._spouse.calc_age_by_year(_year)
+                _spouseage = self._spouse.calc_age_by_year(_year)
+                _spouseIsAlive=_spouseage < self._spouse.lifeSpanAge
                 _data.append(
-                    DataElement("Header", "Age", _year, "%s/%s" % (_age1, _age2))
+                    DataElement("Header", "Age", _year, "%s/%s" % (_clientage, _spouseage))
                 )
             else:
-                _data.append(DataElement("Header", "Age", _year, "%s" % (_age1)))
+                _data.append(DataElement("Header", "Age", _year, "%s" % (_clientage)))
 
             _income_total = 0
             for _src in self._IncomeSources:
@@ -249,7 +256,10 @@ class Projections:
                 # _data.append(DataElement("Pulled from Assets", "Total", _year, ))
                 # we need to pull money from Assets..
                 # define a new class that takes care of this logic, etc
-                _ws = WithdrawStrategy(self._withdrawOrder, self._Assets)
+                _ws = WithdrawStrategy(self._withdrawOrder,
+                                       _clientage, _clientIsAlive,
+                                       _spouseage, _spouseIsAlive,
+                                       self._Assets)
                 _cash_flow = _ws.reconcile_deficit(abs(_cash_flow))
 
                 _data.append(

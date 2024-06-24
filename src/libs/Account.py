@@ -1,6 +1,6 @@
 from datetime import date
 
-from .EnumTypes import AccountType
+from .EnumTypes import AccountType, AccountOwnerType
 
 
 class Account:
@@ -8,7 +8,7 @@ class Account:
         self,
         Name: str,
         Type: AccountType,
-        Owner: str,
+        Owner: AccountOwnerType,
         Balance: int = 0,
         COLA: float = 0,
     ):
@@ -18,7 +18,7 @@ class Account:
         assert isinstance(Type, AccountType)
         self.Type = Type
 
-        assert isinstance(Owner, str)
+        assert isinstance(Owner, AccountOwnerType)
         self.Owner = Owner
 
         assert isinstance(Balance, int)

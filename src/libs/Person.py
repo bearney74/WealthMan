@@ -4,55 +4,43 @@ from datetime import date, datetime
 class Person:
     def __init__(
         self,
-        Name,
-        BirthDate,
-        RetirementDate=None,
-        LifeExpectancy=None,
-        Relationship=None,
+        name:str,
+        birthDate:date,
+        retirementAge:int=None,
+        lifeSpanAge:int=None,
+        relationship=None,
     ):
-        self.Name = Name
+        assert isinstance(name, str)
+        self.name = name
 
-        assert isinstance(BirthDate, date)
-        self.BirthDate = BirthDate  # date of birth
+        assert isinstance(birthDate, date)
+        self.birthDate = birthDate  # date of birth
 
-        self.RetirementDate = RetirementDate
-        self.LifeExpectancy = LifeExpectancy  # date of death (Dec 31st of year)
-        self.Relationship = Relationship
+        assert isinstance(retirementAge, int)
+        self.retirementAge = retirementAge
+        
+        assert isinstance(lifeSpanAge, int)
+        self.lifeSpanAge= lifeSpanAge  # date of death (Dec 31st of year)
+        #todo..
+        self.relationship = relationship
 
-    def set_BirthDate_by_age(self, age: int):
-        assert isinstance(age, int)
-        _now = datetime.now()
-        self.BirthDate = date(
-            _now.year - age, _now.month, _now.day
-        )  # set to today - age
+    #def set_BirthDate_by_age(self, age: int):
+    #    assert isinstance(age, int)
+    #    _now = datetime.now()
+    #    self.BirthDate = date(
+    #        _now.year - age, _now.month, _now.day
+    #    )  # set to today - age
 
-    def set_LifeExpectancy_by_age(self, age: int):  # DOD = Date of Death
-        assert isinstance(age, int)
-        assert isinstance(self.BirthDate, date)
-        if age is not None:
-            self.LifeExpectancy = date(
-                self.BirthDate.year + age, 12, 31
-            )  # set to Dec 31st of year
-        else:
-            self.LifeExpectancy = None
-
-    def set_Retirement_by_age(self, age: int):
-        assert isinstance(age, int)
-        assert isinstance(self.BirthDate, date)
-        if age is not None:
-            self.RetirementDate = date(
-                self.BirthDate.year + age, 12, 31
-            )  # set to Dec 31st of year
-        else:
-            self.Retirementdate = None
-
+    def calc_date_by_age(self, age:int) -> date:
+        return date(self.birthdate.year + age, self.birthdate.month, self.birthdate.day)
+    
     def calc_age_by_date(self, dt: date) -> int:
         """returns the number of years between two dates"""
-        assert isinstance(self.BirthDate, date)
+        assert isinstance(self.birthDate, date)
         return (
             dt.year
-            - self.BirthDate.year
-            - ((dt.month, dt.day) < (self.BirthDate.month, self.BirthDate.day))
+            - self.birthDate.year
+            - ((dt.month, dt.day) < (self.birthDate.month, self.birthDate.day))
         )
 
     def calc_age_by_year(self, year: int) -> int:

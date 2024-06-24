@@ -18,6 +18,11 @@ class PersonType(Enum):
     Spouse = 1
 
 
+class AccountOwnerType(Enum):
+    Client=0
+    Spouse=1
+    Both=2
+
 class Relationship(Enum):
     Spouse = 1
     Child = 2
