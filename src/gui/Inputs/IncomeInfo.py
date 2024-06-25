@@ -6,6 +6,7 @@ from PyQt6.QtCore import Qt
 from gui.guihelpers.Entry import MoneyEntry, PercentEntry, AgeEntry
 
 from libs.DataVariables import DataVariables, IncomeRecord
+from libs.EnumTypes import AccountOwnerType
 
 
 class IncomeInfoTab(QWidget):
@@ -109,10 +110,11 @@ class IncomeInfoTab(QWidget):
                 _item = self.gridLayout.itemAtPosition(_i, 4)
                 _end_age = _item.widget().get_int()
 
-            _owner = "1"
+            _owner = AccountOwnerType.Client
             if self.BasicInfoTab.client_is_married():
                 if _person == "Spouse":
-                    _owner = "2"
+                    _owner = AccountOwnerType.Spouse
+                    # _owner = "2"
 
             dv._incomes.append(
                 IncomeRecord(_descr, _amount, _cola, _owner, _begin_age, _end_age)

@@ -1,26 +1,56 @@
 from datetime import date
 
-from .EnumTypes import RelationStatus
+from .EnumTypes import RelationStatus, AccountOwnerType
 
 
-class IncomeRecord:
-    def __init__(self, descr, amount, COLA, owner, begin_age, end_age):
+class BaseRecord:
+    def __init__(
+        self,
+        descr,
+        amount,
+        COLA,
+        owner,
+        begin_age,
+        end_age,
+        isSocialSecurity: bool = False,
+    ):
+        assert isinstance(descr, str)
         self._descr = descr
+        assert isinstance(amount, int)
         self._amount = amount
+        assert isinstance(COLA, float)
         self._COLA = COLA
+        assert isinstance(owner, AccountOwnerType)
         self._owner = owner
+        assert isinstance(begin_age, int) or begin_age is None
         self._begin_age = begin_age
+        assert isinstance(end_age, int) or end_age is None
         self._end_age = end_age
 
 
-class ExpenseRecord:
+class IncomeRecord(BaseRecord):
+    def __init__(
+        self,
+        descr,
+        amount,
+        COLA,
+        owner,
+        begin_age,
+        end_age,
+        isSocialSecurity: bool = False,
+    ):
+        super(IncomeRecord, self).__init__(
+            descr, amount, COLA, owner, begin_age, end_age
+        )
+        assert isinstance(isSocialSecurity, bool)
+        self._isSocialSecurity = isSocialSecurity
+
+
+class ExpenseRecord(BaseRecord):
     def __init__(self, descr, amount, COLA, owner, begin_age, end_age):
-        self._descr = descr
-        self._amount = amount
-        self._COLA = COLA
-        self._owner = owner
-        self._begin_age = begin_age
-        self._end_age = end_age
+        super(ExpenseRecord, self).__init__(
+            descr, amount, COLA, owner, begin_age, end_age
+        )
 
 
 class DataVariables:
