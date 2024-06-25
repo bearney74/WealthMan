@@ -1,6 +1,6 @@
 from datetime import date
 
-from .EnumTypes import IncomeType, AmountPeriodType
+from .EnumTypes import IncomeType, AmountPeriodType, AccountOwnerType
 from .IncomeExpenseBase import IncomeExpenseBase
 
 
@@ -21,12 +21,16 @@ class IncomeSource(IncomeExpenseBase):
         IncomeExpenseBase.__init__(
             self, Name, Amount, AmountPeriod, BeginDate, EndDate, COLA=COLA
         )
+        assert isinstance(IncomeSource, IncomeType)
         self.IncomeSource = IncomeSource
+        
+        assert isinstance (Owner, AccountOwnerType) or Owner is None
         self.Owner = Owner
+        
         self.SurvivorPercent = SurvivorPercent
         self.Taxable = Taxable
 
-
+"""
 class SocialSecurity(IncomeSource):
     def __init__(
         self,
@@ -66,3 +70,4 @@ class SocialSecurity(IncomeSource):
         else:
             assert False
             # todo
+"""

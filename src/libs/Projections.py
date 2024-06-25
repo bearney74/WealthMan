@@ -9,6 +9,7 @@ from .EnumTypes import (
     AccountOwnerType,
     AmountPeriodType,
     FederalTaxStatusType,
+    IncomeType,
 )
 from .FederalTax import FederalTax
 
@@ -93,7 +94,7 @@ class Projections:
                     _record._COLA = 0.0
                 _is = IncomeSource(
                     _record._descr,
-                    None,
+                    IncomeType.Employment,  #todo Fix me..  SS, pension
                     _record._amount,
                     AmountPeriodType.Annual,
                     _record._owner,

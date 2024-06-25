@@ -136,7 +136,7 @@ class IncomeInfoTab(QWidget):
             _item.widget().setText(_record._COLA)
 
             if self.BasicInfoTab.client_is_married():
-                if _record._owner == "2":
+                if _record._owner == AccountOwnerType.Spouse:
                     _owner = "Spouse"
                 else:
                     _owner = "Client"

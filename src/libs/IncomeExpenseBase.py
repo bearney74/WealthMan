@@ -10,11 +10,11 @@ class IncomeExpenseBase:
         Name: str,
         Amount: int,
         AmountPeriod: AmountPeriodType,
-        BeginDate: date = None,
-        EndDate: date = None,
-        SurvivorPercent: float = None,
-        Taxable: bool = None,
-        COLA: float = 0,
+        BeginDate: int = None,
+        EndDate: int = None,
+        #SurvivorPercent: float = None,
+        #Taxable: bool = None,
+        COLA: float = 0.0,
     ):
         assert isinstance(Name, str)
         self.Name = Name
@@ -26,16 +26,17 @@ class IncomeExpenseBase:
         assert isinstance(AmountPeriod, AmountPeriodType)
         self.AmountPeriod = AmountPeriod
 
-        assert BeginDate is None or isinstance(BeginDate, date)
+        assert isinstance(BeginDate, date) or BeginDate is None
         self.BeginDate = BeginDate
         # self.Owner=Owner
-        self.SurvivorPercent = SurvivorPercent
-        self.Taxable = Taxable
+        #self.SurvivorPercent = SurvivorPercent
+        #self.Taxable = Taxable
+        assert isinstance(COLA, float) or COLA is None
         if COLA is None:
             COLA = 0.0
-        # print("Cola=%s" % COLA)
-        assert isinstance(COLA, float)
         self.COLA = COLA
+        
+        assert isinstance(EndDate, date) or EndDate is None
         self.EndDate = EndDate
 
         self._annual_balance = 0
@@ -117,23 +118,9 @@ class IncomeExpenseBase:
         assert False
 
     def _calc_annual_balance(self) -> int:
-        if self.AmountPeriod == AmountPeriodType.Annual:
-            return self.Amount
-        if self.AmountPeriod == AmountPeriodType.Monthly:
-            return self.Amount * 12
-        if self.AmountPeriod == AmountPeriodType.BiWeekly:
-            return self.Amount * 26
-        if self.AmountPeriod == AmountPeriodType.Weekly:
-            return self.Amount * 52
-
-        print(
-            "We shouldn't get here: IncomeSources.py, calc_income_by_year function, AmountPeriod='%s'"
-            % self.AmountPeriod
-        )
-
-        # dont know what to do.. just return Amount
+        assert self.AmountPeriod == AmountPeriodType.Annual
         return self.Amount
-
+        
     def _calc_balance(self) -> int:
         if self._annual_balance == 0:
             self._annual_balance = self._calc_annual_balance()
