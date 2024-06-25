@@ -3,6 +3,8 @@ from datetime import date
 from .EnumTypes import AmountPeriodType
 from .DateHelper import DateHelper
 
+import logging
+logger = logging.getLogger(__name__)
 
 class IncomeExpenseBase:
     def __init__(
@@ -115,6 +117,7 @@ class IncomeExpenseBase:
 
         # we shouldn't get here..
         # print(year, self.BeginDate, self.EndDate)
+        logger.error("Something went wrong calculating balance for income/expense")
         assert False
 
     def _calc_annual_balance(self) -> int:
