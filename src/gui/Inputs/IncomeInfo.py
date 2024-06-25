@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QPushButton, QLabel, QLineEdit
-from PyQt6.QtWidgets import QVBoxLayout, QGridLayout, QComboBox
+from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QComboBox
 
 from PyQt6.QtCore import Qt
 
@@ -17,7 +17,79 @@ class IncomeInfoTab(QWidget):
         self.parent = parent
 
         _layout = QVBoxLayout()
-        _layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        _layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        _layout.addWidget(QLabel("<b><u>Social Security</u></b>"))
+        
+        _hlayout=QHBoxLayout()
+        _glayout=QGridLayout()
+        _glayout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        _glayout.addWidget(QLabel("Description"), 0, 0)
+        _glayout.addWidget(QLabel("FRA Amount"), 0, 1)
+        _glayout.addWidget(QLabel("COLA"), 0, 2)
+        _glayout.addWidget(QLabel("Begin\nAge"), 0, 3)
+        
+        _descr = QLineEdit("Client Social Security")
+        _descr.setMaximumWidth(300)
+        _glayout.addWidget(_descr, 1, 0)
+        _glayout.addWidget(MoneyEntry(self.parent), 1, 1)
+        _glayout.addWidget(PercentEntry(self.parent), 1, 2)
+        _glayout.addWidget(AgeEntry(self.parent), 1, 3)
+
+        _descr = QLineEdit("Spouse Social Security")
+        _descr.setMaximumWidth(300)
+        _glayout.addWidget(_descr, 2, 0)
+        _glayout.addWidget(MoneyEntry(self.parent), 2, 1)
+        _glayout.addWidget(PercentEntry(self.parent), 2, 2)
+        _glayout.addWidget(AgeEntry(self.parent), 2, 3)
+        _hlayout.addLayout(_glayout)
+        _hlayout.addStretch()
+        
+        _layout.addLayout(_hlayout)
+        _layout.addStretch(2)
+        
+        _layout.addWidget(QLabel("<b><u>Pensions</u></b>"))
+        
+        _hlayout = QHBoxLayout()
+        _glayout1=QGridLayout()
+        _glayout1.addWidget(QLabel("Description"), 0, 0)
+        _glayout1.addWidget(QLabel("Annual Amount"), 0, 1)
+        _glayout1.addWidget(QLabel("COLA"), 0, 2)
+        _glayout1.addWidget(QLabel("Begin\nAge"), 0, 3)
+        _glayout1.addWidget(QLabel("End\nAge"), 0, 4)
+        
+        _descr = QLineEdit()
+        _descr.setMaximumWidth(300)
+        _glayout1.addWidget(_descr, 1, 0)
+        _glayout1.addWidget(MoneyEntry(self.parent), 1, 1)
+        _glayout1.addWidget(PercentEntry(self.parent), 1, 2)
+        _glayout1.addWidget(AgeEntry(self.parent), 1, 3)
+        _glayout1.addWidget(AgeEntry(self.parent), 1, 4)
+        
+
+        _descr = QLineEdit()
+        _descr.setMaximumWidth(300)
+        _glayout1.addWidget(_descr, 2, 0)
+        _glayout1.addWidget(MoneyEntry(self.parent), 2, 1)
+        _glayout1.addWidget(PercentEntry(self.parent), 2, 2)
+        _glayout1.addWidget(AgeEntry(self.parent), 2, 3)
+        _glayout1.addWidget(AgeEntry(self.parent), 2, 4)
+        
+        _descr = QLineEdit()
+        _descr.setMaximumWidth(300)
+        _glayout1.addWidget(_descr, 3, 0)
+        _glayout1.addWidget(MoneyEntry(self.parent), 3, 1)
+        _glayout1.addWidget(PercentEntry(self.parent), 3, 2)
+        _glayout1.addWidget(AgeEntry(self.parent), 3, 3)
+        _glayout1.addWidget(AgeEntry(self.parent), 3, 4)
+        
+        _hlayout.addLayout(_glayout1)
+        _hlayout.addStretch()
+        
+        _layout.addLayout(_hlayout)
+        _layout.addStretch(2)
+        
+        #_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        _layout.addWidget(QLabel("<b><u>Other Income Sources: (Full/Part time work)</u></b>"))
         self._add_income_button = QPushButton("Add Income", self)
         self._add_income_button.setFixedSize(90, 30)
         self._add_income_button.clicked.connect(self.add_row)
@@ -26,14 +98,18 @@ class IncomeInfoTab(QWidget):
         # Table will fit the screen horizontally
 
         self.gridLayout = QGridLayout()
-        _layout.addLayout(self.gridLayout)
+        _hlayout=QHBoxLayout()
+        _hlayout.addLayout(self.gridLayout)
+        _hlayout.addStretch()
+        _layout.addLayout(_hlayout)
+        _layout.addStretch(3)
         self.setLayout(_layout)
 
     def add_row(self):
         if self.gridLayout.count() == 0:
             self.gridLayout.addWidget(QLabel("Description"), 0, 0)
             self.gridLayout.addWidget(QLabel("Annual Amount"), 0, 1)
-            _temp = QLabel("Annual\nPercent\nIncrease", wordWrap=True)
+            _temp = QLabel("COLA", wordWrap=True)
             self.gridLayout.addWidget(_temp, 0, 2)
 
             if self.BasicInfoTab.client_is_married():
@@ -86,6 +162,7 @@ class IncomeInfoTab(QWidget):
         dv._incomes = []
         for _i in range(1, self.gridLayout.rowCount()):
             _item = self.gridLayout.itemAtPosition(_i, 0)
+            print(_i)
             _descr = _item.widget().text()
 
             _item = self.gridLayout.itemAtPosition(_i, 1)

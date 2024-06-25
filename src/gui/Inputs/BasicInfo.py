@@ -90,7 +90,7 @@ class PersonBasicInfo(QWidget):
         assert self._person_type in ("Client", "Spouse")
 
         vlayout = QVBoxLayout()
-        vlayout.addWidget(QLabel("<b>%s Information</b>" % self._person_type))
+        vlayout.addWidget(QLabel("<b><u>%s Information</u></b>" % self._person_type))
 
         formlayout = QFormLayout()
         vlayout.addLayout(formlayout)
