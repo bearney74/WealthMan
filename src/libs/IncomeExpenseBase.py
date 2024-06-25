@@ -4,7 +4,9 @@ from .EnumTypes import AmountPeriodType
 from .DateHelper import DateHelper
 
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 class IncomeExpenseBase:
     def __init__(
@@ -14,8 +16,8 @@ class IncomeExpenseBase:
         AmountPeriod: AmountPeriodType,
         BeginDate: int = None,
         EndDate: int = None,
-        #SurvivorPercent: float = None,
-        #Taxable: bool = None,
+        # SurvivorPercent: float = None,
+        # Taxable: bool = None,
         COLA: float = 0.0,
     ):
         assert isinstance(Name, str)
@@ -31,13 +33,13 @@ class IncomeExpenseBase:
         assert isinstance(BeginDate, date) or BeginDate is None
         self.BeginDate = BeginDate
         # self.Owner=Owner
-        #self.SurvivorPercent = SurvivorPercent
-        #self.Taxable = Taxable
+        # self.SurvivorPercent = SurvivorPercent
+        # self.Taxable = Taxable
         assert isinstance(COLA, float) or COLA is None
         if COLA is None:
             COLA = 0.0
         self.COLA = COLA
-        
+
         assert isinstance(EndDate, date) or EndDate is None
         self.EndDate = EndDate
 
@@ -123,7 +125,7 @@ class IncomeExpenseBase:
     def _calc_annual_balance(self) -> int:
         assert self.AmountPeriod == AmountPeriodType.Annual
         return self.Amount
-        
+
     def _calc_balance(self) -> int:
         if self._annual_balance == 0:
             self._annual_balance = self._calc_annual_balance()

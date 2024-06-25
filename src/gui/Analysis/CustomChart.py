@@ -80,11 +80,11 @@ class CustomChartTab(QWidget):
         _data["Regular"] = []
         for _record in self.parent.projectionData:
             if _record.clientIsAlive or _record.spouseIsAlive:
-               if _record.projectionYear not in _years:
-                  _years.append(_record.projectionYear)
+                if _record.projectionYear not in _years:
+                    _years.append(_record.projectionYear)
 
-               for _name, _value in _record.assetSources.items():
-                   _data[_name].append(_value)
+                for _name, _value in _record.assetSources.items():
+                    _data[_name].append(_value)
 
         self.chart.setTitle("Total Assets")
         self.chart.plot(_years, _data.values(), _data.keys())

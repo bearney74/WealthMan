@@ -23,12 +23,13 @@ class IncomeSource(IncomeExpenseBase):
         )
         assert isinstance(IncomeSource, IncomeType)
         self.IncomeSource = IncomeSource
-        
-        assert isinstance (Owner, AccountOwnerType) or Owner is None
+
+        assert isinstance(Owner, AccountOwnerType) or Owner is None
         self.Owner = Owner
-        
+
         self.SurvivorPercent = SurvivorPercent
         self.Taxable = Taxable
+
 
 """
 class SocialSecurity(IncomeSource):

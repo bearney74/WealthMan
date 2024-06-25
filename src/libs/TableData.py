@@ -28,12 +28,12 @@ class TableData:
         for _record in self.projectionData:
             if not _record.clientIsAlive:
                 if _record.spouseAge is None:
-                   continue
+                    continue
                 if not _record.spouseIsAlive:
-                   continue
-            
-            #print("got here for year ", _record.projectionYear)
-            _header_flag=_data == []
+                    continue
+
+            # print("got here for year ", _record.projectionYear)
+            _header_flag = _data == []
             # get year header (year, age1, age2)
             _list = [_record.projectionYear]
 
@@ -76,7 +76,7 @@ class TableData:
             if _header_flag:
                 _header.append("Asset Withdraw")
             _list.append(_record.assetWithdraw)
-            
+
             if _header_flag:
                 _header.append("Surplus/Deficit")
             _list.append(_record.deficit)
@@ -98,23 +98,22 @@ class TableData:
                 _header.append("Client RMD %")
             _list.append(_record.clientRMDPercent)
 
-
             if _record.spouseAge is not None:
-               if _header_flag:
-                  _header.append("Spouse RMD")
-               _list.append(_record.spouseRMD)
+                if _header_flag:
+                    _header.append("Spouse RMD")
+                _list.append(_record.spouseRMD)
 
-               if _header_flag:
-                  _header.append("Spouse RMD %")
-               _list.append(_record.spouseRMDPercent)
+                if _header_flag:
+                    _header.append("Spouse RMD %")
+                _list.append(_record.spouseRMDPercent)
 
-               if _header_flag:
-                   _header.append("Total RMD")
-               _list.append(_record.totalRMD)
-                  
-               if _header_flag:
-                   _header.append("Total RMD %")
-               _list.append(_record.totalRMDPercent)
+                if _header_flag:
+                    _header.append("Total RMD")
+                _list.append(_record.totalRMD)
+
+                if _header_flag:
+                    _header.append("Total RMD %")
+                _list.append(_record.totalRMDPercent)
 
             _data.append(_list)
         # print(_data)
