@@ -48,6 +48,7 @@ class ProjectionYearData:
         self.surplus_deficit: int = 0
 
         self.assetSources: dict = {}
+        self.assetContributions: dict = {}
         self.assetTotal: int = 0
 
         # required Minimal distributions
@@ -126,24 +127,26 @@ class Projections:
                          BirthDate=_birthdate,
                          BeginAge=dv.pension1BeginAge,
                          LifeSpanAge=_lifespan,
+                         SurvivorPercent=dv.pension1SurvivorBenefits,
                          COLA=dv.pension1Cola)
             self._IncomeSources.append(_is)              
        
         if dv.pension2Name is not None and dv.pension2Name.strip() != "":
-            print("pension2Name='%s'" % dv.pension2Name)
+            #print("pension2Name='%s'" % dv.pension2Name)
             _birthdate=dv.clientBirthDate
             _lifespan=dv.clientLifeSpanAge
             if dv.pension2Owner == AccountOwnerType.Spouse:
                 _birthdate=dv.spouseBirthDate
                 _lifespan=dv.spouseLifeSpanAge
-                
+
             _is=IncomeSource(Name=dv.pension2Name,
                          IncomeType=IncomeSourceType.Pension,
                          Owner=dv.pension2Owner,
                          Amount=dv.pension2Amount,
                          AmountPeriod=AmountPeriodType.Annual,
                          BirthDate=_birthdate,
-                         BeginAge=dv.pension1BeginAge,
+                         BeginAge=dv.pension2BeginAge,
+                         SurvivorPercent=dv.pension2SurvivorBenefits,
                          COLA=dv.pension2Cola)
             self._IncomeSources.append(_is)              
        
@@ -169,8 +172,7 @@ class Projections:
                     _record.owner,
                     BirthDate=_birthdate,
                     BeginAge=_record.begin_age,
-                    SurvivorPercent=_record.survivor_percent,
-                    #EndAge=_record.end_age,
+                    EndAge=_record.end_age,
                     Taxable=True,
                     COLA=_record.COLA,
                 )
@@ -219,59 +221,79 @@ class Projections:
                         "Expense '%s' not used since amount not set" % _record._descr
                     )
 
-        _cola = 7.0  # TODO fix me..
+        #_cola = 7.0  # TODO fix me..
         self._Assets = []
         if dv.clientIRABalance is not None:
             self._Assets.append(
                 Account(
-                    "Client IRA",
-                    AccountType.TaxDeferred,
-                    AccountOwnerType.Client,
-                    dv.clientIRABalance,
-                    dv.clientIRACola,
+                    Name="Client IRA",
+                    Type=AccountType.TaxDeferred,
+                    Owner=AccountOwnerType.Client,
+                    BirthDate=dv.clientBirthDate,
+                    Balance=dv.clientIRABalance,
+                    COLA=dv.clientIRACola,
+                    Contribution=dv.clientIRAContribution,
+                    ContributionBeginAge=None,
+                    ContributionEndAge=65
                 )
             )
         if dv.clientRothIRABalance is not None:
             self._Assets.append(
                 Account(
-                    "Client Roth IRA",
-                    AccountType.TaxFree,
-                    AccountOwnerType.Client,
-                    dv.clientRothIRABalance,
-                    dv.clientRothIRACola,
+                    Name="Client Roth IRA",
+                    Type=AccountType.TaxFree,
+                    Owner=AccountOwnerType.Client,
+                    BirthDate=dv.clientBirthDate,
+                    Balance=dv.clientRothIRABalance,
+                    COLA=dv.clientRothIRACola,
+                    Contribution=dv.clientRothIRAContribution,
+                    ContributionBeginAge=None,
+                    ContributionEndAge=65
                 )
             )
 
         if dv.regularBalance is not None:
             self._Assets.append(
                 Account(
-                    "Regular",
-                    AccountType.Regular,
-                    AccountOwnerType.Both,
-                    dv.regularBalance,
-                    dv.regularCola,
+                    Name="Regular",
+                    Type=AccountType.Regular,
+                    Owner=AccountOwnerType.Both,
+                    BirthDate=dv.clientBirthDate,
+                    Balance=dv.regularBalance,
+                    COLA=dv.regularCola,
+                    Contribution=dv.regularContribution,
+                    ContributionBeginAge=None,
+                    ContributionEndAge=65
                 )
             )
 
         if dv.spouseIRABalance is not None:
             self._Assets.append(
                 Account(
-                    "Spouse IRA",
-                    AccountType.TaxDeferred,
-                    AccountOwnerType.Spouse,
-                    dv.spouseIRABalance,
-                    dv.spouseIRACola,
+                    Name="Spouse IRA",
+                    Type=AccountType.TaxDeferred,
+                    Owner=AccountOwnerType.Spouse,
+                    Balance=dv.spouseIRABalance,
+                    BirthDate=dv.spouseBirthDate,
+                    COLA=dv.spouseIRACola,
+                    Contribution=dv.spouseIRAContribution,
+                    ContributionBeginAge=None,
+                    ContributionEndAge=65
                 )
             )
 
         if dv.spouseRothIRABalance is not None:
             self._Assets.append(
                 Account(
-                    "Spouse Roth IRA",
-                    AccountType.TaxFree,
-                    AccountOwnerType.Spouse,
-                    dv.spouseRothIRABalance,
-                    dv.spouseRothIRACola,
+                    Name="Spouse Roth IRA",
+                    Type=AccountType.TaxFree,
+                    Owner=AccountOwnerType.Spouse,
+                    BirthDate=dv.spouseBirthDate,
+                    Balance=dv.spouseRothIRABalance,
+                    COLA=dv.spouseRothIRACola,
+                    Contribution=dv.spouseRothIRAContribution,
+                    ContributionBeginAge=None,
+                    ContributionEndAge=65
                 )
             )
 
@@ -288,6 +310,7 @@ class Projections:
         if self._spouse is not None:
             _spouseRMD = RMD(self._spouse, self._client)
 
+        _lastYearsFederalTaxes=0
         for _year in range(self._begin_year, self._end_year + 1):
             _pyd = ProjectionYearData(_year)
 
@@ -333,10 +356,10 @@ class Projections:
             _pyd.incomeTotal = _income_total
 
             # federal taxes
-            _ft = FederalTax(self._federal_tax_status, 2024)
-            _taxable_income = max(_income_total - _ft.StandardDeduction, 0)
-            _taxes = _ft.calc_taxes(_taxable_income)
-            _pyd.federalTaxes = _taxes
+            #_ft = FederalTax(self._federal_tax_status, 2024)
+            #_taxable_income = max(_income_total - _ft.StandardDeduction, 0)
+            #_taxes = _ft.calc_taxes(_taxable_income)
+            #_pyd.federalTaxes = _taxes
 
             _expense_total = 0
             for _src in self._Expenses:
@@ -346,7 +369,7 @@ class Projections:
                 _expense_total += _expense
             _pyd.expenseTotal = _expense_total
 
-            _cash_flow = _income_total - _expense_total - _taxes
+            #_cash_flow = _income_total - _expense_total - _taxes
 
             # _total = 0
             _client_ira_total = 0
@@ -375,16 +398,27 @@ class Projections:
                 _pyd.spouseRMD = int(_rmd_pct / 100.0 * _spouse_ira_total)
 
             _pyd.totalRMD = _pyd.clientRMD + _pyd.spouseRMD
-            _pyd.totalRMDPercent = (
+            if _client_ira_total + _spouse_ira_total == 0:
+               _pyd.totalRMDPercent=0.0 
+            else:
+               _pyd.totalRMDPercent = (
                 100.0 * _pyd.totalRMD / (_client_ira_total + _spouse_ira_total)
-            )
+               )
 
-            if _cash_flow >= 0:
+
+            #??? should we include TotalRMD as part of cashflow?
+            _cash_flow = _income_total - _expense_total #- _lastYearsFederalTaxes
+
+            print(_income_total, _expense_total, _income_total - _expense_total, _pyd.totalRMD)
+            if _cash_flow < 0:
+                _pyd.assetWithdraw = max(abs(_cash_flow), _pyd.totalRMD)
+            else:
                 _pyd.assetWithdraw = 0
+
+            if _pyd.assetWithdraw == 0:
+                #_pyd.assetWithdraw = 0
                 _pyd.surplus_deficit = _cash_flow
-                
-            if _cash_flow < 0 or _pyd.totalRMD > 0:
-                # _beginning_cash_flow = abs(_cash_flow)
+            else:
                 # we need to pull money from Assets..
                 # define a new class that takes care of this logic, etc
                 # print(_cash_flow, _pyd.totalRMD, max(abs(_cash_flow), _pyd.totalRMD))
@@ -396,7 +430,7 @@ class Projections:
                     _spouseIsAlive,
                     self._Assets,
                 )
-                _pyd.assetWithdraw = max(abs(_cash_flow), _pyd.totalRMD)
+                #_pyd.assetWithdraw = max(abs(_cash_flow), _pyd.totalRMD)
                 _deficit = _ws.reconcile_required_withdraw(_pyd.assetWithdraw)
                 #if _deficit > 0.. we have run out of money...
                 if _deficit > 0:
@@ -413,18 +447,36 @@ class Projections:
             _total = 0
             _client_ira_total = 0
             _spouse_ira_total = 0
+            _contribution_total=0
             for _src in self._Assets:
-                _balance = _src.calc_balance_by_year(_year)
-                _pyd.assetSources[_src.Name] = _balance
+                _src.calc_balance()
+                if _src.ContributionBeginDate.year <= _year and _src.ContributionEndDate.year >= _year:
+                   #print(_src.Contribution)
+                   _src.deposit(_src.Contribution)
+                   _pyd.assetContributions[_src.Name]=_src.Contribution
+                   _contribution_total += _src.Contribution
+                else:
+                   _pyd.assetContributions[_src.Name]=0
+                   
+                _pyd.assetSources[_src.Name] = _src.Balance
+                #print(_src.Name, _src.Balance)
                 if _src.Type == AccountType.TaxDeferred:
                     if _src.Owner == AccountOwnerType.Client:
-                        _client_ira_total += _balance
+                        _client_ira_total += _src.Balance
                     elif _src.Owner == AccountOwnerType.Spouse:
-                        _spouse_ira_total += _balance
+                        _spouse_ira_total += _src.Balance
 
-                _total += _balance
+                _total += _src.Balance
 
             _pyd.assetTotal = _total
+            _pyd.assetContributionTotal=_contribution_total
+
+            # federal taxes
+            _ft = FederalTax(self._federal_tax_status, 2024)
+            _taxable_income = max(_pyd.assetWithdraw + _income_total - _ft.StandardDeduction, 0)
+            _taxes = _ft.calc_taxes(_taxable_income)
+            _pyd.federalTaxes = _taxes
+            _lastYearsFederalTaxes=_taxes
 
             _projection_data.append(_pyd)
 

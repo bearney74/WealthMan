@@ -57,8 +57,8 @@ class DataTableTab(QWidget):
 
         self.table = QTableWidget()
         self.table.setItemDelegate(InitialDelegate(self.table))
-        self.table.setItemDelegateForColumn(0, QStyledItemDelegate(self.table))
-        self.table.setItemDelegateForColumn(1, QStyledItemDelegate(self.table))
+        #self.table.setItemDelegateForColumn(0, QStyledItemDelegate(self.table))
+        #self.table.setItemDelegateForColumn(1, QStyledItemDelegate(self.table))
 
         layout = QVBoxLayout()
         layout.addWidget(self.table)
@@ -66,7 +66,7 @@ class DataTableTab(QWidget):
 
     # Create table
     def createTable(self):
-        _header, _data = self.parent.tableData.get_data_sheet()
+        _header, _vheader, _data = self.parent.tableData.get_data_sheet()
 
         self.table.hide()
         self.table.clear()
@@ -92,6 +92,7 @@ class DataTableTab(QWidget):
 
         # have to put data in table before setting the header, (or header won't display)
         self.table.setHorizontalHeaderLabels(_header)
+        self.table.setVerticalHeaderLabels(_vheader)
         # Table will fit the screen horizontally
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.horizontalHeader().setSectionResizeMode(

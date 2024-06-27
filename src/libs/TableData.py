@@ -17,12 +17,14 @@ class TableData:
 
     def get_data_sheet(self):
         if self.data is None:
-            self.categories, self.data = self._get_data_sheet()
+            self.categories, _vheader, self.data = self._get_data_sheet()
 
-        return self.categories, self.data
+        return self.categories, _vheader, self.data
 
     def _get_data_sheet(self):
-        _header = ["Year", "Age(s)"]
+        #_header = ["Year", "Age(s)"]
+        _header=[]
+        _vheader=[]
         _data = []
 
         for _record in self.projectionData:
@@ -35,7 +37,9 @@ class TableData:
             # print("got here for year ", _record.projectionYear)
             _header_flag = _data == []
             # get year header (year, age1, age2)
-            _list = [_record.projectionYear]
+            #_list = [_record.projectionYear]
+            _list=[]
+            #_vertical_header=[str(_record.projectionYear)]
 
             _ages = ""
             if _record.clientIsAlive:
@@ -49,7 +53,9 @@ class TableData:
                     _ages += "%s" % _record.spouseAge
                 else:
                     _ages += "--"
-            _list.append(_ages)
+            #_list.append(_ages)
+            #_vertical_header.append(_ages)
+            _vheader.append("%s: %s" % (_record.projectionYear, _ages))
 
             for _name, _balance in _record.incomeSources.items():
                 if _header_flag:
@@ -72,6 +78,15 @@ class TableData:
             if _header_flag:
                 _header.append("Federal Taxes")
             _list.append(_record.federalTaxes)
+
+            for _name, _contribution in _record.assetContributions.items():
+                if _header_flag:
+                   _header.append("%s Contribution" % _name)
+                _list.append(_contribution)
+                
+            if _header_flag:
+                _header.append("Asset Contribution Total")
+            _list.append(_record.assetContributionTotal)
 
             if _header_flag:
                 _header.append("Asset Withdraw")
@@ -117,4 +132,4 @@ class TableData:
 
             _data.append(_list)
         # print(_data)
-        return _header, _data
+        return _header, _vheader, _data

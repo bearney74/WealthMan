@@ -9,7 +9,11 @@ class Account:
         Name: str,
         Type: AccountType,
         Owner: AccountOwnerType,
+        BirthDate: date = None,
         Balance: int = 0,
+        Contribution: int=0,
+        ContributionBeginAge: int=None,
+        ContributionEndAge: int=None,
         COLA: float = 0,
     ):
         assert isinstance(Name, str)
@@ -27,21 +31,35 @@ class Account:
         assert isinstance(COLA, float)
         self.COLA = COLA
 
-        self.AllocationPeriods = []
-        self.AssetClasses = []
+        self.Contribution = Contribution
+        if ContributionBeginAge is None:
+            ContributionBeginAge=0
+        if ContributionEndAge is None:
+            ContributionEndAge=99
+            
+        self.ContributionBeginDate=date(BirthDate.year + ContributionBeginAge,
+                                        BirthDate.month, BirthDate.day)
+        self.ContributionEndDate=date(BirthDate.year + ContributionEndAge,
+                                      BirthDate.month, BirthDate.day)
+        
 
-    def deposit(self, amount: float):
-        assert isinstance(amount, float)
+        #self.AllocationPeriods = []
+        #self.AssetClasses = []
+
+    def deposit(self, amount: int):
+        assert isinstance(amount, int)
         self.Balance += amount
 
-    def withdraw(self, amount: float):
-        assert isinstance(amount, float)
+    def withdraw(self, amount: int):
+        assert isinstance(amount, int)
         self.Balance -= amount
-
+    
     def calc_balance(self):
-        self.Balance = self.Balance * (1.0 + self.COLA / 100.0)
+        self.Balance = int(self.Balance * (1.0 + self.COLA / 100.0))
         return self.Balance
 
+#todo delete stuff below this line
+"""
     def set_AllocationPeriods(self, periods):
         assert len(periods) > 0
         # sort periods by begin and end dates..
@@ -195,3 +213,5 @@ class AssetClassPeriod:
 
         assert EndDate is None or isinstance(EndDate, date)
         self.EndDate = EndDate
+
+"""

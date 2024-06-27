@@ -14,6 +14,7 @@ class IncomeSource(IncomeExpenseBase):
         Owner: AccountOwnerType,
         BirthDate: date,
         BeginAge: int = None,
+        EndAge: int=None,
         LifeSpanAge: int=None,
         SurvivorPercent: float = 0.0,
         Taxable: bool = None,
@@ -22,7 +23,7 @@ class IncomeSource(IncomeExpenseBase):
         super(IncomeSource, self).__init__(
             Name=Name, Amount=Amount, AmountPeriod=AmountPeriod,
             BirthDate=BirthDate,
-            BeginAge=BeginAge, LifeSpanAge=LifeSpanAge,
+            BeginAge=BeginAge, EndAge=EndAge, LifeSpanAge=LifeSpanAge,
             SurvivorPercent=SurvivorPercent, COLA=COLA
         )
         assert isinstance(IncomeType, IncomeSourceType)
@@ -31,17 +32,18 @@ class IncomeSource(IncomeExpenseBase):
         assert isinstance(Owner, AccountOwnerType) or Owner is None
         self.Owner = Owner
 
-        if LifeSpanAge is None:
-            self.LifeSpanDate=None
-        else:
-            self.LifeSpanDate=date(BirthDate.year + LifeSpanAge, BirthDate.month, BirthDate.day)
+        #if LifeSpanAge is None:
+        #    self.LifeSpanDate=None
+        #else:
+        #    self.LifeSpanDate=date(BirthDate.year + LifeSpanAge, BirthDate.month, BirthDate.day)
 
-        self.SurvivorPercent = SurvivorPercent
-        self.Taxable = Taxable
+        #self.SurvivorPercent = SurvivorPercent
+        #self.Taxable = Taxable
 
     def calc_balance_by_year(self, year):
         _balance=IncomeExpenseBase.calc_balance_by_year(self, year)
 
+        #print(self.Name, self.SurvivorPercent)
         if self.LifeSpanDate is not None and self.LifeSpanDate.year < year:
             return int(self.SurvivorPercent/100.0 * _balance)
      

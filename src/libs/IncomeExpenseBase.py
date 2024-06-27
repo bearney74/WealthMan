@@ -18,7 +18,7 @@ class IncomeExpenseBase:
         BeginAge: int = None,
         EndAge: int = None,
         LifeSpanAge: int=None,
-        SurvivorPercent: float = None,
+        SurvivorPercent: float = 0.0,
         # Taxable: bool = None,
         COLA: float = 0.0,
     ):
@@ -47,7 +47,7 @@ class IncomeExpenseBase:
         self.EndDate = date(BirthDate.year + EndAge, BirthDate.month, BirthDate.day)
         
         # self.Owner=Owner
-        # self.SurvivorPercent = SurvivorPercent
+        self.SurvivorPercent = SurvivorPercent
         # self.Taxable = Taxable
         assert isinstance(COLA, float) or COLA is None
         if COLA is None:

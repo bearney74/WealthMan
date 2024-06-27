@@ -66,10 +66,47 @@ class AgeEntry(IntegerEntry):
 
 
 class MoneyEntry(IntegerEntry):
+    # parts copied from https://github.com/yjg30737/pyqt-number-lineedit/blob/main/pyqt_number_lineedit/numberLineEdit.py
     def __init__(self, parent=None):
         super(MoneyEntry, self).__init__(parent, limit_size=80)
         self.setFixedWidth(80)
 
+        self.__comma_enabled = True
+        self.textEdited.connect(self.__textEdited)
+
+    def __textEdited(self, text):
+        if self.__comma_enabled:
+            self.setCommaToText()
+
+    def setComma(self, f: bool):
+        self.__comma_enabled = f
+        self.setCommaToText()
+
+    def setCommaToText(self):
+        text = IntegerEntry.text(self)
+        cur_pos = self.cursorPosition()
+        if text:
+            if self.__comma_enabled:
+                text = text.replace(',', '')
+                if text.find('.') == -1:
+                    IntegerEntry.setText(self, '${:,}'.format(int(text)))
+                else:
+                    pre_dot, post_dot = text.split('.')
+                    text = '${:,}'.format(int(pre_dot)) + '.' + post_dot
+                    IntegerEntry.setText(self, text)
+                self.setCursorPosition(cur_pos)
+            else:
+                self.setText(text.replace(',', ''))
+                
+    def setText(self, text):
+        IntegerEntry.setText(self, text)
+        self.setCommaToText()
+    
+    def text(self):
+        _text=IntegerEntry.text(self)
+        if _text.startswith('$'):
+            _text=_text[1:]
+        return _text.replace(',', '')
 
 class FloatEntry(Entry):
     def __init__(
