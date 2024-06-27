@@ -51,35 +51,35 @@ class BasicInfoTab(QWidget):
             self._spouseinfo.clear_form()
 
     def export_data(self, d: DataVariables):
-        d._clientName = self._clientinfo._name.text()
-        d._clientBirthDate = self._clientinfo._birthDate.get_date()
-        d._clientLifeSpanAge = self._clientinfo._lifespan_age.get_int()
-        d._clientRetirementAge = self._clientinfo._retirement_age.get_int()
-        d._relationStatus = self._clientinfo._status.currentText()
+        d.clientName = self._clientinfo._name.text()
+        d.clientBirthDate = self._clientinfo._birthDate.get_date()
+        d.clientLifeSpanAge = self._clientinfo._lifespan_age.get_int()
+        d.clientRetirementAge = self._clientinfo._retirement_age.get_int()
+        d.relationStatus = self._clientinfo._status.currentText()
 
         if self.client_is_married():
-            d._spouseName = self._spouseinfo._name.text()
-            d._spouseBirthDate = self._spouseinfo._birthDate.get_date()
-            d._spouseLifeSpanAge = self._spouseinfo._lifespan_age.get_int()
-            d._spouseRetirementAge = self._spouseinfo._retirement_age.get_int()
+            d.spouseName = self._spouseinfo._name.text()
+            d.spouseBirthDate = self._spouseinfo._birthDate.get_date()
+            d.spouseLifeSpanAge = self._spouseinfo._lifespan_age.get_int()
+            d.spouseRetirementAge = self._spouseinfo._retirement_age.get_int()
         else:
-            d._spouseName = None
-            d._spouseBirthDate = None
-            d._spouseLifeSpanAge = None
-            d._spouseRetirementAge = None
+            d.spouseName = None
+            d.spouseBirthDate = None
+            d.spouseLifeSpanAge = None
+            d.spouseRetirementAge = None
 
     def import_data(self, d: DataVariables):
-        self._clientinfo._name.setText(d._clientName)
-        self._clientinfo._birthDate.set_date(d._clientBirthDate)
-        self._clientinfo._lifespan_age.setText(d._clientLifeSpanAge)
-        self._clientinfo._retirement_age.setText(d._clientRetirementAge)
-        self._clientinfo._status.setCurrentText(d._relationStatus)
+        self._clientinfo._name.setText(d.clientName)
+        self._clientinfo._birthDate.set_date(d.clientBirthDate)
+        self._clientinfo._lifespan_age.setText(d.clientLifeSpanAge)
+        self._clientinfo._retirement_age.setText(d.clientRetirementAge)
+        self._clientinfo._status.setCurrentText(d.relationStatus)
 
         if self.client_is_married():
-            self._spouseinfo._name.setText(d._spouseName)
-            self._spouseinfo._birthDate.set_date(d._spouseBirthDate)
-            self._spouseinfo._lifespan_age.setText(d._spouseLifeSpanAge)
-            self._spouseinfo._retirement_age.setText(d._spouseRetirementAge)
+            self._spouseinfo._name.setText(d.spouseName)
+            self._spouseinfo._birthDate.set_date(d.spouseBirthDate)
+            self._spouseinfo._lifespan_age.setText(d.spouseLifeSpanAge)
+            self._spouseinfo._retirement_age.setText(d.spouseRetirementAge)
 
 
 class PersonBasicInfo(QWidget):

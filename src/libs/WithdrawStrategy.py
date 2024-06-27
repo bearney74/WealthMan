@@ -60,7 +60,7 @@ class WithdrawStrategy:
                 case _:
                     logger.error("invalid asset type '%s'" % _type)
 
-    def reconcile_deficit(self, deficit: int):
+    def reconcile_required_withdraw(self, deficit: int):
         # todo.  how to deal with taxes from asset sells???
         for _asset in self._assets:
             if _asset.Type in (AccountType.TaxDeferred, AccountType.TaxFree):

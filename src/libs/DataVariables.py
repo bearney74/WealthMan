@@ -12,20 +12,23 @@ class BaseRecord:
         owner,
         begin_age,
         end_age,
-        isSocialSecurity: bool = False,
+        survivor_percent: float = None,
     ):
         assert isinstance(descr, str)
-        self._descr = descr
+        self.descr = descr
         assert isinstance(amount, int)
-        self._amount = amount
+        self.amount = amount
         assert isinstance(COLA, float)
-        self._COLA = COLA
+        self.COLA = COLA
         assert isinstance(owner, AccountOwnerType)
-        self._owner = owner
+        self.owner = owner
         assert isinstance(begin_age, int) or begin_age is None
-        self._begin_age = begin_age
+        self.begin_age = begin_age
         assert isinstance(end_age, int) or end_age is None
-        self._end_age = end_age
+        self.end_age = end_age
+        
+        assert isinstance(survivor_percent, float) or survivor_percent is None
+        self.survivor_percent=survivor_percent
 
 
 class IncomeRecord(BaseRecord):
@@ -37,13 +40,13 @@ class IncomeRecord(BaseRecord):
         owner,
         begin_age,
         end_age,
-        isSocialSecurity: bool = False,
+        survivor_benefit: float = None
     ):
         super(IncomeRecord, self).__init__(
-            descr, amount, COLA, owner, begin_age, end_age
+            descr, amount, COLA, owner, begin_age, end_age, survivor_benefit
         )
-        assert isinstance(isSocialSecurity, bool)
-        self._isSocialSecurity = isSocialSecurity
+        #assert isinstance(isSocialSecurity, bool)
+        #self._isSocialSecurity = isSocialSecurity
 
 
 class ExpenseRecord(BaseRecord):
@@ -58,33 +61,67 @@ class DataVariables:
         self.__version__ = 0.1
         # BasicInfo
 
-        self._clientName: str = ""
-        self._clientBirthDate: date = None
-        self._clientLifeSpanAge: int = None  # age
-        self._clientRetirementAge: int = None
-        self._relationStatus: RelationStatus = RelationStatus.Single
+        self.clientName: str = ""
+        self.clientBirthDate: date = None
+        self.clientLifeSpanAge: int = None  # age
+        self.clientRetirementAge: int = None
+        self.relationStatus: RelationStatus = RelationStatus.Single
 
-        self._spouseName: str = ""
-        self._spouseBirthDate: date = None
-        self._spouseLifeSpanAge: int = None
-        self._spouseRetirementAge: int = None
+        self.spouseName: str = ""
+        self.spouseBirthDate: date = None
+        self.spouseLifeSpanAge: int = None
+        self.spouseRetirementAge: int = None
 
         # Income Sources
-        self._incomes: [IncomeRecord] = []
+        self.clientSSAmount: int = None
+        self.clientSSCola: float = None
+        self.clientSSBeginAge: int = None
+
+        self.spouseSSAmount: int = None
+        self.spouseSSCola: float = None
+        self.spouseSSBeginAge: int = None
+
+        self.pension1Name: str = None
+        self.pension1Amount: int = None
+        self.pension1Cola: float = None
+        self.pension1SurvivorBenefits: float = None
+        self.pension1BeginAge: int = None
+        self.pension1EndAge: int = None
+
+        self.pension2Name: str = None
+        self.pension2Amount: int = None
+        self.pension2Cola: float = None
+        self.pension2SurvivorBenefits: float = None
+        self.pension2BeginAge: int = None
+        self.pension2EndAge: int = None
+
+        self.otherIncomes: [IncomeRecord] = []
 
         # Expense Sources
-        self._expenses: [ExpenseRecord] = []
+        self.expenses: [ExpenseRecord] = []
 
         # Assets
-        self._clientIRA: int = None
-        self._clientRothIRA: int = None
-        self._Regular: int = None
+        self.clientIRABalance: int = None
+        self.clientIRACola: float = None
+        self.clientContribution: int = None
 
-        self._spouseIRA: int = None
-        self._spouseRothIRA: int = None
-        # self._spouseRegular: int = None
+        self.clientRothIRABalance: int = None
+        self.clientRothIRACola: float = None
+        self.clientRothContribution: int = None
+
+        self.spouseIRABalance: int = None
+        self.spouseIRACola: float = None
+        self.spouseContribution: int = None
+
+        self.spouseRothIRABalance: int = None
+        self.spouseRothIRACola: float = None
+        self.spouseRothContribution: int = None
+
+        self.regularBalance: int = None
+        self.regularCola: float = None
+        self.regularContribution: int = None
 
         # Global Variables
-        self._inflation: float = None
-        self._withdrawOrder: str = None
-        self._forecastYears: int = None
+        self.inflation: float = None
+        self.withdrawOrder: str = None
+        self.forecastYears: int = None

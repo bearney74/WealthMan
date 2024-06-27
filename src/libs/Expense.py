@@ -10,10 +10,12 @@ class Expense(IncomeExpenseBase):
         Name: str,
         Amount: int,
         AmountPeriod: AmountPeriodType,
-        BeginDate: date = None,
-        EndDate: date = None,
+        BirthDate: date=None,
+        BeginAge: int = None,
+        EndAge: int = None,
         COLA: float = 0.0,
     ):
         IncomeExpenseBase.__init__(
-            self, Name, Amount, AmountPeriod, BeginDate, EndDate, COLA=COLA
+            self, Name=Name, Amount=Amount, AmountPeriod=AmountPeriod,
+            BirthDate=BirthDate, BeginAge=BeginAge, EndAge=EndAge, COLA=COLA
         )

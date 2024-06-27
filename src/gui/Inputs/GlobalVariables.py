@@ -42,12 +42,12 @@ class GlobalVariablesTab(QWidget):
         self._Inflation.setText("")
 
     def export_data(self, d: DataVariables):
-        d._inflation = self._Inflation.get_float()
-        d._withdrawOrder = self._WithdrawOrder.currentText()
-        d._forecastYears = self._forecast_years.get_int()
+        d.inflation = self._Inflation.get_float()
+        d.withdrawOrder = self._WithdrawOrder.currentText()
+        d.forecastYears = self._forecast_years.get_int()
 
     def import_data(self, d: DataVariables):
         """imports variables to the Global Variables tab"""
-        self._Inflation.setText(d._inflation)
-        self._WithdrawOrder.setCurrentText(d._withdrawOrder)
-        self._forecast_years.setText(d._forecastYears)
+        self._Inflation.setText(d.inflation)
+        self._WithdrawOrder.setCurrentText(d.withdrawOrder)
+        self._forecast_years.setText(d.forecastYears)

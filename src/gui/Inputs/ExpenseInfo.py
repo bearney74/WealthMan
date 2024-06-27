@@ -115,27 +115,27 @@ class ExpenseInfoTab(QWidget):
                 if _person == "Spouse":
                     _owner = AccountOwnerType.Spouse
 
-            d._expenses.append(
+            d.expenses.append(
                 ExpenseRecord(_descr, _amount, _cola, _owner, _begin_age, _end_age)
             )
 
     def import_data(self, d: DataVariables):
-        for _record in d._expenses:
+        for _record in d.expenses:
             self.add_row()
 
             _i = self.gridLayout.rowCount() - 1
 
             _item = self.gridLayout.itemAtPosition(_i, 0)
-            _item.widget().setText(_record._descr)
+            _item.widget().setText(_record.descr)
 
             _item = self.gridLayout.itemAtPosition(_i, 1)
-            _item.widget().setText(_record._amount)
+            _item.widget().setText(_record.amount)
 
             _item = self.gridLayout.itemAtPosition(_i, 2)
-            _item.widget().setText(_record._COLA)
+            _item.widget().setText(_record.COLA)
 
             if self.BasicInfoTab.client_is_married():
-                if _record._owner == AccountOwnerType.Spouse:
+                if _record.owner == AccountOwnerType.Spouse:
                     _owner = "Spouse"
                 else:
                     _owner = "Client"
@@ -143,14 +143,14 @@ class ExpenseInfoTab(QWidget):
                 _item.widget().setCurrentText(_owner)
 
                 _item = self.gridLayout.itemAtPosition(_i, 4)
-                _item.widget().setText(_record._begin_age)
+                _item.widget().setText(_record.begin_age)
 
                 _item = self.gridLayout.itemAtPosition(_i, 5)
-                _item.widget().setText(_record._end_age)
+                _item.widget().setText(_record.end_age)
 
             else:
                 _item = self.gridLayout.itemAtPosition(_i, 3)
-                _item.widget().setText(_record._begin_age)
+                _item.widget().setText(_record.begin_age)
 
                 _item = self.gridLayout.itemAtPosition(_i, 4)
-                _item.widget().setText(_record._end_age)
+                _item.widget().setText(_record.end_age)

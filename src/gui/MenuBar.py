@@ -67,6 +67,7 @@ class MenuBar:
         with open(_fname, "rb") as _fp:
             dv = pickle.load(_fp)
 
+        self.parent.InputsTab.clear_forms()
         self.parent.InputsTab.BasicInfoTab.import_data(dv)
         self.parent.InputsTab.IncomeInfoTab.import_data(dv)
         self.parent.InputsTab.ExpenseInfoTab.import_data(dv)

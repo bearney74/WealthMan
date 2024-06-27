@@ -1,7 +1,7 @@
 from datetime import datetime, date
 
 from .Account import Account
-from .IncomeSources import IncomeSource
+from .IncomeSources import IncomeSource, SocialSecurity
 from .Expense import Expense
 from .RequiredMinimalDistributions import RMD
 from .EnumTypes import (
@@ -9,14 +9,13 @@ from .EnumTypes import (
     AccountOwnerType,
     AmountPeriodType,
     FederalTaxStatusType,
-    IncomeType,
+    IncomeSourceType,
 )
 from .FederalTax import FederalTax
 
 from .Person import Person
 from .DataVariables import DataVariables
 from .WithdrawStrategy import WithdrawStrategy
-
 
 import logging
 
@@ -46,7 +45,7 @@ class ProjectionYearData:
 
         # how much we had to pull from assets because expenses > income
         self.assetWithdraw: int = 0
-        self.deficit: int = 0
+        self.surplus_deficit: int = 0
 
         self.assetSources: dict = {}
         self.assetTotal: int = 0
@@ -66,167 +65,217 @@ class Projections:
     def __init__(self, dv: DataVariables):
         self._begin_year = datetime.now().year
 
-        self._withdrawOrder = dv._withdrawOrder
+        self._withdrawOrder = dv.withdrawOrder
 
         self._client = Person(
-            name=dv._clientName,
-            birthDate=dv._clientBirthDate,
-            lifeSpanAge=dv._clientLifeSpanAge,
-            retirementAge=dv._clientRetirementAge,
-            relationship=dv._relationStatus,
+            name=dv.clientName,
+            birthDate=dv.clientBirthDate,
+            lifeSpanAge=dv.clientLifeSpanAge,
+            retirementAge=dv.clientRetirementAge,
+            relationship=dv.relationStatus,
         )
 
         self._spouse = None
-        if dv._relationStatus == "Married":
+        if dv.relationStatus == "Married":
             self._spouse = Person(
-                name=dv._spouseName,
-                birthDate=dv._spouseBirthDate,
-                retirementAge=dv._spouseRetirementAge,
-                lifeSpanAge=dv._spouseLifeSpanAge,
+                name=dv.spouseName,
+                birthDate=dv.spouseBirthDate,
+                retirementAge=dv.spouseRetirementAge,
+                lifeSpanAge=dv.spouseLifeSpanAge,
             )
 
         self._IncomeSources = []
-        for _record in dv._incomes:
-            _birthdate = self._client.birthDate
-            if _record._owner == AccountOwnerType.Spouse:
-                _birthdate = self._spouse.birthDate
+        # do SS and pensions...
+        _client_ss=SocialSecurity(Name="Client Social Security",
+                           BirthDate=dv.clientBirthDate,
+                           FRAAmount=dv.clientSSAmount,
+                           Owner=AccountOwnerType.Client,
+                           BeginAge=dv.clientSSBeginAge,
+                           LifeSpanAge=dv.clientLifeSpanAge,
+                           COLA=dv.clientSSCola)
+        self._IncomeSources.append(_client_ss)
+        if dv.relationStatus == "Married":
+            _spouse_ss=SocialSecurity(Name="Spouse Social Security",
+                               BirthDate=dv.spouseBirthDate,
+                               FRAAmount=dv.spouseSSAmount,
+                               Owner=AccountOwnerType.Spouse,
+                               BeginAge=dv.spouseSSBeginAge,
+                               LifeSpanAge=dv.spouseLifeSpanAge,
+                               COLA=dv.spouseSSCola)
+            self._IncomeSources.append(_spouse_ss)
+            
+            #these are needed for comparing spouses ss benefits when
+            #spouse dies so that living spouse gets the greater benefit of the
+            #two
+            _spouse_ss.set_SpouseSS(_client_ss)
+            _client_ss.set_SpouseSS(_spouse_ss)
+            
+        #pensions..
+        if dv.pension1Name is not None and dv.pension1Name.strip() != "":
+            _birthdate=dv.clientBirthDate
+            _lifespan=dv.clientLifeSpanAge
+            if dv.pension1Owner == AccountOwnerType.Spouse:
+                _birthdate=dv.spouseBirthDate
+                _lifespan=dv.spouseLifeSpanAge
+            
+            _is=IncomeSource(Name=dv.pension1Name,
+                         IncomeType=IncomeSourceType.Pension,
+                         Owner=dv.pension1Owner,
+                         Amount=dv.pension1Amount,
+                         AmountPeriod=AmountPeriodType.Annual,
+                         BirthDate=_birthdate,
+                         BeginAge=dv.pension1BeginAge,
+                         LifeSpanAge=_lifespan,
+                         COLA=dv.pension1Cola)
+            self._IncomeSources.append(_is)              
+       
+        if dv.pension2Name is not None and dv.pension2Name.strip() != "":
+            print("pension2Name='%s'" % dv.pension2Name)
+            _birthdate=dv.clientBirthDate
+            _lifespan=dv.clientLifeSpanAge
+            if dv.pension2Owner == AccountOwnerType.Spouse:
+                _birthdate=dv.spouseBirthDate
+                _lifespan=dv.spouseLifeSpanAge
+                
+            _is=IncomeSource(Name=dv.pension2Name,
+                         IncomeType=IncomeSourceType.Pension,
+                         Owner=dv.pension2Owner,
+                         Amount=dv.pension2Amount,
+                         AmountPeriod=AmountPeriodType.Annual,
+                         BirthDate=_birthdate,
+                         BeginAge=dv.pension1BeginAge,
+                         COLA=dv.pension2Cola)
+            self._IncomeSources.append(_is)              
+       
+       
+        for _record in dv.otherIncomes:
+            _birthdate = dv.clientBirthDate
+            if _record.owner == AccountOwnerType.Spouse:
+                _birthdate = dv.spouseBirthDate
 
-            if _record._begin_age is None:
-                _record._begin_age = 0
+            if _record.begin_age is None:
+                _record.begin_age = 0
 
-            if _record._amount is not None:
-                if _record._end_age is None:
-                    _record._end_age = 99
-                if _record._COLA is None:
-                    _record._COLA = 0.0
+            if _record.amount is not None:
+                if _record.end_age is None:
+                    _record.end_age = 99
+                if _record.COLA is None:
+                    _record.COLA = 0.0
                 _is = IncomeSource(
-                    _record._descr,
-                    IncomeType.Employment,  # todo Fix me..  SS, pension
-                    _record._amount,
+                    _record.descr,
+                    IncomeSourceType.Employment,
+                    _record.amount,
                     AmountPeriodType.Annual,
-                    _record._owner,
-                    BeginDate=date(
-                        _birthdate.year + _record._begin_age,
-                        _birthdate.month,
-                        _birthdate.day,
-                    ),
-                    EndDate=date(
-                        _birthdate.year + _record._end_age,
-                        _birthdate.month,
-                        _birthdate.day,
-                    ),
+                    _record.owner,
+                    BirthDate=_birthdate,
+                    BeginAge=_record.begin_age,
+                    SurvivorPercent=_record.survivor_percent,
+                    #EndAge=_record.end_age,
                     Taxable=True,
-                    COLA=_record._COLA,
+                    COLA=_record.COLA,
                 )
 
                 self._IncomeSources.append(_is)
             else:
-                if _record._amount is None:
+                if _record.amount is None:
                     logger.Error(
                         "Income Source '%s' not used since amount not set"
-                        % _record._descr
+                        % _record.descr
                     )
 
         self._Expenses = []
-        for _record in dv._expenses:
-            _birthdate = self._client.birthDate
-            if _record._owner == AccountOwnerType.Spouse:
-                _birthdate = self._spouse.birthDate
+        for _record in dv.expenses:
+            _birthdate = dv.clientBirthDate
+            if _record.owner == AccountOwnerType.Spouse:
+                _birthdate = dv.spouseBirthDate
 
-            if _record._begin_age is None:
-                _record._begin_age = 0
-            if _record._amount is not None:
-                if _record._end_age is None:
-                    _record._end_age = 99
-                if _record._COLA is None:
-                    _record._COLA = 0.0
+            if _record.begin_age is None:
+                _record.begin_age = 0
+            if _record.amount is not None:
+                if _record.end_age is None:
+                    _record.end_age = 99
+                if _record.COLA is None:
+                    _record.COLA = 0.0
 
                 _e = Expense(
-                    _record._descr,
-                    _record._amount,
+                    _record.descr,
+                    _record.amount,
                     AmountPeriodType.Annual,
-                    BeginDate=date(
-                        _birthdate.year + _record._begin_age,
-                        _birthdate.month,
-                        _birthdate.day,
-                    ),
-                    EndDate=date(
-                        _birthdate.year + _record._end_age,
-                        _birthdate.month,
-                        _birthdate.day,
-                    ),
-                    COLA=_record._COLA,
+                    BirthDate=_birthdate,
+                    BeginAge=_record.begin_age,
+                    EndAge=_record.end_age,
+                    COLA=_record.COLA,
                 )
 
                 self._Expenses.append(_e)
             else:
-                if _record._begin_age is None:
+                if _record.begin_age is None:
                     logger.Error(
                         "Expense '%s' not used since begin date not set"
-                        % _record._descr
+                        % _record.descr
                     )
-                if _record._amount is None:
+                if _record.amount is None:
                     logger.Error(
                         "Expense '%s' not used since amount not set" % _record._descr
                     )
 
         _cola = 7.0  # TODO fix me..
         self._Assets = []
-        if dv._clientIRA is not None:
+        if dv.clientIRABalance is not None:
             self._Assets.append(
                 Account(
                     "Client IRA",
                     AccountType.TaxDeferred,
                     AccountOwnerType.Client,
-                    dv._clientIRA,
-                    _cola,
+                    dv.clientIRABalance,
+                    dv.clientIRACola,
                 )
             )
-        if dv._clientRothIRA is not None:
+        if dv.clientRothIRABalance is not None:
             self._Assets.append(
                 Account(
                     "Client Roth IRA",
                     AccountType.TaxFree,
                     AccountOwnerType.Client,
-                    dv._clientRothIRA,
-                    _cola,
+                    dv.clientRothIRABalance,
+                    dv.clientRothIRACola,
                 )
             )
 
-        if dv._Regular is not None:
+        if dv.regularBalance is not None:
             self._Assets.append(
                 Account(
                     "Regular",
                     AccountType.Regular,
                     AccountOwnerType.Both,
-                    dv._Regular,
-                    _cola,
+                    dv.regularBalance,
+                    dv.regularCola,
                 )
             )
 
-        if dv._spouseIRA is not None:
+        if dv.spouseIRABalance is not None:
             self._Assets.append(
                 Account(
                     "Spouse IRA",
                     AccountType.TaxDeferred,
                     AccountOwnerType.Spouse,
-                    dv._spouseIRA,
-                    _cola,
+                    dv.spouseIRABalance,
+                    dv.spouseIRACola,
                 )
             )
 
-        if dv._spouseRothIRA is not None:
+        if dv.spouseRothIRABalance is not None:
             self._Assets.append(
                 Account(
                     "Spouse Roth IRA",
                     AccountType.TaxFree,
                     AccountOwnerType.Spouse,
-                    dv._spouseRothIRA,
-                    _cola,
+                    dv.spouseRothIRABalance,
+                    dv.spouseRothIRACola,
                 )
             )
 
-        self._end_year = self._begin_year + dv._forecastYears
+        self._end_year = self._begin_year + dv.forecastYears
         # TODO fix me
         self._federal_tax_status = FederalTaxStatusType.MarriedJointly
         # self._federal_tax_status = self._vars["GlobalVars"].FederalTaxStatus
@@ -246,7 +295,12 @@ class Projections:
             _clientIsAlive = _clientage <= self._client.lifeSpanAge
             _pyd.clientAge = _clientage
             _pyd.clientIsAlive = _clientIsAlive
-
+            
+            if _clientage == self._client.lifeSpanAge + 1:
+               #should set client RMD to spouse
+               _clientRMD.death_event(self._client)
+               
+            
             _spouseage = None
             _spouseIsAlive = None
             if self._spouse is not None:
@@ -254,6 +308,9 @@ class Projections:
                 _spouseIsAlive = _spouseage <= self._spouse.lifeSpanAge
                 _pyd.spouseAge = _spouseage
                 _pyd.spouseIsAlive = _spouseIsAlive
+
+                if _spouseage == self._spouse.lifeSpanAge + 1:
+                   _spouseRMD.death_event(self._spouse)
 
             if not _clientIsAlive:
                 if self._client.relationship == "Single":
@@ -267,7 +324,9 @@ class Projections:
             _income_total = 0
             for _src in self._IncomeSources:
                 _income = _src.calc_balance_by_year(_year)
+                    
                 _pyd.incomeSources[_src.Name] = _income
+                    
 
                 _income_total += _income  # _src.calc_income_by_year(_year)
 
@@ -320,9 +379,11 @@ class Projections:
                 100.0 * _pyd.totalRMD / (_client_ira_total + _spouse_ira_total)
             )
 
-            if _cash_flow >= 0 and _pyd.totalRMD == 0:
+            if _cash_flow >= 0:
                 _pyd.assetWithdraw = 0
-            else:
+                _pyd.surplus_deficit = _cash_flow
+                
+            if _cash_flow < 0 or _pyd.totalRMD > 0:
                 # _beginning_cash_flow = abs(_cash_flow)
                 # we need to pull money from Assets..
                 # define a new class that takes care of this logic, etc
@@ -336,8 +397,12 @@ class Projections:
                     self._Assets,
                 )
                 _pyd.assetWithdraw = max(abs(_cash_flow), _pyd.totalRMD)
-                _resulting_deficit = _ws.reconcile_deficit(_pyd.assetWithdraw)
-                _pyd.deficit = _resulting_deficit
+                _deficit = _ws.reconcile_required_withdraw(_pyd.assetWithdraw)
+                #if _deficit > 0.. we have run out of money...
+                if _deficit > 0:
+                    _pyd.surplus_deficit=-_deficit
+                else:
+                    _pyd.surplus_deficit=_pyd.assetWithdraw + _cash_flow
                 # print(_resulting_deficit)
                 # _resulting deficit should be zero, unless client does not have the funds available..
 

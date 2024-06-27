@@ -1,6 +1,13 @@
 from datetime import datetime, date
-from PyQt6.QtWidgets import QLineEdit, QWidget, QComboBox, QHBoxLayout
+from PyQt6.QtWidgets import QLineEdit, QWidget, QComboBox, QHBoxLayout, QLabel
 from PyQt6.QtGui import QIntValidator, QDoubleValidator
+# from PyQt6.QtGui.QDoubleValidator import StandardNotation
+
+
+class MinWidthLabel(QLabel):
+    def __init__(self, text):
+        super(MinWidthLabel, self).__init__(text)
+        self.setFixedWidth(self.sizeHint().width())
 
 
 class Entry(QLineEdit):
@@ -97,8 +104,13 @@ class PercentEntry(FloatEntry):
     def __init__(self, parent=None, min=0.0, max=9.9, num_decimal_places: int = 1):
         super(PercentEntry, self).__init__(parent, min, max, num_decimal_places)
 
-        self.setMaxLength(4)
+        # self.setMaxLength(4)
         self.setFixedWidth(30)
+        # self.setValidator(QDoubleValidator(min, max, num_decimal_places))
+        # _dv=QDoubleValidator(0.0, 9.9, 1)
+        _dv = QDoubleValidator(min, max, num_decimal_places)
+        _dv.setNotation(QDoubleValidator.Notation.StandardNotation)
+        self.setValidator(_dv)
 
 
 class DateEntry(QWidget):

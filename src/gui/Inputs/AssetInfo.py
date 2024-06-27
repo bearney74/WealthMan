@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
 
-from gui.guihelpers.Entry import MoneyEntry
+from gui.guihelpers.Entry import MoneyEntry, PercentEntry
 
 from libs.DataVariables import DataVariables
 
@@ -12,7 +12,7 @@ class AssetInfoTab(QWidget):
 
         self.BasicInfoTab = BasicInfoTab
 
-        _layout = QHBoxLayout()
+        _layout = QVBoxLayout()
 
         self._clientinfo = AssetInfoForm(parent, "Client")
         self._spouseinfo = AssetInfoForm(parent, "Spouse")
@@ -21,29 +21,76 @@ class AssetInfoTab(QWidget):
         _layout.addWidget(self._clientinfo)
         _layout.addWidget(self._spouseinfo)
 
+        _layout.addWidget(QLabel("<b><u>Other Assets (Taxable)</u></b>"))
+
+        _flayout = QFormLayout()
+        # _layout.addWidget(QLabel("Regular(Taxable):"))
+        self.RegularBalance = MoneyEntry()
+        _flayout.addRow(QLabel("Regular Balance:"), self.RegularBalance)
+
+        self.RegularCola = PercentEntry()
+        _flayout.addRow("Regular COLA:", self.RegularCola)
+
+        self.RegularContribution = MoneyEntry()
+        _flayout.addRow(
+            QLabel("Regular Annual\nContribution:"), self.RegularContribution
+        )
+
+        _layout.addLayout(_flayout)
+
+        _layout.addStretch(2)
         self.setLayout(_layout)
 
     def clear_form(self):
         self._clientinfo.clear_form()
         self._spouseinfo.clear_form()
 
-    def export_data(self, d: DataVariables):
-        d._clientIRA = self._clientinfo.IRA.get_int()
-        d._clientRothIRA = self._clientinfo.RothIRA.get_int()
-        d._Regular = self._clientinfo.Regular.get_int()
+        self.RegularBalance.setText("")
+        self.RegularCola.setText("")
+        self.RegularContribution.setText("")
 
-        d._spouseIRA = self._spouseinfo.IRA.get_int()
-        d._spouseRothIRA = self._spouseinfo.RothIRA.get_int()
-        # d._spouseRegular=self._spouseinfo._Regular.text()
+    def export_data(self, d: DataVariables):
+        d.clientIRABalance = self._clientinfo.IRABalance.get_int()
+        d.clientIRACola = self._clientinfo.IRACola.get_float()
+        d.clientIRAContribution = self._clientinfo.IRAContribution.get_int()
+
+        d.clientRothIRABalance = self._clientinfo.RothIRABalance.get_int()
+        d.clientRothIRACola = self._clientinfo.RothIRACola.get_float()
+        d.clientRothIRAContribution = self._clientinfo.RothIRAContribution.get_int()
+
+        if self.BasicInfoTab.client_is_married():
+            d.spouseIRABalance = self._spouseinfo.IRABalance.get_int()
+            d.spouseIRACola = self._spouseinfo.IRACola.get_float()
+            d.spouseIRAContribution = self._spouseinfo.IRAContribution.get_int()
+
+            d.spouseRothIRABalance = self._spouseinfo.RothIRABalance.get_int()
+            d.spouseRothIRACola = self._spouseinfo.RothIRACola.get_float()
+            d.spouseRothIRAContribution = self._spouseinfo.RothIRAContribution.get_int()
+
+        d.regularBalance = self.RegularBalance.get_int()
+        d.regularCola = self.RegularCola.get_float()
+        d.regularContribution = self.RegularContribution.get_int()
 
     def import_data(self, d: DataVariables):
-        self._clientinfo.IRA.setText(d._clientIRA)
-        self._clientinfo.RothIRA.setText(d._clientRothIRA)
-        self._clientinfo.Regular.setText(d._Regular)
+        self._clientinfo.IRABalance.setText(d.clientIRABalance)
+        self._clientinfo.IRACola.setText(d.clientIRACola)
+        self._clientinfo.IRAContribution.setText(d.clientIRAContribution)
 
-        self._spouseinfo.IRA.setText(d._spouseIRA)
-        self._spouseinfo.RothIRA.setText(d._spouseRothIRA)
-        # self._spouseinfo._Regular.setText(d._spouseRegular)
+        self._clientinfo.RothIRABalance.setText(d.clientRothIRABalance)
+        self._clientinfo.RothIRACola.setText(d.clientRothIRACola)
+        self._clientinfo.RothIRAContribution.setText(d.clientRothIRAContribution)
+
+        self.RegularBalance.setText(d.regularBalance)
+        self.RegularCola.setText(d.regularCola)
+        self.RegularContribution.setText(d.regularContribution)
+
+        self._spouseinfo.IRABalance.setText(d.spouseIRABalance)
+        self._spouseinfo.IRACola.setText(d.spouseIRACola)
+        self._spouseinfo.IRAContribution.setText(d.spouseIRAContribution)
+
+        self._spouseinfo.RothIRABalance.setText(d.spouseRothIRABalance)
+        self._spouseinfo.RothIRACola.setText(d.spouseRothIRACola)
+        self._spouseinfo.RothIRAContribution.setText(d.spouseRothIRAContribution)
 
 
 class AssetInfoForm(QWidget):
@@ -54,26 +101,45 @@ class AssetInfoForm(QWidget):
         # tk.Label(self, text="Client Information").grid(row=_row, column=0, columnspan=2, sticky='w')
 
         _vlayout = QVBoxLayout()
-        _vlayout.addWidget(QLabel("<b>%s Asset Information</b>" % self._person_type))
+        _vlayout.addWidget(
+            QLabel("<b><u>%s Asset Information</u></b>" % self._person_type)
+        )
 
-        _layout = QFormLayout()
-        self.IRA = MoneyEntry()
-        _layout.addRow(QLabel("IRA:"), self.IRA)
+        _hlayout = QHBoxLayout()
+        _flayout = QFormLayout()
 
-        self.RothIRA = MoneyEntry()
-        _layout.addRow(QLabel("Roth IRA:"), self.RothIRA)
+        self.IRABalance = MoneyEntry()
+        _flayout.addRow(QLabel("IRA Balance:"), self.IRABalance)
+        self.IRACola = PercentEntry()
+        _flayout.addRow(QLabel("IRA COLA:"), self.IRACola)
+        self.IRAContribution = MoneyEntry()
+        _flayout.addRow(QLabel("IRA Annual\nContribution:"), self.IRAContribution)
+        _hlayout.addLayout(_flayout)
 
-        if self._person_type == "Client":
-            self.Regular = MoneyEntry()
-            _layout.addRow(QLabel("Taxable (Regular):"), self.Regular)
+        # _hayout1=QHBoxLayout()
+        _flayout1 = QFormLayout()
+        self.RothIRABalance = MoneyEntry()
+        _flayout1.addRow(QLabel("Roth IRA Balance:"), self.RothIRABalance)
 
-        _vlayout.addLayout(_layout)
+        self.RothIRACola = PercentEntry()
+        _flayout1.addRow(QLabel("Roth IRA COLA:"), self.RothIRACola)
+
+        self.RothIRAContribution = MoneyEntry()
+        _flayout1.addRow(
+            QLabel("Roth IRA Annual\nContribution:"), self.RothIRAContribution
+        )
+        _hlayout.addLayout(_flayout1)
+        _vlayout.addLayout(_hlayout)
+
         _vlayout.addStretch()
 
         self.setLayout(_vlayout)
 
     def clear_form(self):
-        self.IRA.setText("")
-        self.RothIRA.setText("")
-        if self._person_type == "Client":
-            self.Regular.setText("")
+        self.IRABalance.setText("")
+        self.IRACola.setText("")
+        self.IRAContribution.setText("")
+
+        self.RothIRABalance.setText("")
+        self.RothIRACola.setText("")
+        self.RothIRAContribution.setText("")

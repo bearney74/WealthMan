@@ -14,12 +14,16 @@ class IncomeExpenseBase:
         Name: str,
         Amount: int,
         AmountPeriod: AmountPeriodType,
-        BeginDate: int = None,
-        EndDate: int = None,
-        # SurvivorPercent: float = None,
+        BirthDate:date=None,
+        BeginAge: int = None,
+        EndAge: int = None,
+        LifeSpanAge: int=None,
+        SurvivorPercent: float = None,
         # Taxable: bool = None,
         COLA: float = 0.0,
     ):
+        self.BirthDate=BirthDate
+        
         assert isinstance(Name, str)
         self.Name = Name
         # self.IncomeSource=IncomeType
@@ -30,8 +34,18 @@ class IncomeExpenseBase:
         assert isinstance(AmountPeriod, AmountPeriodType)
         self.AmountPeriod = AmountPeriod
 
-        assert isinstance(BeginDate, date) or BeginDate is None
-        self.BeginDate = BeginDate
+        if BeginAge is None:
+            BeginAge=0
+        if EndAge is None:
+            EndAge=99
+        
+        if LifeSpanAge is None:
+            LifeSpanAge=99
+        
+        self.BeginDate = date(BirthDate.year + BeginAge, BirthDate.month, BirthDate.day)
+        self.LifeSpanDate=date(BirthDate.year + LifeSpanAge, BirthDate.month, BirthDate.day)
+        self.EndDate = date(BirthDate.year + EndAge, BirthDate.month, BirthDate.day)
+        
         # self.Owner=Owner
         # self.SurvivorPercent = SurvivorPercent
         # self.Taxable = Taxable
@@ -40,53 +54,12 @@ class IncomeExpenseBase:
             COLA = 0.0
         self.COLA = COLA
 
-        assert isinstance(EndDate, date) or EndDate is None
-        self.EndDate = EndDate
+        #assert isinstance(EndDate, date) or EndDate is None
+        #self.EndDate = EndDate
 
         self._annual_balance = 0
 
     def calc_balance_by_year(self, year) -> int:
-        # this income source has no begin or end date..  so it should be calculated..
-        if self.BeginDate is None and self.EndDate is None:
-            return self._calc_balance()
-
-        if self.BeginDate is None:  # end date is not None
-            assert self.EndDate is not None
-
-            if self.EndDate.year < year:
-                return 0
-            if self.EndDate.year > year:
-                return self._calc_balance()
-
-            assert self.EndDate.year == year
-
-            _dh = DateHelper(self.BeginDate, self.EndDate)
-            self._annual_balance = int(
-                _dh.percent_of_year() / 100.0 * self._calc_balance()
-            )
-            return self._annual_balance
-
-        elif self.EndDate is None:  # begin date is not None
-            assert self.BeginDate is not None
-
-            if self.BeginDate.year > year:  # income source has not started yet.
-                return 0
-            if self.BeginDate.year < year:  # this income source has started..
-                # this is a full year's worth of income
-                return self._calc_balance()
-
-            assert self.BeginDate.year == year
-
-            _dh = DateHelper(self.BeginDate, date(self.BeginDate.year, 12, 31))
-            self._annual_income = int(
-                _dh.percent_of_year() / 100.0 * self._calc_balance()
-            )
-            return self._annual_balance
-
-        # if we get here both BeginDate and EndDate should not be None
-        assert self.BeginDate is not None
-        assert self.EndDate is not None
-
         # this income source is still in the future..  just return 0.
         if self.BeginDate.year > year:
             return 0
@@ -105,11 +78,11 @@ class IncomeExpenseBase:
                 return int(_dh.percent_of_year() / 100.0 * self._calc_balance())
             else:  # Endyear also equal to year
                 _dh = DateHelper(self.BeginDate, self.EndDate)
-                self._annual_income = int(
+                return int(
                     _dh.percent_of_year() / 100.0 * self._calc_balance()
                 )
-                return self._annual_income
-        elif self.EndDate.year == year:
+                #return self._annual_income
+        if self.EndDate.year == year:
             if self.BeginDate.year < year:
                 _dh = DateHelper(date(year, 1, 1), self.EndDate)
                 return int(_dh.percent_of_year() / 100.0 * self._calc_balance())

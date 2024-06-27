@@ -35,7 +35,7 @@ class AccountType(Enum):
     TaxFree = 3  # Roth IRA, Life Insurance Payout, etc
 
 
-class IncomeType(Enum):
+class IncomeSourceType(Enum):
     Employment = 1
     Pension = 2
     SocialSecurity = 3

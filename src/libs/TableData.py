@@ -79,7 +79,7 @@ class TableData:
 
             if _header_flag:
                 _header.append("Surplus/Deficit")
-            _list.append(_record.deficit)
+            _list.append(_record.surplus_deficit)
 
             for _name, _balance in _record.assetSources.items():
                 if _header_flag:

@@ -1,5 +1,11 @@
 from PyQt6.QtWidgets import QWidget, QPushButton, QLabel, QLineEdit
-from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QComboBox
+from PyQt6.QtWidgets import (
+    QVBoxLayout,
+    QHBoxLayout,
+    QFormLayout,
+    QGridLayout,
+    QComboBox,
+)
 
 from PyQt6.QtCore import Qt
 
@@ -7,6 +13,34 @@ from gui.guihelpers.Entry import MoneyEntry, PercentEntry, AgeEntry
 
 from libs.DataVariables import DataVariables, IncomeRecord
 from libs.EnumTypes import AccountOwnerType
+
+
+class SocialSecurityWidget(QWidget):
+    def __init__(self, parent, person_type):
+        super(SocialSecurityWidget, self).__init__(parent)
+        self.parent = parent
+        self.person_type = person_type
+
+        _layout = QVBoxLayout()
+        _flayout = QFormLayout()
+        _layout.addWidget(QLabel("%s Social Security" % self.person_type))
+
+        self.Amount = MoneyEntry()
+        _flayout.addRow(QLabel("FRA Amount:"), self.Amount)
+
+        self.Cola = PercentEntry(self.parent)
+        _flayout.addRow(QLabel("COLA"), self.Cola)
+
+        self.BeginAge = AgeEntry(self.parent)
+        _flayout.addRow(QLabel("Begin Age:"), self.BeginAge)
+        _layout.addLayout(_flayout)
+
+        self.setLayout(_layout)
+
+    def clear_form(self):
+        self.Amount.setText("")
+        self.Cola.setText("")
+        self.BeginAge.setText("")
 
 
 class IncomeInfoTab(QWidget):
@@ -21,70 +55,76 @@ class IncomeInfoTab(QWidget):
         _layout.addWidget(QLabel("<b><u>Social Security</u></b>"))
 
         _hlayout = QHBoxLayout()
-        _glayout = QGridLayout()
-        _glayout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        _glayout.addWidget(QLabel("Description"), 0, 0)
-        _glayout.addWidget(QLabel("FRA Amount"), 0, 1)
-        _glayout.addWidget(QLabel("COLA"), 0, 2)
-        _glayout.addWidget(QLabel("Begin\nAge"), 0, 3)
-
-        _descr = QLineEdit("Client Social Security")
-        _descr.setMaximumWidth(300)
-        _glayout.addWidget(_descr, 1, 0)
-        _glayout.addWidget(MoneyEntry(self.parent), 1, 1)
-        _glayout.addWidget(PercentEntry(self.parent), 1, 2)
-        _glayout.addWidget(AgeEntry(self.parent), 1, 3)
-
-        _descr = QLineEdit("Spouse Social Security")
-        _descr.setMaximumWidth(300)
-        _glayout.addWidget(_descr, 2, 0)
-        _glayout.addWidget(MoneyEntry(self.parent), 2, 1)
-        _glayout.addWidget(PercentEntry(self.parent), 2, 2)
-        _glayout.addWidget(AgeEntry(self.parent), 2, 3)
-        _hlayout.addLayout(_glayout)
-        _hlayout.addStretch()
+        self.clientSS = SocialSecurityWidget(self.parent, "Client")
+        _hlayout.addWidget(self.clientSS)
+        
+        self.spouseSS = SocialSecurityWidget(self.parent, "Spouse")
+        _hlayout.addWidget(self.spouseSS)
+        self.spouseSS.setEnabled(self.BasicInfoTab.client_is_married())
 
         _layout.addLayout(_hlayout)
         _layout.addStretch(2)
 
         _layout.addWidget(QLabel("<b><u>Pensions</u></b>"))
 
-        _hlayout = QHBoxLayout()
-        _glayout1 = QGridLayout()
-        _glayout1.addWidget(QLabel("Description"), 0, 0)
-        _glayout1.addWidget(QLabel("Annual Amount"), 0, 1)
-        _glayout1.addWidget(QLabel("COLA"), 0, 2)
-        _glayout1.addWidget(QLabel("Begin\nAge"), 0, 3)
-        _glayout1.addWidget(QLabel("End\nAge"), 0, 4)
+        _hlayout1 = QHBoxLayout()
+        _flayout1 = QFormLayout()
+        self.pension1Name = QLineEdit()
+        self.pension1Name.setMaximumWidth(300)
+        _flayout1.addRow(QLabel("Description"), self.pension1Name)
 
-        _descr = QLineEdit()
-        _descr.setMaximumWidth(300)
-        _glayout1.addWidget(_descr, 1, 0)
-        _glayout1.addWidget(MoneyEntry(self.parent), 1, 1)
-        _glayout1.addWidget(PercentEntry(self.parent), 1, 2)
-        _glayout1.addWidget(AgeEntry(self.parent), 1, 3)
-        _glayout1.addWidget(AgeEntry(self.parent), 1, 4)
+        self.pension1OwnerLabel=QLabel("Owner:")
+        self.pension1Owner=QComboBox()
+        self.pension1Owner.addItems(["Client", "Spouse"])
+        _flayout1.addRow(self.pension1OwnerLabel, self.pension1Owner)
+        
+        self.pension1Amount = MoneyEntry()
+        _flayout1.addRow(QLabel("Annual Amount:"), self.pension1Amount)
 
-        _descr = QLineEdit()
-        _descr.setMaximumWidth(300)
-        _glayout1.addWidget(_descr, 2, 0)
-        _glayout1.addWidget(MoneyEntry(self.parent), 2, 1)
-        _glayout1.addWidget(PercentEntry(self.parent), 2, 2)
-        _glayout1.addWidget(AgeEntry(self.parent), 2, 3)
-        _glayout1.addWidget(AgeEntry(self.parent), 2, 4)
+        self.pension1Cola = PercentEntry()
+        _flayout1.addRow(QLabel("COLA:"), self.pension1Cola)
 
-        _descr = QLineEdit()
-        _descr.setMaximumWidth(300)
-        _glayout1.addWidget(_descr, 3, 0)
-        _glayout1.addWidget(MoneyEntry(self.parent), 3, 1)
-        _glayout1.addWidget(PercentEntry(self.parent), 3, 2)
-        _glayout1.addWidget(AgeEntry(self.parent), 3, 3)
-        _glayout1.addWidget(AgeEntry(self.parent), 3, 4)
+        self.pension1SurvivorBenefits = PercentEntry(max=100.0)
+        _flayout1.addRow(QLabel("Survivor\nBenefit:"), self.pension1SurvivorBenefits)
 
-        _hlayout.addLayout(_glayout1)
-        _hlayout.addStretch()
+        self.pension1BeginAge = AgeEntry()
+        _flayout1.addRow(QLabel("Begin Age:"), self.pension1BeginAge)
 
-        _layout.addLayout(_hlayout)
+        self.pension1EndAge = AgeEntry()
+        _flayout1.addRow(QLabel("End Age:"), self.pension1EndAge)
+
+        _hlayout1.addLayout(_flayout1)
+
+        _flayout2 = QFormLayout()
+        self.pension2Name = QLineEdit()
+        self.pension2Name.setMaximumWidth(300)
+        _flayout2.addRow(QLabel("Description"), self.pension2Name)
+
+        self.pension2OwnerLabel=QLabel("Owner:")
+        self.pension2Owner=QComboBox()
+        self.pension2Owner.addItems(["Client", "Spouse"])
+        _flayout2.addRow(self.pension2OwnerLabel, self.pension2Owner)
+        
+        self.pension2Amount = MoneyEntry()
+        _flayout2.addRow(QLabel("Annual Amount:"), self.pension2Amount)
+
+        self.pension2Cola = PercentEntry()
+        _flayout2.addRow(QLabel("COLA:"), self.pension2Cola)
+
+        self.pension2SurvivorBenefits = PercentEntry(max=100.0)
+        _flayout2.addRow(QLabel("Survivor\nBenefit:"), self.pension2SurvivorBenefits)
+
+        self.pension2BeginAge = AgeEntry()
+        _flayout2.addRow(QLabel("Begin Age:"), self.pension2BeginAge)
+
+        self.pension2EndAge = AgeEntry()
+        _flayout2.addRow(QLabel("End Age:"), self.pension2EndAge)
+
+        _hlayout1.addLayout(_flayout2)
+
+        _hlayout1.addStretch()
+
+        _layout.addLayout(_hlayout1)
         _layout.addStretch(2)
 
         # _layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -151,6 +191,9 @@ class IncomeInfoTab(QWidget):
             self.gridLayout.addWidget(_end_age, _len, 4)
 
     def clear_form(self):
+        self.clientSS.clear_form()
+        self.spouseSS.clear_form()
+
         for _i in reversed(range(self.gridLayout.count())):
             _item = self.gridLayout.itemAt(_i)
             self.gridLayout.removeItem(_item)
@@ -160,10 +203,40 @@ class IncomeInfoTab(QWidget):
         assert self.gridLayout.count() == 0
 
     def export_data(self, dv: DataVariables):
-        dv._incomes = []
+        dv.clientSSAmount = self.clientSS.Amount.get_int()
+        dv.clientSSCola = self.clientSS.Cola.get_float()
+        dv.clientSSBeginAge = self.clientSS.BeginAge.get_int()
+
+        dv.spouseSSAmount = self.spouseSS.Amount.get_int()
+        dv.spouseSSCola = self.spouseSS.Cola.get_float()
+        dv.spouseSSBeginAge = self.spouseSS.BeginAge.get_int()
+
+        dv.pension1Name = self.pension1Name.text()
+        if not self.BasicInfoTab.client_is_married():
+            dv.pension1Owner=AccountOwnerType.Client
+        else:
+            dv.pension1Owner=AccountOwnerType[self.pension1Owner.currentText()]
+        dv.pension1Amount = self.pension1Amount.get_int()
+        dv.pension1Cola = self.pension1Cola.get_float()
+        dv.pension1SurvivorBenefits = self.pension1SurvivorBenefits.get_float()
+        dv.pension1BeginAge = self.pension1BeginAge.get_int()
+        dv.pension1EndAge = self.pension1EndAge.get_int()
+
+        dv.pension2Name = self.pension2Name.text()
+        if not self.BasicInfoTab.client_is_married():
+            dv.pension2Owner=AccountOwnerType.Client
+        else:
+            dv.pension2Owner=AccountOwnerType[self.pension2Owner.currentText()]
+        
+        dv.pension2Amount = self.pension2Amount.get_int()
+        dv.pension2Cola = self.pension2Cola.get_float()
+        dv.pension2SurvivorBenefits = self.pension2SurvivorBenefits.get_float()
+        dv.pension2BeginAge = self.pension2BeginAge.get_int()
+        dv.pension2EndAge = self.pension2EndAge.get_int()
+
+        dv.otherIncomes = []
         for _i in range(1, self.gridLayout.rowCount()):
             _item = self.gridLayout.itemAtPosition(_i, 0)
-            print(_i)
             _descr = _item.widget().text()
 
             _item = self.gridLayout.itemAtPosition(_i, 1)
@@ -194,27 +267,49 @@ class IncomeInfoTab(QWidget):
                     _owner = AccountOwnerType.Spouse
                     # _owner = "2"
 
-            dv._incomes.append(
+            dv.otherIncomes.append(
                 IncomeRecord(_descr, _amount, _cola, _owner, _begin_age, _end_age)
             )
 
-    def import_data(self, d: DataVariables):
-        for _record in d._incomes:
+    def import_data(self, dv: DataVariables):
+        self.clientSS.Amount.setText(dv.clientSSAmount)
+        self.clientSS.Cola.setText(dv.clientSSCola)
+        self.clientSS.BeginAge.setText(dv.clientSSBeginAge)
+
+        self.spouseSS.Amount.setText(dv.spouseSSAmount)
+        self.spouseSS.Cola.setText(dv.spouseSSCola)
+        self.spouseSS.BeginAge.setText(dv.spouseSSBeginAge)
+
+        self.pension1Name.setText(dv.pension1Name)
+        self.pension1Amount.setText(dv.pension1Amount)
+        self.pension1Cola.setText(dv.pension1Cola)
+        self.pension1SurvivorBenefits.setText(dv.pension1SurvivorBenefits)
+        self.pension1BeginAge.setText(dv.pension1BeginAge)
+        self.pension1EndAge.setText(dv.pension1EndAge)
+
+        self.pension2Name.setText(dv.pension2Name)
+        self.pension2Amount.setText(dv.pension2Amount)
+        self.pension2Cola.setText(dv.pension2Cola)
+        self.pension2SurvivorBenefits.setText(dv.pension2SurvivorBenefits)
+        self.pension2BeginAge.setText(dv.pension2BeginAge)
+        self.pension2EndAge.setText(dv.pension2EndAge)
+
+        for _record in dv.otherIncomes:
             self.add_row()
 
             _i = self.gridLayout.rowCount() - 1
 
             _item = self.gridLayout.itemAtPosition(_i, 0)
-            _item.widget().setText(_record._descr)
+            _item.widget().setText(_record.descr)
 
             _item = self.gridLayout.itemAtPosition(_i, 1)
-            _item.widget().setText(_record._amount)
+            _item.widget().setText(_record.amount)
 
             _item = self.gridLayout.itemAtPosition(_i, 2)
-            _item.widget().setText(_record._COLA)
+            _item.widget().setText(_record.COLA)
 
             if self.BasicInfoTab.client_is_married():
-                if _record._owner == AccountOwnerType.Spouse:
+                if _record.owner == AccountOwnerType.Spouse:
                     _owner = "Spouse"
                 else:
                     _owner = "Client"
@@ -222,13 +317,13 @@ class IncomeInfoTab(QWidget):
                 _item.widget().setCurrentText(_owner)
 
                 _item = self.gridLayout.itemAtPosition(_i, 4)
-                _item.widget().setText(_record._begin_age)
+                _item.widget().setText(_record.begin_age)
 
                 _item = self.gridLayout.itemAtPosition(_i, 5)
-                _item.widget().setText(_record._end_age)
+                _item.widget().setText(_record.end_age)
             else:
                 _item = self.gridLayout.itemAtPosition(_i, 3)
-                _item.widget().setText(_record._begin_age)
+                _item.widget().setText(_record.begin_age)
 
                 _item = self.gridLayout.itemAtPosition(_i, 4)
-                _item.widget().setText(_record._end_age)
+                _item.widget().setText(_record.end_age)
