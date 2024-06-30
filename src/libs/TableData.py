@@ -7,24 +7,27 @@ class TableData:
         self.projectionData = Data
 
         self.categories = None
+        self.vheader=None
         self.data = None
 
     def getCategories(self):
         if self.categories is None:
-            self.categories, self.data = self._get_data_sheet()
+            _categories, self.vheader, self.data = self._get_data_sheet()
+            self.categories=[_x.replace('\n', ' ') for _x in _categories]
 
         return self.categories
 
     def get_data_sheet(self):
         if self.data is None:
-            self.categories, _vheader, self.data = self._get_data_sheet()
+            _categories, self.vheader, self.data = self._get_data_sheet()
+            self.categories=[_x.replace('\n', ' ') for _x in _categories]
 
-        return self.categories, _vheader, self.data
+        return self.categories, self.vheader, self.data
 
     def _get_data_sheet(self):
-        #_header = ["Year", "Age(s)"]
-        _header=[]
-        _vheader=[]
+        # _header = ["Year", "Age(s)"]
+        _header = []
+        _vheader = []
         _data = []
 
         for _record in self.projectionData:
@@ -37,9 +40,9 @@ class TableData:
             # print("got here for year ", _record.projectionYear)
             _header_flag = _data == []
             # get year header (year, age1, age2)
-            #_list = [_record.projectionYear]
-            _list=[]
-            #_vertical_header=[str(_record.projectionYear)]
+            # _list = [_record.projectionYear]
+            _list = []
+            # _vertical_header=[str(_record.projectionYear)]
 
             _ages = ""
             if _record.clientIsAlive:
@@ -53,8 +56,8 @@ class TableData:
                     _ages += "%s" % _record.spouseAge
                 else:
                     _ages += "--"
-            #_list.append(_ages)
-            #_vertical_header.append(_ages)
+            # _list.append(_ages)
+            # _vertical_header.append(_ages)
             _vheader.append("%s: %s" % (_record.projectionYear, _ages))
 
             for _name, _balance in _record.incomeSources.items():
@@ -76,16 +79,32 @@ class TableData:
             _list.append(_record.expenseTotal)
 
             if _header_flag:
-                _header.append("Federal Taxes")
-            _list.append(_record.federalTaxes)
+                _header.append("Last Years\nFederal Taxes")
+            _list.append(_record.lastYearsFederalTaxes)
 
+            if _header_flag:
+                _header.append("This Years\nFederal Taxes")
+            _list.append(_record.thisYearsFederalTaxes)
+
+            if _header_flag:
+                _header.append("Taxable Income")
+            _list.append(_record.taxableIncome)
+            
+            if _header_flag:
+                _header.append("Federal Effective\nTax Rate")
+            _list.append(_record.federalEffectiveTaxRate)
+
+            if _header_flag:
+                _header.append("Federal Marginal\nTax Rate")
+            _list.append(_record.federalMarginalTaxRate)
+            
             for _name, _contribution in _record.assetContributions.items():
                 if _header_flag:
-                   _header.append("%s Contribution" % _name)
+                    _header.append("%s\nContribution" % _name)
                 _list.append(_contribution)
-                
+
             if _header_flag:
-                _header.append("Asset Contribution Total")
+                _header.append("Asset\nContribution Total")
             _list.append(_record.assetContributionTotal)
 
             if _header_flag:

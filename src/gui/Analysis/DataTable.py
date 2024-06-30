@@ -57,9 +57,7 @@ class DataTableTab(QWidget):
 
         self.table = QTableWidget()
         self.table.setItemDelegate(InitialDelegate(self.table))
-        #self.table.setItemDelegateForColumn(0, QStyledItemDelegate(self.table))
-        #self.table.setItemDelegateForColumn(1, QStyledItemDelegate(self.table))
-
+  
         layout = QVBoxLayout()
         layout.addWidget(self.table)
         self.setLayout(layout)

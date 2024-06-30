@@ -87,26 +87,32 @@ class MoneyEntry(IntegerEntry):
         cur_pos = self.cursorPosition()
         if text:
             if self.__comma_enabled:
-                text = text.replace(',', '')
-                if text.find('.') == -1:
-                    IntegerEntry.setText(self, '${:,}'.format(int(text)))
+                if text.startswith("$"):
+                    text = text[1:]
+                text = text.replace(",", "")
+                if text.find(".") == -1:
+                    if text == "":
+                       IntegerEntry.setText(self, "")
+                    else:        
+                       IntegerEntry.setText(self, "${:,}".format(int(text)))
                 else:
-                    pre_dot, post_dot = text.split('.')
-                    text = '${:,}'.format(int(pre_dot)) + '.' + post_dot
+                    pre_dot, post_dot = text.split(".")
+                    text = "${:,}".format(int(pre_dot)) + "." + post_dot
                     IntegerEntry.setText(self, text)
-                self.setCursorPosition(cur_pos)
+                self.setCursorPosition(cur_pos + 1)
             else:
-                self.setText(text.replace(',', ''))
-                
+                self.setText(text.replace(",", ""))
+
     def setText(self, text):
         IntegerEntry.setText(self, text)
         self.setCommaToText()
-    
+
     def text(self):
-        _text=IntegerEntry.text(self)
-        if _text.startswith('$'):
-            _text=_text[1:]
-        return _text.replace(',', '')
+        _text = IntegerEntry.text(self)
+        if _text.startswith("$"):
+            _text = _text[1:]
+        return _text.replace(",", "")
+
 
 class FloatEntry(Entry):
     def __init__(

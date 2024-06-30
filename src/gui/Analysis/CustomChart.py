@@ -2,11 +2,14 @@ import matplotlib
 
 matplotlib.use("QtAgg")
 
-from PyQt6.QtWidgets import QWidget, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QComboBox
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 
+import logging
+logger = logging.getLogger(__name__)
 
 class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
@@ -38,38 +41,66 @@ class StackChart(QWidget):
         else:
             self.canvas.hide()
 
-    def plot(self, years, values, labels):
-        self.canvas.axes.stackplot(years, values, labels=labels, alpha=0.8)
+    def plot(self, years, values, labels, legend_location="upper left"):
+        self.canvas.axes.clear()
+        
+        _output=self.canvas.axes.stackplot(years, values, labels=labels, alpha=0.8)
+        #print(_output)
 
         self.canvas.axes.set_title(self.title)
-        self.canvas.axes.legend(loc="upper left")
+        self.canvas.axes.legend(loc=legend_location)
 
+        #self.canvas.axes.clear()
+        
         def format_string(x, pos):
             _str = ""
             x = int(x)
             return f"${x:,d}"
 
+        self.canvas.axes.yaxis.set_major_formatter(FuncFormatter(format_string))
+        #self.canvas.axes.fill_between(values, 0, years, alpha=0.7)
+        for _line in _output:
+            if _line.figure is not None:
+               _line.figure.canvas.draw()
 
+        
 class CustomChartTab(QWidget):
     def __init__(self, parent=None):
         super(CustomChartTab, self).__init__(parent)
         self.parent = parent
-        # self.Data=[]
-
-        # self.variables=QComboBox(self.parent)
+        
+        self.variables=QComboBox(self.parent)
 
         self.chart = StackChart(self, width=5, height=45, dpi=100)
         # self.chart.show(False)
 
         layout = QVBoxLayout()
-        # hlayout=QHBoxLayout()
-        # hlayout.addWidget(self.variables)
-        # hlayout.addStretch()
-        # layout.addLayout(hlayout)
+        hlayout=QHBoxLayout()
+        hlayout.addWidget(self.variables)
+        hlayout.addStretch()
+        layout.addLayout(hlayout)
         layout.addWidget(self.chart)
         self.setLayout(layout)
+        
+        self.variables.currentIndexChanged.connect(self._selectionchange)
+  
+    def setCategories(self):
+        self.variables.addItems(["Asset Totals",
+                                 "Asset Contribution Totals",
+                                 "Income Totals"])
+     
+    def _selectionchange(self, i):
+        match self.variables.currentText():
+            case "Asset Totals":
+                self.AssetTotals()
+            case "Asset Contribution Totals":
+                self.AssetContributionTotals()
+            case "Income Totals":
+                self.IncomeTotals()
+            case _:
+                logger.error("invalid custom chart")
 
-    def populate(self):
+    def AssetTotals(self):
         _years = []
 
         _data = {}
@@ -86,6 +117,45 @@ class CustomChartTab(QWidget):
                 for _name, _value in _record.assetSources.items():
                     _data[_name].append(_value)
 
-        self.chart.setTitle("Total Assets")
+        #self.chart.show(False)
+        self.chart.setTitle("Asset Totals")
         self.chart.plot(_years, _data.values(), _data.keys())
+        self.chart.show(True)
+
+    def IncomeTotals(self):
+        _years = []
+
+        _data = {}
+        for _record in self.parent.projectionData:
+            if _record.clientIsAlive or _record.spouseIsAlive:
+                if _record.projectionYear not in _years:
+                    _years.append(_record.projectionYear)
+
+                for _name, _value in _record.incomeSources.items():
+                    if _name not in _data:
+                        _data[_name]=[]
+                    _data[_name].append(_value)
+
+        #self.chart.show(False)
+        self.chart.setTitle("Income Totals")
+        self.chart.plot(_years, _data.values(), _data.keys(), legend_location="upper right")
+        self.chart.show(True)
+        
+    def AssetContributionTotals(self):
+        _years = []
+
+        _data = {}
+        for _record in self.parent.projectionData:
+            if _record.clientIsAlive or _record.spouseIsAlive:
+                if _record.projectionYear not in _years:
+                    _years.append(_record.projectionYear)
+
+                for _name, _value in _record.assetContributions.items():
+                    if _name not in _data:
+                        _data[_name]=[]
+                    _data[_name].append(_value)
+
+        #self.chart.show(False)
+        self.chart.setTitle("Asset Contribution Totals")
+        self.chart.plot(_years, _data.values(), _data.keys(), legend_location="upper right")
         self.chart.show(True)

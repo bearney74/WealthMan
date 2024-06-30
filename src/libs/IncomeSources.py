@@ -14,17 +14,22 @@ class IncomeSource(IncomeExpenseBase):
         Owner: AccountOwnerType,
         BirthDate: date,
         BeginAge: int = None,
-        EndAge: int=None,
-        LifeSpanAge: int=None,
+        EndAge: int = None,
+        LifeSpanAge: int = None,
         SurvivorPercent: float = 0.0,
         Taxable: bool = None,
         COLA: float = 0,
     ):
         super(IncomeSource, self).__init__(
-            Name=Name, Amount=Amount, AmountPeriod=AmountPeriod,
+            Name=Name,
+            Amount=Amount,
+            AmountPeriod=AmountPeriod,
             BirthDate=BirthDate,
-            BeginAge=BeginAge, EndAge=EndAge, LifeSpanAge=LifeSpanAge,
-            SurvivorPercent=SurvivorPercent, COLA=COLA
+            BeginAge=BeginAge,
+            EndAge=EndAge,
+            LifeSpanAge=LifeSpanAge,
+            SurvivorPercent=SurvivorPercent,
+            COLA=COLA,
         )
         assert isinstance(IncomeType, IncomeSourceType)
         self.IncomeType = IncomeType
@@ -32,23 +37,24 @@ class IncomeSource(IncomeExpenseBase):
         assert isinstance(Owner, AccountOwnerType) or Owner is None
         self.Owner = Owner
 
-        #if LifeSpanAge is None:
+        # if LifeSpanAge is None:
         #    self.LifeSpanDate=None
-        #else:
+        # else:
         #    self.LifeSpanDate=date(BirthDate.year + LifeSpanAge, BirthDate.month, BirthDate.day)
 
-        #self.SurvivorPercent = SurvivorPercent
-        #self.Taxable = Taxable
+        # self.SurvivorPercent = SurvivorPercent
+        # self.Taxable = Taxable
 
     def calc_balance_by_year(self, year):
-        _balance=IncomeExpenseBase.calc_balance_by_year(self, year)
+        _balance = IncomeExpenseBase.calc_balance_by_year(self, year)
 
-        #print(self.Name, self.SurvivorPercent)
+        # print(self.Name, self.SurvivorPercent)
         if self.LifeSpanDate is not None and self.LifeSpanDate.year < year:
-            return int(self.SurvivorPercent/100.0 * _balance)
-     
-        #if we get here, #we are single, or #spouse is still alive
+            return int(self.SurvivorPercent / 100.0 * _balance)
+
+        # if we get here, #we are single, or #spouse is still alive
         return _balance
+
 
 class SocialSecurity(IncomeSource):
     def __init__(
@@ -57,11 +63,11 @@ class SocialSecurity(IncomeSource):
         BirthDate: date,
         FRAAmount: int,
         Owner: AccountOwnerType,
-        BeginAge: int=None,
+        BeginAge: int = None,
         LifeSpanAge: int = None,
         COLA: float = 0,
     ):
-        #table used to figure out the SS benefit based on Age benefits start...
+        # table used to figure out the SS benefit based on Age benefits start...
         self._table: dict[int, float] = {
             62: 0.7,
             63: 0.75,
@@ -74,13 +80,12 @@ class SocialSecurity(IncomeSource):
             70: 1.24,
         }
 
-        self.FRAAmount=FRAAmount
-        #todo: need to calculate Amount from FRAAmount and birthdate...
+        self.FRAAmount = FRAAmount
+        # todo: need to calculate Amount from FRAAmount and birthdate...
         assert BeginAge in self._table.keys()
-        Amount=int(self.FRAAmount * self._table[BeginAge])
+        Amount = int(self.FRAAmount * self._table[BeginAge])
 
-        
-        self.SpouseObj=None
+        self.SpouseObj = None
 
         super(SocialSecurity, self).__init__(
             Name=Name,
@@ -91,30 +96,31 @@ class SocialSecurity(IncomeSource):
             BirthDate=BirthDate,
             BeginAge=BeginAge,
             LifeSpanAge=LifeSpanAge,
-            COLA=COLA
+            COLA=COLA,
         )
-        
+
     def set_SpouseSS(self, SpouseObj):
-        #assert isinstance(SpouseObj, SocialSecurity)
-        
-        self.SpouseObj=SpouseObj
-        
+        # assert isinstance(SpouseObj, SocialSecurity)
+
+        self.SpouseObj = SpouseObj
+
     def IamDead(self, year) -> bool:
         return self.LifeSpanDate.year < year
-    
+
     def calc_balance_by_year(self, year) -> int:
-    
         if year > self.LifeSpanDate.year:
-            return 0   #assume we are dead..
-        
-        #we are alive.. what about spouse?
+            return 0  # assume we are dead..
+
+        # we are alive.. what about spouse?
         if self.SpouseObj is not None:
             if self.SpouseObj.IamDead(year):
-                return max(self.SpouseObj.calc_balance_by_year_for_SpouseBenefit(year),
-                           IncomeSource.calc_balance_by_year(self, year))
-            
-        #if we get here, #we are single, or #spouse is still alive
+                return max(
+                    self.SpouseObj.calc_balance_by_year_for_SpouseBenefit(year),
+                    IncomeSource.calc_balance_by_year(self, year),
+                )
+
+        # if we get here, #we are single, or #spouse is still alive
         return IncomeSource.calc_balance_by_year(self, year)
-    
+
     def calc_balance_by_year_for_SpouseBenefit(self, year):
         return IncomeSource.calc_balance_by_year(self, year)

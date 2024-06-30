@@ -43,7 +43,7 @@ class AnalysisTab(QWidget):
         # if self.tableData is None:
         #   self.tableData=TableData(self.parent.projectionData)
 
-        # print(_tabName)
+        #print(_tabName)
         match _tabName:
             case "Details":
                 # _tableData=TableData(self.parent.projectionData)
@@ -52,4 +52,5 @@ class AnalysisTab(QWidget):
                 self.ChartTab.setCategories()
                 self.ChartTab.chart.show(False)
             case "Custom Charts":
-                self.CustomChartTab.populate()
+                self.CustomChartTab.setCategories()
+                #self.CustomChartTab.AssetTotals()

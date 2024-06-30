@@ -11,9 +11,9 @@ class Account:
         Owner: AccountOwnerType,
         BirthDate: date = None,
         Balance: int = 0,
-        Contribution: int=0,
-        ContributionBeginAge: int=None,
-        ContributionEndAge: int=None,
+        Contribution: int = 0,
+        ContributionBeginAge: int = None,
+        ContributionEndAge: int = None,
         COLA: float = 0,
     ):
         assert isinstance(Name, str)
@@ -31,20 +31,23 @@ class Account:
         assert isinstance(COLA, float)
         self.COLA = COLA
 
+        if Contribution is None:
+            Contribution = 0
         self.Contribution = Contribution
         if ContributionBeginAge is None:
-            ContributionBeginAge=0
+            ContributionBeginAge = 0
         if ContributionEndAge is None:
-            ContributionEndAge=99
-            
-        self.ContributionBeginDate=date(BirthDate.year + ContributionBeginAge,
-                                        BirthDate.month, BirthDate.day)
-        self.ContributionEndDate=date(BirthDate.year + ContributionEndAge,
-                                      BirthDate.month, BirthDate.day)
-        
+            ContributionEndAge = 99
 
-        #self.AllocationPeriods = []
-        #self.AssetClasses = []
+        self.ContributionBeginDate = date(
+            BirthDate.year + ContributionBeginAge, BirthDate.month, BirthDate.day
+        )
+        self.ContributionEndDate = date(
+            BirthDate.year + ContributionEndAge, BirthDate.month, BirthDate.day
+        )
+
+        # self.AllocationPeriods = []
+        # self.AssetClasses = []
 
     def deposit(self, amount: int):
         assert isinstance(amount, int)
@@ -53,12 +56,13 @@ class Account:
     def withdraw(self, amount: int):
         assert isinstance(amount, int)
         self.Balance -= amount
-    
+
     def calc_balance(self):
         self.Balance = int(self.Balance * (1.0 + self.COLA / 100.0))
         return self.Balance
 
-#todo delete stuff below this line
+
+# todo delete stuff below this line
 """
     def set_AllocationPeriods(self, periods):
         assert len(periods) > 0

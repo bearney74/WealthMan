@@ -37,14 +37,14 @@ class ExpenseInfoTab(QWidget):
             # _temp.setWordWrap(True)
             self.gridLayout.addWidget(_temp, 0, 2)
 
-            if self.BasicInfoTab.client_is_married():
-                self.gridLayout.addWidget(QLabel("Person"), 0, 3)
+            #if self.BasicInfoTab.client_is_married():
+            self.gridLayout.addWidget(QLabel("Person"), 0, 3)
 
-                self.gridLayout.addWidget(QLabel("Begin Age"), 0, 4)
-                self.gridLayout.addWidget(QLabel("End Age"), 0, 5)
-            else:
-                self.gridLayout.addWidget(QLabel("Begin Age"), 0, 3)
-                self.gridLayout.addWidget(QLabel("End Age"), 0, 4)
+            self.gridLayout.addWidget(QLabel("Begin Age"), 0, 4)
+            self.gridLayout.addWidget(QLabel("End Age"), 0, 5)
+            #else:
+            #    self.gridLayout.addWidget(QLabel("Begin Age"), 0, 3)
+            #    self.gridLayout.addWidget(QLabel("End Age"), 0, 4)
 
         _len = self.gridLayout.rowCount()
         _descr = QLineEdit()
@@ -57,22 +57,23 @@ class ExpenseInfoTab(QWidget):
         _COLA = PercentEntry(self.parent)
         self.gridLayout.addWidget(_COLA, _len, 2)
 
-        if self.BasicInfoTab.client_is_married():
-            _person = QComboBox()
-            _person.addItems(["Client", "Spouse"])
-            self.gridLayout.addWidget(_person, _len, 3)
+        #if self.BasicInfoTab.client_is_married():
+        _person = QComboBox()
+        _person.addItems(["Client", "Spouse"])
+        _person.setEnabled(self.BasicInfoTab.client_is_married())
+        self.gridLayout.addWidget(_person, _len, 3)
 
-            _begin_age = AgeEntry(self.parent)
-            self.gridLayout.addWidget(_begin_age, _len, 4)
+        _begin_age = AgeEntry(self.parent)
+        self.gridLayout.addWidget(_begin_age, _len, 4)
 
-            _end_age = AgeEntry(self.parent)
-            self.gridLayout.addWidget(_end_age, _len, 5)
-        else:
-            _begin_age = AgeEntry(self.parent)
-            self.gridLayout.addWidget(_begin_age, _len, 3)
+        _end_age = AgeEntry(self.parent)
+        self.gridLayout.addWidget(_end_age, _len, 5)
+        #else:
+        #    _begin_age = AgeEntry(self.parent)
+        #    self.gridLayout.addWidget(_begin_age, _len, 3)
 
-            _end_age = AgeEntry(self.parent)
-            self.gridLayout.addWidget(_end_age, _len, 4)
+        #    _end_age = AgeEntry(self.parent)
+        #    self.gridLayout.addWidget(_end_age, _len, 4)
 
     def clear_form(self):
         for _i in reversed(range(self.gridLayout.count())):

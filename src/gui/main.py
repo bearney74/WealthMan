@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import QMainWindow, QTabWidget
 from PyQt6.QtWidgets import QStatusBar
+from PyQt6.QtGui import QIcon
 
 from MenuBar import MenuBar
 from Inputs import InputsTab
@@ -18,6 +19,7 @@ class Main(QMainWindow):
     def __init__(self, parent=None):
         super(Main, self).__init__(parent)
 
+        self.title="Wealth Manager v0.1 alpha"
         self.projectionData = None
 
         logger.debug("starting Main Window")
@@ -33,13 +35,16 @@ class Main(QMainWindow):
 
         self.setCentralWidget(self.tabs)
 
-        self.setWindowTitle("Wealth Manager v0.1 alpha")
+        self.setWindowTitle(self.title)
         self.resize(1024, 800)
 
         _statusbar = QStatusBar(self)
         self.setStatusBar(_statusbar)
 
         self._createMenuBar()
+
+        self.setWindowIcon(QIcon("resources/icons8-w-67.png"))
+
         self.show()
         logger.debug("ending Main Window")
 

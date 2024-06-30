@@ -1,6 +1,7 @@
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QFileDialog
 
+import os
 import pickle
 import sys
 
@@ -63,7 +64,7 @@ class MenuBar:
             "",
             "WealthMan Data Files (*.wmd)",
         )
-        logger.debug(_fname)
+        logger.debug("filename:%s" % _fname)
         with open(_fname, "rb") as _fp:
             dv = pickle.load(_fp)
 
@@ -74,6 +75,7 @@ class MenuBar:
         self.parent.InputsTab.AssetInfoTab.import_data(dv)
         self.parent.InputsTab.GlobalVariablesTab.import_data(dv)
 
+        self.parent.setWindowTitle("%s :%s" % (self.parent.title, os.path.basename(_fname)))
         # _import.get_gui_data(self.parent)
         self._filename = _fname
 

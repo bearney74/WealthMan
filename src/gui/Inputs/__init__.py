@@ -58,11 +58,22 @@ class InputsTab(QMainWindow):
                 self.IncomeInfoTab.pension2Owner.setEnabled(
                     self.BasicInfoTab.client_is_married()
                 )
+                
+                for _i in range(1, self.IncomeInfoTab.gridLayout.rowCount()):
+                    _item = self.IncomeInfoTab.gridLayout.itemAtPosition(_i, 3)
+                    # print(_item)
+                    if isinstance(
+                        _item.widget(), QComboBox
+                    ):  # this is probably a person/owner
+                        _item.widget().setEnabled(self.BasicInfoTab.client_is_married())
+
             case "Expenses":
                 for _i in range(1, self.ExpenseInfoTab.gridLayout.rowCount()):
-                    _item=self.ExpenseInfoTab.gridLayout.itemAtPosition(_i, 3)
-                    #print(_item)
-                    if isinstance(_item.widget(), QComboBox):  #this is probably a person/owner
+                    _item = self.ExpenseInfoTab.gridLayout.itemAtPosition(_i, 3)
+                    # print(_item)
+                    if isinstance(
+                        _item.widget(), QComboBox
+                    ):  # this is probably a person/owner
                         _item.widget().setEnabled(self.BasicInfoTab.client_is_married())
 
         # self._previous_tab_name = _tabName
