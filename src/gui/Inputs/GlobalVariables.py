@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QComboBox
+from PyQt6.QtWidgets import (QWidget, QLabel, QFormLayout, QComboBox, QCheckBox)
 
 from gui.guihelpers.Entry import AgeEntry, PercentEntry
 
@@ -30,6 +30,9 @@ class GlobalVariablesTab(QWidget):
             ]
         )
         formlayout.addRow(QLabel("Withdrawal Order"), self._WithdrawOrder)
+        
+        self._InTodaysDollars=QCheckBox("", self)
+        formlayout.addRow(QLabel("In Todays Dollars"), self._InTodaysDollars)
 
         self.setLayout(formlayout)
 
@@ -40,14 +43,17 @@ class GlobalVariablesTab(QWidget):
         self._WithdrawOrder.setCurrentIndex(0)
         self._forecast_years.setText("")
         self._Inflation.setText("")
+        self._InTodaysDollars.setChecked(False)
 
     def export_data(self, d: DataVariables):
         d.inflation = self._Inflation.get_float()
         d.withdrawOrder = self._WithdrawOrder.currentText()
         d.forecastYears = self._forecast_years.get_int()
+        d.inTodaysDollars = self._InTodaysDollars.isChecked()
 
     def import_data(self, d: DataVariables):
         """imports variables to the Global Variables tab"""
         self._Inflation.setText(d.inflation)
         self._WithdrawOrder.setCurrentText(d.withdrawOrder)
         self._forecast_years.setText(d.forecastYears)
+        self._InTodaysDollars.setChecked(d.inTodaysDollars)
