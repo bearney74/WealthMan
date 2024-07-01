@@ -1,5 +1,9 @@
 from PyQt6.QtWidgets import QTabWidget, QToolBar, QMainWindow, QComboBox
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QIcon
+
+from libs.DataVariables import DataVariables
+from libs.Projections import Projections
+from libs.TableData import TableData
 
 from .BasicInfo import BasicInfoTab
 from .GlobalVariables import GlobalVariablesTab
@@ -12,9 +16,11 @@ class InputsTab(QMainWindow):
     def __init__(self, parent=None):
         super(InputsTab, self).__init__(parent)
 
-        self._previous_tab_name = None
+        self.parent=parent
+        #self._previous_tab_name = None
         _toolbar = QToolBar("Inputs Toolbar")
         _toolbar.addAction(self.clear_forms_action())
+        _toolbar.addAction(self.calculate_projection_action())
         self.addToolBar(_toolbar)
 
         self.tabs = QTabWidget()
@@ -80,8 +86,17 @@ class InputsTab(QMainWindow):
 
     def clear_forms_action(self):
         _action = QAction("Clear forms", self)
+        _action.setIcon(QIcon("resources/clear_form.png"))
         _action.setStatusTip("Clear Forms")
         _action.triggered.connect(lambda x: self.clear_forms())
+        return _action
+
+    def calculate_projection_action(self):
+        _action = QAction("Projection", self)
+        _action.setIcon(QIcon("resources/projections.png"))
+        _action.setStatusTip("Create Data Projection")
+        _action.setToolTip("Create Data Projection")
+        _action.triggered.connect(lambda x: self.create_projection())
         return _action
 
     def clear_forms(self):
@@ -90,3 +105,21 @@ class InputsTab(QMainWindow):
         self.IncomeInfoTab.clear_form()
         self.ExpenseInfoTab.clear_form()
         self.GlobalVariablesTab.clear_form()
+
+    def create_projection(self):
+        dv = DataVariables()
+
+        self.BasicInfoTab.export_data(dv)
+        self.IncomeInfoTab.export_data(dv)
+        self.ExpenseInfoTab.export_data(dv)
+        self.AssetInfoTab.export_data(dv)
+        self.GlobalVariablesTab.export_data(dv)
+        
+        self.parent.statusbar.showMessage("Calculating projections")
+        _p = Projections(dv)
+        _projectionData = _p.execute()
+        self.parent.AnalysisTab.projectionData = _projectionData
+        self.parent.AnalysisTab.tableData = TableData(_projectionData, _p.InTodaysDollars)
+        
+        #self.parent.AnalysisTab.reset()
+        self.parent.showAnalysisTab(True)
