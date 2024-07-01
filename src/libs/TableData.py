@@ -2,13 +2,14 @@ from .Projections import ProjectionYearData
 
 
 class TableData:
-    def __init__(self, Data: [ProjectionYearData]):
+    def __init__(self, Data: [ProjectionYearData], InTodaysDollars:bool):
         assert Data is not None
         self.projectionData = Data
 
         self.categories = None
         self.vheader=None
         self.data = None
+        self.InTodaysDollars=InTodaysDollars
 
     def getCategories(self):
         if self.categories is None:
@@ -40,10 +41,11 @@ class TableData:
             # print("got here for year ", _record.projectionYear)
             _header_flag = _data == []
             # get year header (year, age1, age2)
-            # _list = [_record.projectionYear]
-            _list = []
-            # _vertical_header=[str(_record.projectionYear)]
-
+            _list = [_record.projectionYear]
+            #_list = []
+            if _header_flag:
+                _header.append("Year")
+                
             _ages = ""
             if _record.clientIsAlive:
                 _ages += "%s" % _record.clientAge
@@ -56,8 +58,10 @@ class TableData:
                     _ages += "%s" % _record.spouseAge
                 else:
                     _ages += "--"
-            # _list.append(_ages)
-            # _vertical_header.append(_ages)
+            _list.append(_ages)
+            if _header_flag:
+                _header.append("Age(s)")
+                
             _vheader.append("%s: %s" % (_record.projectionYear, _ages))
 
             for _name, _balance in _record.incomeSources.items():

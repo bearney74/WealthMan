@@ -66,8 +66,10 @@ class ProjectionYearData:
 class Projections:
     def __init__(self, dv: DataVariables):
         # can set this to see todays dollars
-        _todays_dollars_flag = True
-        if _todays_dollars_flag:
+        #_todays_dollars_flag = True
+        self.InTodaysDollars=dv.inTodaysDollars
+        
+        if dv.inTodaysDollars:
             self._inflation = dv.inflation
         else:
             self._inflation = 0

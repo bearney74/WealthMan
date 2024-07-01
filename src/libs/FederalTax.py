@@ -11,7 +11,8 @@ class FederalTax(ImportHelper):
         self.Year = Year
 
         self.Brackets = None
-
+        self.StandardDeduction=None
+        
         self._import_data()
 
         # if things were imported correctly from the xml, the vars below should be dicts..

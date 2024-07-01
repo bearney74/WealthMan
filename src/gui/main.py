@@ -7,8 +7,8 @@ from Inputs import InputsTab
 from Logs import Logs
 from Analysis import AnalysisTab
 
-from libs.DataVariables import DataVariables
-from libs.Projections import Projections
+#from libs.DataVariables import DataVariables
+#from libs.Projections import Projections
 
 import logging
 
@@ -33,13 +33,14 @@ class Main(QMainWindow):
         self.tabs.addTab(self.AnalysisTab, "Analysis")
         self.tabs.addTab(self.LogsTab, "Logs")
 
+        self.showAnalysisTab(False)
         self.setCentralWidget(self.tabs)
 
         self.setWindowTitle(self.title)
         self.resize(1024, 800)
 
-        _statusbar = QStatusBar(self)
-        self.setStatusBar(_statusbar)
+        self.statusbar = QStatusBar(self)
+        self.setStatusBar(self.statusbar)
 
         self._createMenuBar()
 
@@ -48,24 +49,24 @@ class Main(QMainWindow):
         self.show()
         logger.debug("ending Main Window")
 
+    def showAnalysisTab(self, flag:bool):
+        self.tabs.setTabEnabled(1, flag)
+        
+        if flag:
+            self.AnalysisTab.reset()
+            self.tabs.setCurrentIndex(1)
+            self.AnalysisTab.tabs.setCurrentIndex(0)
+            
     def _createMenuBar(self):
         _mb = MenuBar(self)
         self.menubar = _mb.get_menubar()
 
     def onTabChange(self, i):
         _tabName = self.tabs.tabText(i)
-        # print(_tabName)
-        if _tabName == "Analysis":
-            dv = DataVariables()
-
-            self.InputsTab.BasicInfoTab.export_data(dv)
-            self.InputsTab.IncomeInfoTab.export_data(dv)
-            self.InputsTab.ExpenseInfoTab.export_data(dv)
-            self.InputsTab.AssetInfoTab.export_data(dv)
-            self.InputsTab.GlobalVariablesTab.export_data(dv)
-            _p = Projections(dv)
-            self.projectionData = _p.execute()
-
+        
+        if _tabName == "Input":
+            self.showAnalysisTab(False)
+        
         self._previous_tab_name = _tabName
 
 

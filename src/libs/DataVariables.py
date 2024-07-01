@@ -135,3 +135,4 @@ class DataVariables:
         self.inflation: float = None
         self.withdrawOrder: str = None
         self.forecastYears: int = None
+        self.inTodaysDollars: bool = False
