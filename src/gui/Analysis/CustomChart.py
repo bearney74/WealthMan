@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
-        fig, self.axes = plt.subplots()
-        super(MplCanvas, self).__init__(fig)
+        self.fig, self.axes = plt.subplots()
+        super(MplCanvas, self).__init__(self.fig)
 
 
 class StackChart(QWidget):
@@ -33,6 +33,9 @@ class StackChart(QWidget):
     def setTitle(self, title):
         self.title = title
 
+    def setSubTitle(self, subtitle):
+        self.subtitle=subtitle
+
     def show(self, flag: bool):
         assert isinstance(flag, bool)
 
@@ -47,7 +50,10 @@ class StackChart(QWidget):
         _output=self.canvas.axes.stackplot(years, values, labels=labels, alpha=0.8)
         #print(_output)
 
-        self.canvas.axes.set_title(self.title)
+        self.canvas.fig.suptitle(self.title)
+        #self.canvas.axes.set_title(self.title)
+        if self.subtitle != "":
+            self.canvas.fig.text(0.5, 0.9, self.subtitle, horizontalalignment="center")
         self.canvas.axes.legend(loc=legend_location)
 
         #self.canvas.axes.clear()
@@ -70,6 +76,9 @@ class CustomChartTab(QWidget):
         self.parent = parent
         
         self.variables=QComboBox(self.parent)
+        self.variables.addItems(["Asset Totals",
+                                 "Asset Contribution Totals",
+                                 "Income Totals"])
 
         self.chart = StackChart(self, width=5, height=45, dpi=100)
         # self.chart.show(False)
@@ -84,11 +93,6 @@ class CustomChartTab(QWidget):
         
         self.variables.currentIndexChanged.connect(self._selectionchange)
   
-    def setCategories(self):
-        self.variables.addItems(["Asset Totals",
-                                 "Asset Contribution Totals",
-                                 "Income Totals"])
-     
     def _selectionchange(self, i):
         match self.variables.currentText():
             case "Asset Totals":
@@ -98,7 +102,7 @@ class CustomChartTab(QWidget):
             case "Income Totals":
                 self.IncomeTotals()
             case _:
-                logger.error("invalid custom chart")
+                logger.error("invalid custom chart '%s' " % self.variables.currentText())
 
     def AssetTotals(self):
         _years = []
@@ -119,6 +123,9 @@ class CustomChartTab(QWidget):
 
         #self.chart.show(False)
         self.chart.setTitle("Asset Totals")
+        if self.parent.tableData.InTodaysDollars:
+            self.chart.setSubTitle("In Today's Dollars")
+
         self.chart.plot(_years, _data.values(), _data.keys())
         self.chart.show(True)
 
@@ -138,6 +145,8 @@ class CustomChartTab(QWidget):
 
         #self.chart.show(False)
         self.chart.setTitle("Income Totals")
+        if self.parent.tableData.InTodaysDollars:
+            self.chart.setSubTitle("In Today's Dollars")
         self.chart.plot(_years, _data.values(), _data.keys(), legend_location="upper right")
         self.chart.show(True)
         
@@ -157,5 +166,8 @@ class CustomChartTab(QWidget):
 
         #self.chart.show(False)
         self.chart.setTitle("Asset Contribution Totals")
+        if self.parent.tableData.InTodaysDollars:
+            self.chart.setSubTitle("In Today's Dollars")
+
         self.chart.plot(_years, _data.values(), _data.keys(), legend_location="upper right")
         self.chart.show(True)

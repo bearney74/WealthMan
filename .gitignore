@@ -8,6 +8,7 @@ __pycache__/
 
 #WeathMan extension
 *.wmd
+*.csv
 
 # Distribution / packaging
 .Python

@@ -12,14 +12,15 @@ from matplotlib.ticker import FuncFormatter
 
 class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
-        fig, self.axes = plt.subplots()
-        super(MplCanvas, self).__init__(fig)
+        self.fig, self.axes = plt.subplots()
+        super(MplCanvas, self).__init__(self.fig)
 
 
 class Chart(QWidget):
     def __init__(self, parent, width=5, height=45, dpi=100):
         super(Chart, self).__init__(parent)
         self.title = ""
+        self.subtitle=""
 
         _layout = QVBoxLayout()
         self.canvas = MplCanvas(self, width=width, height=height, dpi=dpi)
@@ -60,6 +61,9 @@ class Chart(QWidget):
     def setTitle(self, title):
         self.title = title
 
+    def setSubTitle(self, subtitle):
+        self.subtitle=subtitle
+
     def show(self, flag: bool):
         assert isinstance(flag, bool)
 
@@ -77,7 +81,10 @@ class Chart(QWidget):
             _y_data.append(_y)
 
         self.canvas.axes.clear()
-        self.canvas.axes.set_title(self.title)
+        self.canvas.fig.suptitle(self.title)
+        #self.canvas.axes.set_title(self.title)
+        if self.subtitle != "":
+            self.canvas.fig.text(0.5, 0.9, self.subtitle, horizontalalignment="center")
         (_line,) = self.canvas.axes.plot(_x_data, _y_data)
      
         self.setLabels(self.title)
@@ -87,7 +94,7 @@ class Chart(QWidget):
 
 
 class ChartTab(QWidget):
-    def __init__(self, parent, projectionData):
+    def __init__(self, parent):
         super(ChartTab, self).__init__(parent)
         self.parent = parent
         
@@ -115,9 +122,7 @@ class ChartTab(QWidget):
         _ndx = self.variables.currentIndex()
 
         _data = []
-        _year = self._begin_year = (
-            datetime.now().year
-        )  # should we get this somewhere else?
+        _year = datetime.now().year # should we get this somewhere else?
         for _list in self.parent.tableData.data:
             _data.append((_year, _list[_ndx]))
             _year += 1
@@ -125,6 +130,8 @@ class ChartTab(QWidget):
         _category=self.variables.currentText()
         self.chart.setTitle(_category)
         self.chart.setLabels(_category)
+        if self.parent.tableData.InTodaysDollars:
+            self.chart.setSubTitle("In Today's Dollars")
 
         self.chart.plot(_data)
         self.chart.show(True)
