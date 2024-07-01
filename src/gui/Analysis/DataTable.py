@@ -1,8 +1,10 @@
 import csv
 
 from PyQt6.QtWidgets import (
+    QFileDialog,
     QWidget,
     QTableWidget,
+    QToolBar,
     QTableWidgetItem,
     QVBoxLayout,
     QHeaderView,
@@ -10,7 +12,7 @@ from PyQt6.QtWidgets import (
 )
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QBrush, QColor
+from PyQt6.QtGui import QBrush, QColor, QAction, QIcon
 
 import logging
 
@@ -57,8 +59,14 @@ class DataTableTab(QWidget):
 
         self.table = QTableWidget()
         self.table.setItemDelegate(InitialDelegate(self.table))
-  
+        self.table.setItemDelegateForColumn(0, QStyledItemDelegate(self.table))
+        self.table.setItemDelegateForColumn(1, QStyledItemDelegate(self.table))
+        
+        _toolbar = QToolBar("DataTable Toolbar")
+        _toolbar.addAction(self.get_csv_action())
+        
         layout = QVBoxLayout()
+        layout.addWidget(_toolbar)
         layout.addWidget(self.table)
         self.setLayout(layout)
 
@@ -98,8 +106,20 @@ class DataTableTab(QWidget):
         )
         self.table.show()
 
+    def get_csv_action(self):
+        _action = QAction("Download CSV", self)
+        _action.setIcon(QIcon("resources/csv.png"))
+        _action.setStatusTip("Download CSV")
+        _action.triggered.connect(lambda x: self.get_csv())
+        return _action
+
+    def get_csv(self):
+        _fname, _x = QFileDialog.getSaveFileName(self.parent, "Save CSV File")
+        logger.debug("save csv file, filename:%s" % _fname)
+        self.to_csv(_fname)
+
     def to_csv(self, filename):
-        _columns = range(self.tableWidget.columnCount())
+        _columns = range(self.table.columnCount())
         _header = [
             self.table.horizontalHeaderItem(column).text() for column in _columns
         ]
