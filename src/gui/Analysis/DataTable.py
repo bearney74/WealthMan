@@ -61,10 +61,10 @@ class DataTableTab(QWidget):
         self.table.setItemDelegate(InitialDelegate(self.table))
         self.table.setItemDelegateForColumn(0, QStyledItemDelegate(self.table))
         self.table.setItemDelegateForColumn(1, QStyledItemDelegate(self.table))
-        
+
         _toolbar = QToolBar("DataTable Toolbar")
         _toolbar.addAction(self.get_csv_action())
-        
+
         layout = QVBoxLayout()
         layout.addWidget(_toolbar)
         layout.addWidget(self.table)
@@ -108,7 +108,7 @@ class DataTableTab(QWidget):
 
     def get_csv_action(self):
         _action = QAction("Download CSV", self)
-        _action.setIcon(QIcon("resources/csv.png"))
+        _action.setIcon(QIcon("resources/download.png"))
         _action.setStatusTip("Download CSV")
         _action.triggered.connect(lambda x: self.get_csv())
         return _action

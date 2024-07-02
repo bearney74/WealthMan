@@ -66,9 +66,8 @@ class ProjectionYearData:
 class Projections:
     def __init__(self, dv: DataVariables):
         # can set this to see todays dollars
-        #_todays_dollars_flag = True
-        self.InTodaysDollars=dv.inTodaysDollars
-        
+        self.InTodaysDollars = dv.inTodaysDollars
+
         if dv.inTodaysDollars:
             self._inflation = dv.inflation
         else:
@@ -237,7 +236,6 @@ class Projections:
                         "Expense '%s' not used since amount not set" % _record._descr
                     )
 
-        # _cola = 7.0  # TODO fix me..
         self._Assets = []
         if dv.clientIRABalance is not None:
             self._Assets.append(
@@ -369,12 +367,7 @@ class Projections:
 
             _pyd.incomeTotal = _income_total
 
-            # federal taxes
-            # _ft = FederalTax(self._federal_tax_status, 2024)
-            # _taxable_income = max(_income_total - _ft.StandardDeduction, 0)
-            # _taxes = _ft.calc_taxes(_taxable_income)
-            # _pyd.federalTaxes = _taxes
-
+           
             _expense_total = 0
             for _src in self._Expenses:
                 _expense = _src.calc_balance_by_year(_year)
@@ -450,13 +443,7 @@ class Projections:
                     _pyd.surplus_deficit = -_deficit
                 else:
                     _pyd.surplus_deficit = _pyd.assetWithdraw + _cash_flow
-                # print(_resulting_deficit)
-                # _resulting deficit should be zero, unless client does not have the funds available..
-
-                # _pyd.assetWithdraw = _beginning_cash_flow - _cash_flow
-                # _pyd.assetWidthdraw = _cash_flow
-                # _cash_flow = -_cash_flow  # needs to be negative
-
+                
             _total = 0
             _client_ira_total = 0
             _spouse_ira_total = 0
@@ -467,7 +454,6 @@ class Projections:
                     _src.ContributionBeginDate.year <= _year
                     and _src.ContributionEndDate.year >= _year
                 ):
-                    # print(_src.Contribution)
                     _src.deposit(_src.Contribution)
                     _pyd.assetContributions[_src.Name] = _src.Contribution
                     _contribution_total += _src.Contribution
@@ -475,7 +461,7 @@ class Projections:
                     _pyd.assetContributions[_src.Name] = 0
 
                 _pyd.assetSources[_src.Name] = _src.Balance
-                # print(_src.Name, _src.Balance)
+                
                 if _src.Type == AccountType.TaxDeferred:
                     if _src.Owner == AccountOwnerType.Client:
                         _client_ira_total += _src.Balance
@@ -492,14 +478,18 @@ class Projections:
             _taxable_income = max(
                 _pyd.assetWithdraw + _income_total - _ft.StandardDeduction, 0
             )
-            _pyd.taxableIncome=_taxable_income
+            _pyd.taxableIncome = _taxable_income
             _pyd.thisYearsFederalTaxes = _ft.calc_taxes(_taxable_income)
 
             _pyd.lastYearsFederalTaxes = _lastYearsFederalTaxes
             _lastYearsFederalTaxes = _pyd.thisYearsFederalTaxes
 
-            _pyd.federalEffectiveTaxRate=_ft.effective_tax_rate(_taxable_income, _pyd.incomeTotal + _pyd.assetWithdraw)
-            _pyd.federalMarginalTaxRate=_ft.marginal_tax_rate(_pyd.incomeTotal + _pyd.assetWithdraw)
+            _pyd.federalEffectiveTaxRate = _ft.effective_tax_rate(
+                _taxable_income, _pyd.incomeTotal + _pyd.assetWithdraw
+            )
+            _pyd.federalMarginalTaxRate = _ft.marginal_tax_rate(
+                _pyd.incomeTotal + _pyd.assetWithdraw
+            )
 
             _projection_data.append(_pyd)
 

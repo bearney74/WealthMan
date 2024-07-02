@@ -2,26 +2,26 @@ from .Projections import ProjectionYearData
 
 
 class TableData:
-    def __init__(self, Data: [ProjectionYearData], InTodaysDollars:bool):
+    def __init__(self, Data: [ProjectionYearData], InTodaysDollars: bool):
         assert Data is not None
         self.projectionData = Data
 
         self.categories = None
-        self.vheader=None
+        self.vheader = None
         self.data = None
-        self.InTodaysDollars=InTodaysDollars
+        self.InTodaysDollars = InTodaysDollars
 
     def getCategories(self):
         if self.categories is None:
             _categories, self.vheader, self.data = self._get_data_sheet()
-            self.categories=[_x.replace('\n', ' ') for _x in _categories]
+            self.categories = [_x.replace("\n", " ") for _x in _categories]
 
         return self.categories
 
     def get_data_sheet(self):
         if self.data is None:
             _categories, self.vheader, self.data = self._get_data_sheet()
-            self.categories=[_x.replace('\n', ' ') for _x in _categories]
+            self.categories = [_x.replace("\n", " ") for _x in _categories]
 
         return self.categories, self.vheader, self.data
 
@@ -42,10 +42,10 @@ class TableData:
             _header_flag = _data == []
             # get year header (year, age1, age2)
             _list = [_record.projectionYear]
-            #_list = []
+            # _list = []
             if _header_flag:
                 _header.append("Year")
-                
+
             _ages = ""
             if _record.clientIsAlive:
                 _ages += "%s" % _record.clientAge
@@ -61,7 +61,7 @@ class TableData:
             _list.append(_ages)
             if _header_flag:
                 _header.append("Age(s)")
-                
+
             _vheader.append("%s: %s" % (_record.projectionYear, _ages))
 
             for _name, _balance in _record.incomeSources.items():
@@ -93,7 +93,7 @@ class TableData:
             if _header_flag:
                 _header.append("Taxable Income")
             _list.append(_record.taxableIncome)
-            
+
             if _header_flag:
                 _header.append("Federal Effective\nTax Rate")
             _list.append(_record.federalEffectiveTaxRate)
@@ -101,7 +101,7 @@ class TableData:
             if _header_flag:
                 _header.append("Federal Marginal\nTax Rate")
             _list.append(_record.federalMarginalTaxRate)
-            
+
             for _name, _contribution in _record.assetContributions.items():
                 if _header_flag:
                     _header.append("%s\nContribution" % _name)

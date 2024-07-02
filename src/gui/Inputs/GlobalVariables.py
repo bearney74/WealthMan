@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import (QWidget, QLabel, QFormLayout, QComboBox, QCheckBox)
+from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QComboBox, QCheckBox
 
 from gui.guihelpers.Entry import AgeEntry, PercentEntry
 
@@ -30,8 +30,8 @@ class GlobalVariablesTab(QWidget):
             ]
         )
         formlayout.addRow(QLabel("Withdrawal Order"), self._WithdrawOrder)
-        
-        self._InTodaysDollars=QCheckBox("", self)
+
+        self._InTodaysDollars = QCheckBox("", self)
         formlayout.addRow(QLabel("In Todays Dollars"), self._InTodaysDollars)
 
         self.setLayout(formlayout)

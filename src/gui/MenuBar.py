@@ -75,7 +75,9 @@ class MenuBar:
         self.parent.InputsTab.AssetInfoTab.import_data(dv)
         self.parent.InputsTab.GlobalVariablesTab.import_data(dv)
 
-        self.parent.setWindowTitle("%s :%s" % (self.parent.title, os.path.basename(_fname)))
+        self.parent.setWindowTitle(
+            "%s :%s" % (self.parent.title, os.path.basename(_fname))
+        )
         # _import.get_gui_data(self.parent)
         self._filename = _fname
 

@@ -11,8 +11,8 @@ class FederalTax(ImportHelper):
         self.Year = Year
 
         self.Brackets = None
-        self.StandardDeduction=None
-        
+        self.StandardDeduction = None
+
         self._import_data()
 
         # if things were imported correctly from the xml, the vars below should be dicts..
@@ -84,19 +84,18 @@ class FederalTax(ImportHelper):
 
         return int(_total)
 
-    def effective_tax_rate(self, taxable_income: int, total_income: int) -> float : 
-        return 100.0 * self.calc_taxes(taxable_income)/total_income
-    
+    def effective_tax_rate(self, taxable_income: int, total_income: int) -> float:
+        return 100.0 * self.calc_taxes(taxable_income) / total_income
+
     def marginal_tax_rate(self, taxable_income) -> int:
         for _rate, _dict in self.Brackets.items():
-            _begin=_dict['Begin']
-            _end=_dict['End']
+            _begin = _dict["Begin"]
+            _end = _dict["End"]
             if _begin is None:
                 _begin = 0
             if _end is None:
                 _end = 999_999_999_999
             if taxable_income >= _begin and taxable_income <= _end:
                 return float(_rate)
-            
+
         return None  # we shouldn't get here..
-    

@@ -4,8 +4,6 @@ from .DataTable import DataTableTab
 from .Chart import ChartTab
 from .CustomChart import CustomChartTab
 
-from libs.TableData import TableData
-
 
 class AnalysisTab(QWidget):
     def __init__(self, parent):
@@ -23,7 +21,7 @@ class AnalysisTab(QWidget):
         self.ChartTab = ChartTab(self)
         self.CustomChartTab = CustomChartTab(self)
 
-        #self.tabs.currentChanged.connect(self.onTabChange)
+        # self.tabs.currentChanged.connect(self.onTabChange)
         self.tabs.addTab(QWidget(), "Dashboard")
         self.tabs.addTab(self.DataTableTab, "Details")
         self.tabs.addTab(self.ChartTab, "Charts")
@@ -33,11 +31,11 @@ class AnalysisTab(QWidget):
         layout.addWidget(self.tabs)
 
         self.setLayout(layout)
-    
+
     def reset(self):
         self.parent.statusbar.showMessage("updating Analysis GUI")
         self.DataTableTab.createTable()
         self.ChartTab.setCategories()
-        #self.CustomChartTab.setCategories()
+        # self.CustomChartTab.setCategories()
         self.CustomChartTab.AssetTotals()
         self.parent.statusbar.showMessage("Done updating Analysis GUI", 2000)

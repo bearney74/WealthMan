@@ -7,9 +7,6 @@ from Inputs import InputsTab
 from Logs import Logs
 from Analysis import AnalysisTab
 
-#from libs.DataVariables import DataVariables
-#from libs.Projections import Projections
-
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,9 +16,8 @@ class Main(QMainWindow):
     def __init__(self, parent=None):
         super(Main, self).__init__(parent)
 
-        self.title="Wealth Manager v0.1 alpha"
-        self.projectionData = None
-
+        self.title = "Wealth Manager v0.1 alpha"
+        
         logger.debug("starting Main Window")
         self.tabs = QTabWidget()
         self.InputsTab = InputsTab(self)
@@ -49,24 +45,24 @@ class Main(QMainWindow):
         self.show()
         logger.debug("ending Main Window")
 
-    def showAnalysisTab(self, flag:bool):
+    def showAnalysisTab(self, flag: bool):
         self.tabs.setTabEnabled(1, flag)
-        
+
         if flag:
             self.AnalysisTab.reset()
             self.tabs.setCurrentIndex(1)
             self.AnalysisTab.tabs.setCurrentIndex(0)
-            
+
     def _createMenuBar(self):
-        _mb = MenuBar(self)
-        self.menubar = _mb.get_menubar()
+        self.menubar = MenuBar(self)
+        _menubar = self.menubar.get_menubar()
 
     def onTabChange(self, i):
         _tabName = self.tabs.tabText(i)
-        
+
         if _tabName == "Input":
             self.showAnalysisTab(False)
-        
+
         self._previous_tab_name = _tabName
 
 

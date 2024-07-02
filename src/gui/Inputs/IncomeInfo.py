@@ -153,14 +153,10 @@ class IncomeInfoTab(QWidget):
             _temp = QLabel("COLA", wordWrap=True)
             self.gridLayout.addWidget(_temp, 0, 2)
 
-            #if self.BasicInfoTab.client_is_married():
             self.gridLayout.addWidget(QLabel("Person"), 0, 3)
             self.gridLayout.addWidget(QLabel("Begin Age"), 0, 4)
             self.gridLayout.addWidget(QLabel("End Age"), 0, 5)
-            #else:
-            #    self.gridLayout.addWidget(QLabel("Begin Age"), 0, 3)
-            #    self.gridLayout.addWidget(QLabel("End Age"), 0, 4)
-
+            
         _len = self.gridLayout.rowCount()
 
         _descr = QLineEdit()
@@ -173,7 +169,6 @@ class IncomeInfoTab(QWidget):
         _percent = PercentEntry(self.parent)
         self.gridLayout.addWidget(_percent, _len, 2)
 
-        #if self.BasicInfoTab.client_is_married():
         _person = QComboBox()
         _person.addItems(["Client", "Spouse"])
         self.gridLayout.addWidget(_person, _len, 3)
@@ -184,13 +179,7 @@ class IncomeInfoTab(QWidget):
 
         _end_age = AgeEntry(self.parent)
         self.gridLayout.addWidget(_end_age, _len, 5)
-        #else:
-        #    _begin_age = AgeEntry(self.parent)
-        #    self.gridLayout.addWidget(_begin_age, _len, 3)
-
-        #    _end_age = AgeEntry(self.parent)
-        #    self.gridLayout.addWidget(_end_age, _len, 4)
-
+        
     def clear_form(self):
         self.clientSS.clear_form()
         self.spouseSS.clear_form()
@@ -217,6 +206,7 @@ class IncomeInfoTab(QWidget):
             dv.pension1Owner = AccountOwnerType.Client
         else:
             dv.pension1Owner = AccountOwnerType[self.pension1Owner.currentText()]
+        
         dv.pension1Amount = self.pension1Amount.get_int()
         dv.pension1Cola = self.pension1Cola.get_float()
         dv.pension1SurvivorBenefits = self.pension1SurvivorBenefits.get_float()
@@ -246,7 +236,6 @@ class IncomeInfoTab(QWidget):
             _item = self.gridLayout.itemAtPosition(_i, 2)
             _cola = _item.widget().get_float()
 
-            #if self.BasicInfoTab.client_is_married():
             _item = self.gridLayout.itemAtPosition(_i, 3)
             _person = _item.widget().currentText()
 
@@ -255,19 +244,12 @@ class IncomeInfoTab(QWidget):
 
             _item = self.gridLayout.itemAtPosition(_i, 5)
             _end_age = _item.widget().get_int()
-            #else:
-            #    _item = self.gridLayout.itemAtPosition(_i, 3)
-            #    _begin_age = _item.widget().get_int()
-
-            #    _item = self.gridLayout.itemAtPosition(_i, 4)
-            #    _end_age = _item.widget().get_int()
-
+        
             _owner = AccountOwnerType.Client
             if self.BasicInfoTab.client_is_married():
                 if _person == "Spouse":
                     _owner = AccountOwnerType.Spouse
-                    # _owner = "2"
-
+        
             dv.otherIncomes.append(
                 IncomeRecord(_descr, _amount, _cola, _owner, _begin_age, _end_age)
             )
@@ -316,7 +298,7 @@ class IncomeInfoTab(QWidget):
                 else:
                     _owner = "Client"
             else:
-                _owner="Client"
+                _owner = "Client"
                 _item.setEnabled(False)
 
             _item.widget().setCurrentText(_owner)
@@ -326,9 +308,3 @@ class IncomeInfoTab(QWidget):
 
             _item = self.gridLayout.itemAtPosition(_i, 5)
             _item.widget().setText(_record.end_age)
-            #else:
-            #    _item = self.gridLayout.itemAtPosition(_i, 3)
-            #    _item.widget().setText(_record.begin_age)
-
-            #    _item = self.gridLayout.itemAtPosition(_i, 4)
-            #    _item.widget().setText(_record.end_age)

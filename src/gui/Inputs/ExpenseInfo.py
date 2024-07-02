@@ -37,15 +37,11 @@ class ExpenseInfoTab(QWidget):
             # _temp.setWordWrap(True)
             self.gridLayout.addWidget(_temp, 0, 2)
 
-            #if self.BasicInfoTab.client_is_married():
             self.gridLayout.addWidget(QLabel("Person"), 0, 3)
 
             self.gridLayout.addWidget(QLabel("Begin Age"), 0, 4)
             self.gridLayout.addWidget(QLabel("End Age"), 0, 5)
-            #else:
-            #    self.gridLayout.addWidget(QLabel("Begin Age"), 0, 3)
-            #    self.gridLayout.addWidget(QLabel("End Age"), 0, 4)
-
+           
         _len = self.gridLayout.rowCount()
         _descr = QLineEdit()
         _descr.setMaximumWidth(300)
@@ -57,7 +53,6 @@ class ExpenseInfoTab(QWidget):
         _COLA = PercentEntry(self.parent)
         self.gridLayout.addWidget(_COLA, _len, 2)
 
-        #if self.BasicInfoTab.client_is_married():
         _person = QComboBox()
         _person.addItems(["Client", "Spouse"])
         _person.setEnabled(self.BasicInfoTab.client_is_married())
@@ -68,13 +63,7 @@ class ExpenseInfoTab(QWidget):
 
         _end_age = AgeEntry(self.parent)
         self.gridLayout.addWidget(_end_age, _len, 5)
-        #else:
-        #    _begin_age = AgeEntry(self.parent)
-        #    self.gridLayout.addWidget(_begin_age, _len, 3)
-
-        #    _end_age = AgeEntry(self.parent)
-        #    self.gridLayout.addWidget(_end_age, _len, 4)
-
+        
     def clear_form(self):
         for _i in reversed(range(self.gridLayout.count())):
             _item = self.gridLayout.itemAt(_i)
@@ -95,22 +84,15 @@ class ExpenseInfoTab(QWidget):
             _item = self.gridLayout.itemAtPosition(_i, 2)
             _cola = _item.widget().get_float()
 
-            if self.BasicInfoTab.client_is_married():
-                _item = self.gridLayout.itemAtPosition(_i, 3)
-                _person = _item.widget().currentText()
+            _item = self.gridLayout.itemAtPosition(_i, 3)
+            _person = _item.widget().currentText()
 
-                _item = self.gridLayout.itemAtPosition(_i, 4)
-                _begin_age = _item.widget().get_int()
+            _item = self.gridLayout.itemAtPosition(_i, 4)
+            _begin_age = _item.widget().get_int()
 
-                _item = self.gridLayout.itemAtPosition(_i, 5)
-                _end_age = _item.widget().get_int()
-            else:
-                _item = self.gridLayout.itemAtPosition(_i, 3)
-                _begin_age = _item.widget().get_int()
-
-                _item = self.gridLayout.itemAtPosition(_i, 4)
-                _end_age = _item.widget().get_int()
-
+            _item = self.gridLayout.itemAtPosition(_i, 5)
+            _end_age = _item.widget().get_int()
+            
             _owner = AccountOwnerType.Client
             if self.BasicInfoTab.client_is_married():
                 if _person == "Spouse":
@@ -135,23 +117,15 @@ class ExpenseInfoTab(QWidget):
             _item = self.gridLayout.itemAtPosition(_i, 2)
             _item.widget().setText(_record.COLA)
 
-            if self.BasicInfoTab.client_is_married():
-                if _record.owner == AccountOwnerType.Spouse:
-                    _owner = "Spouse"
-                else:
-                    _owner = "Client"
-                _item = self.gridLayout.itemAtPosition(_i, 3)
-                _item.widget().setCurrentText(_owner)
-
-                _item = self.gridLayout.itemAtPosition(_i, 4)
-                _item.widget().setText(_record.begin_age)
-
-                _item = self.gridLayout.itemAtPosition(_i, 5)
-                _item.widget().setText(_record.end_age)
-
+            if _record.owner == AccountOwnerType.Spouse:
+                _owner = "Spouse"
             else:
-                _item = self.gridLayout.itemAtPosition(_i, 3)
-                _item.widget().setText(_record.begin_age)
+                _owner = "Client"
+            _item = self.gridLayout.itemAtPosition(_i, 3)
+            _item.widget().setCurrentText(_owner)
 
-                _item = self.gridLayout.itemAtPosition(_i, 4)
-                _item.widget().setText(_record.end_age)
+            _item = self.gridLayout.itemAtPosition(_i, 4)
+            _item.widget().setText(_record.begin_age)
+
+            _item = self.gridLayout.itemAtPosition(_i, 5)
+            _item.widget().setText(_record.end_age)

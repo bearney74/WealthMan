@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QTabWidget, QToolBar, QMainWindow, QComboBox
+from PyQt6.QtWidgets import QTabWidget, QToolBar, QMainWindow, QComboBox, QStyle
 from PyQt6.QtGui import QAction, QIcon
 
 from libs.DataVariables import DataVariables
@@ -16,10 +16,12 @@ class InputsTab(QMainWindow):
     def __init__(self, parent=None):
         super(InputsTab, self).__init__(parent)
 
-        self.parent=parent
-        #self._previous_tab_name = None
+        self.parent = parent
+        # self._previous_tab_name = None
         _toolbar = QToolBar("Inputs Toolbar")
         _toolbar.addAction(self.clear_forms_action())
+        _toolbar.addAction(self.file_open_action())
+        _toolbar.addAction(self.file_save_action())
         _toolbar.addAction(self.calculate_projection_action())
         self.addToolBar(_toolbar)
 
@@ -64,7 +66,7 @@ class InputsTab(QMainWindow):
                 self.IncomeInfoTab.pension2Owner.setEnabled(
                     self.BasicInfoTab.client_is_married()
                 )
-                
+
                 for _i in range(1, self.IncomeInfoTab.gridLayout.rowCount()):
                     _item = self.IncomeInfoTab.gridLayout.itemAtPosition(_i, 3)
                     # print(_item)
@@ -86,14 +88,32 @@ class InputsTab(QMainWindow):
 
     def clear_forms_action(self):
         _action = QAction("Clear forms", self)
-        _action.setIcon(QIcon("resources/clear_form.png"))
+        _pixmapi=QStyle.StandardPixmap.SP_DialogResetButton
+        _action.setIcon(self.style().standardIcon(_pixmapi))
         _action.setStatusTip("Clear Forms")
         _action.triggered.connect(lambda x: self.clear_forms())
         return _action
 
+    def file_open_action(self):
+        _action = QAction("Open", self)
+        _pixmapi=QStyle.StandardPixmap.SP_FileDialogStart
+        _action.setIcon(self.style().standardIcon(_pixmapi))
+        _action.setStatusTip("open")
+        _action.triggered.connect(lambda x: self.file_open())
+        return _action
+
+    def file_save_action(self):
+        _action = QAction("Save", self)
+        _pixmapi=QStyle.StandardPixmap.SP_DialogSaveButton
+        _action.setIcon(self.style().standardIcon(_pixmapi))
+        _action.setStatusTip("Save")
+        _action.triggered.connect(lambda x: self.file_save())
+        return _action
+
     def calculate_projection_action(self):
         _action = QAction("Projection", self)
-        _action.setIcon(QIcon("resources/projections.png"))
+        _pixmapi=QStyle.StandardPixmap.SP_FileDialogContentsView
+        _action.setIcon(self.style().standardIcon(_pixmapi))
         _action.setStatusTip("Create Data Projection")
         _action.setToolTip("Create Data Projection")
         _action.triggered.connect(lambda x: self.create_projection())
@@ -114,12 +134,21 @@ class InputsTab(QMainWindow):
         self.ExpenseInfoTab.export_data(dv)
         self.AssetInfoTab.export_data(dv)
         self.GlobalVariablesTab.export_data(dv)
-        
+
         self.parent.statusbar.showMessage("Calculating projections")
         _p = Projections(dv)
         _projectionData = _p.execute()
         self.parent.AnalysisTab.projectionData = _projectionData
-        self.parent.AnalysisTab.tableData = TableData(_projectionData, _p.InTodaysDollars)
-        
-        #self.parent.AnalysisTab.reset()
+        self.parent.AnalysisTab.tableData = TableData(
+            _projectionData, _p.InTodaysDollars
+        )
+
+        # self.parent.AnalysisTab.reset()
         self.parent.showAnalysisTab(True)
+
+    def file_open(self):
+        self.parent.menubar.file_open()
+    
+    def file_save(self):
+        self.parent.menubar.file_save()
+        

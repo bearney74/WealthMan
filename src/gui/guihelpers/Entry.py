@@ -92,9 +92,9 @@ class MoneyEntry(IntegerEntry):
                 text = text.replace(",", "")
                 if text.find(".") == -1:
                     if text == "":
-                       IntegerEntry.setText(self, "")
-                    else:        
-                       IntegerEntry.setText(self, "${:,}".format(int(text)))
+                        IntegerEntry.setText(self, "")
+                    else:
+                        IntegerEntry.setText(self, "${:,}".format(int(text)))
                 else:
                     pre_dot, post_dot = text.split(".")
                     text = "${:,}".format(int(pre_dot)) + "." + post_dot
