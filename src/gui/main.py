@@ -28,7 +28,8 @@ class Main(QMainWindow):
         self.tabs.addTab(self.InputsTab, "Input")
         self.tabs.addTab(self.AnalysisTab, "Analysis")
         self.tabs.addTab(self.LogsTab, "Logs")
-
+        self.toggleLogTab()
+        
         self.showAnalysisTab(False)
         self.setCentralWidget(self.tabs)
 
@@ -45,6 +46,9 @@ class Main(QMainWindow):
         self.show()
         logger.debug("ending Main Window")
 
+    def toggleLogTab(self):
+        self.tabs.setTabVisible(2, not self.tabs.isTabVisible(2))
+        
     def showAnalysisTab(self, flag: bool):
         self.tabs.setTabEnabled(1, flag)
 

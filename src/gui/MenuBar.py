@@ -27,6 +27,7 @@ class MenuBar:
         filemenu.addAction(self.file_exit_action())
 
         help_menu = self.menuBar.addMenu("&Help")
+        help_menu.addAction(self.toggle_logs_action())
         help_menu.addAction(self.help_about_action())
 
     def get_menubar(self):
@@ -143,3 +144,13 @@ class MenuBar:
         d.setLayout(_layout)
         d.setModal(True)
         d.exec()
+
+    def toggle_logs_action(self):
+        _action = QAction("Enable/Disable Logs", self.parent)
+        _action.setStatusTip("Enable/Disable Logs")
+        _action.triggered.connect(lambda x: self.toggle_logs())
+
+        return _action
+
+    def toggle_logs(self):
+        self.parent.toggleLogTab()
