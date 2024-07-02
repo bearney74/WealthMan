@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QTabWidget, QToolBar, QMainWindow, QComboBox, QStyle
-from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtGui import QAction
 
 from libs.DataVariables import DataVariables
 from libs.Projections import Projections
@@ -88,7 +88,7 @@ class InputsTab(QMainWindow):
 
     def clear_forms_action(self):
         _action = QAction("Clear forms", self)
-        _pixmapi=QStyle.StandardPixmap.SP_DialogResetButton
+        _pixmapi = QStyle.StandardPixmap.SP_DialogResetButton
         _action.setIcon(self.style().standardIcon(_pixmapi))
         _action.setStatusTip("Clear Forms")
         _action.triggered.connect(lambda x: self.clear_forms())
@@ -96,7 +96,7 @@ class InputsTab(QMainWindow):
 
     def file_open_action(self):
         _action = QAction("Open", self)
-        _pixmapi=QStyle.StandardPixmap.SP_FileDialogStart
+        _pixmapi = QStyle.StandardPixmap.SP_FileDialogStart
         _action.setIcon(self.style().standardIcon(_pixmapi))
         _action.setStatusTip("open")
         _action.triggered.connect(lambda x: self.file_open())
@@ -104,7 +104,7 @@ class InputsTab(QMainWindow):
 
     def file_save_action(self):
         _action = QAction("Save", self)
-        _pixmapi=QStyle.StandardPixmap.SP_DialogSaveButton
+        _pixmapi = QStyle.StandardPixmap.SP_DialogSaveButton
         _action.setIcon(self.style().standardIcon(_pixmapi))
         _action.setStatusTip("Save")
         _action.triggered.connect(lambda x: self.file_save())
@@ -112,7 +112,7 @@ class InputsTab(QMainWindow):
 
     def calculate_projection_action(self):
         _action = QAction("Projection", self)
-        _pixmapi=QStyle.StandardPixmap.SP_FileDialogContentsView
+        _pixmapi = QStyle.StandardPixmap.SP_FileDialogContentsView
         _action.setIcon(self.style().standardIcon(_pixmapi))
         _action.setStatusTip("Create Data Projection")
         _action.setToolTip("Create Data Projection")
@@ -148,7 +148,6 @@ class InputsTab(QMainWindow):
 
     def file_open(self):
         self.parent.menubar.file_open()
-    
+
     def file_save(self):
         self.parent.menubar.file_save()
-        

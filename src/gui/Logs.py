@@ -33,6 +33,7 @@ class Logs(QWidget):
     def __init__(self, parent=None):
         super(Logs, self).__init__(parent)
 
+        self.parent = parent
         self.logger = QTextEditLogger(self)
         self._formatter = logging.Formatter(
             "%(asctime)s - %(levelname)s - %(filename)s;%(module)s.%(funcName)s:%(lineno)s - %(message)s"
@@ -83,6 +84,9 @@ class Logs(QWidget):
 
     def reset_log(self):
         self.logger.widget.clear()
+        logger.log(
+            logger.getEffectiveLevel(), "WeathMan version=%s" % self.parent.__version__
+        )
         _system_info = "OS=%s\nPython Version=%s\nQt Version=%s\nPyQt Version=%s\n" % (
             platform.uname(),
             sys.version,

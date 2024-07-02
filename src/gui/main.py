@@ -11,13 +11,16 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+__version__ = "0.1 alpha"
+
 
 class Main(QMainWindow):
     def __init__(self, parent=None):
         super(Main, self).__init__(parent)
 
-        self.title = "Wealth Manager v0.1 alpha"
-        
+        self.__version__ = __version__
+        self.title = "Wealth Manager v%s" % self.__version__
+
         logger.debug("starting Main Window")
         self.tabs = QTabWidget()
         self.InputsTab = InputsTab(self)
@@ -29,7 +32,7 @@ class Main(QMainWindow):
         self.tabs.addTab(self.AnalysisTab, "Analysis")
         self.tabs.addTab(self.LogsTab, "Logs")
         self.toggleLogTab()
-        
+
         self.showAnalysisTab(False)
         self.setCentralWidget(self.tabs)
 
@@ -48,7 +51,7 @@ class Main(QMainWindow):
 
     def toggleLogTab(self):
         self.tabs.setTabVisible(2, not self.tabs.isTabVisible(2))
-        
+
     def showAnalysisTab(self, flag: bool):
         self.tabs.setTabEnabled(1, flag)
 

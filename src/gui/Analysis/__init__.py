@@ -36,6 +36,5 @@ class AnalysisTab(QWidget):
         self.parent.statusbar.showMessage("updating Analysis GUI")
         self.DataTableTab.createTable()
         self.ChartTab.setCategories()
-        # self.CustomChartTab.setCategories()
-        self.CustomChartTab.AssetTotals()
+        # self.CustomChartTab.AssetTotals()
         self.parent.statusbar.showMessage("Done updating Analysis GUI", 2000)

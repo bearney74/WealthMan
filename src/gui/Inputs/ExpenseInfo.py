@@ -41,7 +41,7 @@ class ExpenseInfoTab(QWidget):
 
             self.gridLayout.addWidget(QLabel("Begin Age"), 0, 4)
             self.gridLayout.addWidget(QLabel("End Age"), 0, 5)
-           
+
         _len = self.gridLayout.rowCount()
         _descr = QLineEdit()
         _descr.setMaximumWidth(300)
@@ -63,7 +63,7 @@ class ExpenseInfoTab(QWidget):
 
         _end_age = AgeEntry(self.parent)
         self.gridLayout.addWidget(_end_age, _len, 5)
-        
+
     def clear_form(self):
         for _i in reversed(range(self.gridLayout.count())):
             _item = self.gridLayout.itemAt(_i)
@@ -92,7 +92,7 @@ class ExpenseInfoTab(QWidget):
 
             _item = self.gridLayout.itemAtPosition(_i, 5)
             _end_age = _item.widget().get_int()
-            
+
             _owner = AccountOwnerType.Client
             if self.BasicInfoTab.client_is_married():
                 if _person == "Spouse":

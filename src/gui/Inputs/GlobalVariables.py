@@ -46,9 +46,10 @@ class GlobalVariablesTab(QWidget):
         self._InTodaysDollars.setChecked(False)
 
     def export_data(self, d: DataVariables):
-        d.inflation = self._Inflation.get_float()
+        d.inflation = self._Inflation.get_float(Default=3.0)
         d.withdrawOrder = self._WithdrawOrder.currentText()
-        d.forecastYears = self._forecast_years.get_int()
+        d.forecastYears = self._forecast_years.get_int(Default=30)
+
         d.inTodaysDollars = self._InTodaysDollars.isChecked()
 
     def import_data(self, d: DataVariables):

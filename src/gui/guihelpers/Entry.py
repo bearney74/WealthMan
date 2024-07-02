@@ -48,7 +48,10 @@ class IntegerEntry(Entry):
         except ValueError:
             return False
 
-    def get_int(self):
+    def get_int(self, Default=None):
+        if self.text() is None or self.text().strip() == "":
+            return Default
+
         if self.is_valid():
             return int(self.text())
 
@@ -57,7 +60,7 @@ class IntegerEntry(Entry):
 
 class AgeEntry(IntegerEntry):
     def __init__(self, parent=None):
-        super(AgeEntry, self).__init__(parent)
+        super(AgeEntry, self).__init__(parent=parent)
 
         self.setFixedWidth(30)
         self.setValidator(QIntValidator(0, 99))
@@ -122,9 +125,11 @@ class FloatEntry(Entry):
         max=10.0,
         num_decimal_places=1,
         limit_size: int = None,
+        Default: float = None,
     ):
         super(FloatEntry, self).__init__(parent)
 
+        self.default = Default
         if limit_size is not None:
             self.setFixedWidth(limit_size)
 
@@ -137,7 +142,10 @@ class FloatEntry(Entry):
         except ValueError:
             return False
 
-    def get_float(self):
+    def get_float(self, Default=None):
+        if self.text() is None or self.text().strip() == "":
+            return Default
+
         if self.is_valid():
             return float(self.text())
         return None

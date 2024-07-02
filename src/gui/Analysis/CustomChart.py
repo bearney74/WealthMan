@@ -49,7 +49,28 @@ class StackChart(QWidget):
     def plot(self, years, values, labels, legend_location="upper left"):
         self.canvas.axes.clear()
 
-        _output = self.canvas.axes.stackplot(years, values, labels=labels, alpha=0.8)
+        try:
+            _output = self.canvas.axes.stackplot(
+                years, values, labels=labels, alpha=0.8
+            )
+        except ValueError as e:
+            logger.error(
+                "Please enter data into income/asset tabs to generate custom charts"
+            )
+            logger.error("%s" % e)
+            logger.error(
+                "plot arugments: years=%s, values=%s, labels=%s"
+                % (years, values, labels)
+            )
+            self.canvas.fig.text(
+                0.5,
+                0.9,
+                "Please enter data into income/asset tabs to generate custom charts",
+                horizontalalignment="center",
+            )
+            self.canvas.fig.draw(self.canvas.fig.canvas.renderer)
+            return
+
         # print(_output)
 
         self.canvas.fig.suptitle(self.title)
@@ -151,6 +172,7 @@ class CustomChartTab(QWidget):
         self.chart.setTitle("Income Totals")
         if self.parent.tableData.InTodaysDollars:
             self.chart.setSubTitle("In Today's Dollars")
+
         self.chart.plot(
             _years, _data.values(), _data.keys(), legend_location="upper right"
         )

@@ -96,33 +96,36 @@ class Projections:
 
         self._IncomeSources = []
         # do SS and pensions...
-        _client_ss = SocialSecurity(
-            Name="Client Social Security",
-            BirthDate=dv.clientBirthDate,
-            FRAAmount=dv.clientSSAmount,
-            Owner=AccountOwnerType.Client,
-            BeginAge=dv.clientSSBeginAge,
-            LifeSpanAge=dv.clientLifeSpanAge,
-            COLA=dv.clientSSCola - self._inflation,
-        )
-        self._IncomeSources.append(_client_ss)
-        if dv.relationStatus == "Married":
-            _spouse_ss = SocialSecurity(
-                Name="Spouse Social Security",
-                BirthDate=dv.spouseBirthDate,
-                FRAAmount=dv.spouseSSAmount,
-                Owner=AccountOwnerType.Spouse,
-                BeginAge=dv.spouseSSBeginAge,
-                LifeSpanAge=dv.spouseLifeSpanAge,
-                COLA=dv.spouseSSCola - self._inflation,
+        if dv.clientSSAmount is not None:
+            _client_ss = SocialSecurity(
+                Name="Client Social Security",
+                BirthDate=dv.clientBirthDate,
+                FRAAmount=dv.clientSSAmount,
+                Owner=AccountOwnerType.Client,
+                BeginAge=dv.clientSSBeginAge,
+                LifeSpanAge=dv.clientLifeSpanAge,
+                COLA=dv.clientSSCola - self._inflation,
             )
-            self._IncomeSources.append(_spouse_ss)
+            self._IncomeSources.append(_client_ss)
 
-            # these are needed for comparing spouses ss benefits when
-            # spouse dies so that living spouse gets the greater benefit of the
-            # two
-            _spouse_ss.set_SpouseSS(_client_ss)
-            _client_ss.set_SpouseSS(_spouse_ss)
+        if dv.relationStatus == "Married":
+            if dv.spouseSSAmount is not None:
+                _spouse_ss = SocialSecurity(
+                    Name="Spouse Social Security",
+                    BirthDate=dv.spouseBirthDate,
+                    FRAAmount=dv.spouseSSAmount,
+                    Owner=AccountOwnerType.Spouse,
+                    BeginAge=dv.spouseSSBeginAge,
+                    LifeSpanAge=dv.spouseLifeSpanAge,
+                    COLA=dv.spouseSSCola - self._inflation,
+                )
+                self._IncomeSources.append(_spouse_ss)
+
+                # these are needed for comparing spouses ss benefits when
+                # spouse dies so that living spouse gets the greater benefit of the
+                # two
+                _spouse_ss.set_SpouseSS(_client_ss)
+                _client_ss.set_SpouseSS(_spouse_ss)
 
         # pensions..
         if dv.pension1Name is not None and dv.pension1Name.strip() != "":
@@ -367,7 +370,6 @@ class Projections:
 
             _pyd.incomeTotal = _income_total
 
-           
             _expense_total = 0
             for _src in self._Expenses:
                 _expense = _src.calc_balance_by_year(_year)
@@ -443,7 +445,7 @@ class Projections:
                     _pyd.surplus_deficit = -_deficit
                 else:
                     _pyd.surplus_deficit = _pyd.assetWithdraw + _cash_flow
-                
+
             _total = 0
             _client_ira_total = 0
             _spouse_ira_total = 0
@@ -461,7 +463,7 @@ class Projections:
                     _pyd.assetContributions[_src.Name] = 0
 
                 _pyd.assetSources[_src.Name] = _src.Balance
-                
+
                 if _src.Type == AccountType.TaxDeferred:
                     if _src.Owner == AccountOwnerType.Client:
                         _client_ira_total += _src.Balance
