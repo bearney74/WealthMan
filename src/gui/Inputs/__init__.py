@@ -67,7 +67,7 @@ class InputsTab(QMainWindow):
                     self.BasicInfoTab.client_is_married()
                 )
 
-                for _i in range(1, self.IncomeInfoTab.gridLayout.rowCount()):
+                for _i in range(1, self.IncomeInfoTab.gridLayout.count() // 6):
                     _item = self.IncomeInfoTab.gridLayout.itemAtPosition(_i, 3)
                     # print(_item)
                     if isinstance(
@@ -76,7 +76,7 @@ class InputsTab(QMainWindow):
                         _item.widget().setEnabled(self.BasicInfoTab.client_is_married())
 
             case "Expenses":
-                for _i in range(1, self.ExpenseInfoTab.gridLayout.rowCount()):
+                for _i in range(1, self.ExpenseInfoTab.gridLayout.count() // 6):
                     _item = self.ExpenseInfoTab.gridLayout.itemAtPosition(_i, 3)
                     # print(_item)
                     if isinstance(
