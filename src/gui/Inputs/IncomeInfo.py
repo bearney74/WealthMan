@@ -26,13 +26,19 @@ class SocialSecurityWidget(QWidget):
         _layout.addWidget(QLabel("%s Social Security" % self.person_type))
 
         self.Amount = MoneyEntry()
-        _flayout.addRow(QLabel("FRA Amount:"), self.Amount)
+        _label = QLabel("FRA Amount:")
+        _label.setToolTip("Full Retirement Age Amount")
+        _flayout.addRow(_label, self.Amount)
 
         self.Cola = PercentEntry(self.parent)
-        _flayout.addRow(QLabel("COLA"), self.Cola)
+        _label = QLabel("COLA:")
+        _label.setToolTip("Cost of Living Adjustment")
+        _flayout.addRow(_label, self.Cola)
 
-        self.BeginAge = AgeEntry(self.parent)
-        _flayout.addRow(QLabel("Begin Age:"), self.BeginAge)
+        self.BeginAge = AgeEntry(min=62, max=70)
+        _label = QLabel("Begin Age:")
+        _label.setToolTip("Age between 62 and 70")
+        _flayout.addRow(_label, self.BeginAge)
         _layout.addLayout(_flayout)
 
         self.setLayout(_layout)
@@ -127,7 +133,6 @@ class IncomeInfoTab(QWidget):
         _layout.addLayout(_hlayout1)
         _layout.addStretch(2)
 
-        # _layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         _layout.addWidget(
             QLabel("<b><u>Other Income Sources: (Full/Part time work)</u></b>")
         )
@@ -157,38 +162,47 @@ class IncomeInfoTab(QWidget):
             self.gridLayout.addWidget(QLabel("Begin Age"), 0, 4)
             self.gridLayout.addWidget(QLabel("End Age"), 0, 5)
 
-        _len = self.gridLayout.rowCount()
+        # do not use rowCount.. it only increases in value
+        # even after you delete some elements (ie, rows)
+        # _len = self.gridLayout.rowCount()
+        _row = self.gridLayout.count() // 6
+        # print("line 170, row = ", _row)
 
         _descr = QLineEdit()
         _descr.setMaximumWidth(300)
-        self.gridLayout.addWidget(_descr, _len, 0)
+        self.gridLayout.addWidget(_descr, _row, 0)
 
         _amount = MoneyEntry(self.parent)
-        self.gridLayout.addWidget(_amount, _len, 1)
+        self.gridLayout.addWidget(_amount, _row, 1)
 
         _percent = PercentEntry(self.parent)
-        self.gridLayout.addWidget(_percent, _len, 2)
+        self.gridLayout.addWidget(_percent, _row, 2)
 
         _person = QComboBox()
         _person.addItems(["Client", "Spouse"])
-        self.gridLayout.addWidget(_person, _len, 3)
+        self.gridLayout.addWidget(_person, _row, 3)
         _person.setEnabled(self.BasicInfoTab.client_is_married())
 
         _begin_age = AgeEntry(self.parent)
-        self.gridLayout.addWidget(_begin_age, _len, 4)
+        self.gridLayout.addWidget(_begin_age, _row, 4)
 
         _end_age = AgeEntry(self.parent)
-        self.gridLayout.addWidget(_end_age, _len, 5)
+        self.gridLayout.addWidget(_end_age, _row, 5)
 
     def clear_form(self):
         self.clientSS.clear_form()
         self.spouseSS.clear_form()
 
-        for _i in reversed(range(self.gridLayout.count())):
-            _item = self.gridLayout.itemAt(_i)
+        # print(self.gridLayout.takeAt(0))
+        _item = self.gridLayout.takeAt(0)
+        while _item is not None:
+            _item.widget().deleteLater()
+            self.gridLayout.removeWidget(_item.widget())
             self.gridLayout.removeItem(_item)
-            _item.widget().setParent(None)
             del _item
+            _item = self.gridLayout.takeAt(0)
+
+        self.gridLayout.invalidate()
 
         assert self.gridLayout.count() == 0
 
@@ -226,23 +240,25 @@ class IncomeInfoTab(QWidget):
         dv.pension2EndAge = self.pension2EndAge.get_int()
 
         dv.otherIncomes = []
-        for _i in range(1, self.gridLayout.rowCount()):
-            _item = self.gridLayout.itemAtPosition(_i, 0)
+        # print(self.gridLayout.count())
+        for _row in range(1, self.gridLayout.count() // 6):
+            # _row=_i
+            _item = self.gridLayout.itemAtPosition(_row, 0)
             _descr = _item.widget().text()
 
-            _item = self.gridLayout.itemAtPosition(_i, 1)
+            _item = self.gridLayout.itemAtPosition(_row, 1)
             _amount = _item.widget().get_int()
 
-            _item = self.gridLayout.itemAtPosition(_i, 2)
+            _item = self.gridLayout.itemAtPosition(_row, 2)
             _cola = _item.widget().get_float()
 
-            _item = self.gridLayout.itemAtPosition(_i, 3)
+            _item = self.gridLayout.itemAtPosition(_row, 3)
             _person = _item.widget().currentText()
 
-            _item = self.gridLayout.itemAtPosition(_i, 4)
+            _item = self.gridLayout.itemAtPosition(_row, 4)
             _begin_age = _item.widget().get_int()
 
-            _item = self.gridLayout.itemAtPosition(_i, 5)
+            _item = self.gridLayout.itemAtPosition(_row, 5)
             _end_age = _item.widget().get_int()
 
             _owner = AccountOwnerType.Client
@@ -280,18 +296,18 @@ class IncomeInfoTab(QWidget):
         for _record in dv.otherIncomes:
             self.add_row()
 
-            _i = self.gridLayout.rowCount() - 1
+            _row = self.gridLayout.count() // 6 - 1  # need last row number
 
-            _item = self.gridLayout.itemAtPosition(_i, 0)
+            _item = self.gridLayout.itemAtPosition(_row, 0)
             _item.widget().setText(_record.descr)
 
-            _item = self.gridLayout.itemAtPosition(_i, 1)
+            _item = self.gridLayout.itemAtPosition(_row, 1)
             _item.widget().setText(_record.amount)
 
-            _item = self.gridLayout.itemAtPosition(_i, 2)
+            _item = self.gridLayout.itemAtPosition(_row, 2)
             _item.widget().setText(_record.COLA)
 
-            _item = self.gridLayout.itemAtPosition(_i, 3)
+            _item = self.gridLayout.itemAtPosition(_row, 3)
             if self.BasicInfoTab.client_is_married():
                 if _record.owner == AccountOwnerType.Spouse:
                     _owner = "Spouse"
@@ -303,8 +319,8 @@ class IncomeInfoTab(QWidget):
 
             _item.widget().setCurrentText(_owner)
 
-            _item = self.gridLayout.itemAtPosition(_i, 4)
+            _item = self.gridLayout.itemAtPosition(_row, 4)
             _item.widget().setText(_record.begin_age)
 
-            _item = self.gridLayout.itemAtPosition(_i, 5)
+            _item = self.gridLayout.itemAtPosition(_row, 5)
             _item.widget().setText(_record.end_age)

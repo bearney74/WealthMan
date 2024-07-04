@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QPushButton, QLabel, QLineEdit
-from PyQt6.QtWidgets import QVBoxLayout, QGridLayout, QComboBox
+from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QComboBox
 
 from PyQt6.QtCore import Qt
 
@@ -24,9 +24,12 @@ class ExpenseInfoTab(QWidget):
         _layout.addWidget(self._add_expense_button)
 
         # Table will fit the screen horizontally
-
         self.gridLayout = QGridLayout()
-        _layout.addLayout(self.gridLayout)
+        _hlayout = QHBoxLayout()
+        _hlayout.addLayout(self.gridLayout)
+        _hlayout.addStretch()
+        _layout.addLayout(_hlayout)
+        _layout.addStretch(3)
         self.setLayout(_layout)
 
     def add_row(self):
@@ -34,7 +37,6 @@ class ExpenseInfoTab(QWidget):
             self.gridLayout.addWidget(QLabel("Description"), 0, 0)
             self.gridLayout.addWidget(QLabel("Annual Amount"), 0, 1)
             _temp = QLabel("Annual\nPercent\nIncrease", wordWrap=True)
-            # _temp.setWordWrap(True)
             self.gridLayout.addWidget(_temp, 0, 2)
 
             self.gridLayout.addWidget(QLabel("Person"), 0, 3)
@@ -42,7 +44,7 @@ class ExpenseInfoTab(QWidget):
             self.gridLayout.addWidget(QLabel("Begin Age"), 0, 4)
             self.gridLayout.addWidget(QLabel("End Age"), 0, 5)
 
-        _len = self.gridLayout.rowCount()
+        _len = self.gridLayout.count() // 6
         _descr = QLineEdit()
         _descr.setMaximumWidth(300)
         self.gridLayout.addWidget(_descr, _len, 0)
@@ -65,16 +67,21 @@ class ExpenseInfoTab(QWidget):
         self.gridLayout.addWidget(_end_age, _len, 5)
 
     def clear_form(self):
-        for _i in reversed(range(self.gridLayout.count())):
-            _item = self.gridLayout.itemAt(_i)
+        _item = self.gridLayout.takeAt(0)
+        while _item is not None:
+            _item.widget().deleteLater()
+            self.gridLayout.removeWidget(_item.widget())
             self.gridLayout.removeItem(_item)
-            _item.widget().setParent(None)
             del _item
+            _item = self.gridLayout.takeAt(0)
+
+        self.gridLayout.invalidate()
 
         assert self.gridLayout.count() == 0
 
     def export_data(self, d: DataVariables):
-        for _i in range(1, self.gridLayout.rowCount()):
+        _row = self.gridLayout.count() // 6
+        for _i in range(1, _row):
             _item = self.gridLayout.itemAtPosition(_i, 0)
             _descr = _item.widget().text()
 
@@ -106,7 +113,7 @@ class ExpenseInfoTab(QWidget):
         for _record in d.expenses:
             self.add_row()
 
-            _i = self.gridLayout.rowCount() - 1
+            _i = self.gridLayout.count() // 6 - 1
 
             _item = self.gridLayout.itemAtPosition(_i, 0)
             _item.widget().setText(_record.descr)
