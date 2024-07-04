@@ -1,7 +1,6 @@
 from datetime import datetime, date
 from PyQt6.QtWidgets import QLineEdit, QWidget, QComboBox, QHBoxLayout, QLabel
-from PyQt6.QtGui import QIntValidator, QDoubleValidator
-# from PyQt6.QtGui.QDoubleValidator import StandardNotation
+from PyQt6.QtGui import QIntValidator, QDoubleValidator, QValidator
 
 
 class MinWidthLabel(QLabel):
@@ -58,14 +57,38 @@ class IntegerEntry(Entry):
         return None
 
 
+class IntRangeValidator(QIntValidator):
+    def __init__(self, parent, min, max):
+        super(IntRangeValidator, self).__init__()
+        self.parent = parent
+        self.min = min
+        self.max = max
+
+    def validate(self, string, pos):
+        try:
+            _int = int(string)
+            _ok = True
+        except ValueError:
+            _ok = False
+
+        if pos < len("%s" % self.min) and pos < len("%s" % self.max):
+            self.parent.setStyleSheet("color: red")
+            return (QValidator.State.Intermediate, string, pos)
+
+        if _ok and _int >= self.min and _int <= self.max:
+            self.parent.setStyleSheet("color: black")
+            return (QValidator.State.Acceptable, string, pos)
+
+        return (QValidator.State.Invalid, string, pos)
+
+
 class AgeEntry(IntegerEntry):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, min=0, max=99):
         super(AgeEntry, self).__init__(parent=parent)
 
+        self.parent = parent
         self.setFixedWidth(30)
-        self.setValidator(QIntValidator(0, 99))
-
-        self.setStyleSheet('*[invalid="true"] {background-color:red;}')
+        self.setValidator(IntRangeValidator(self, min, max))
 
 
 class MoneyEntry(IntegerEntry):
