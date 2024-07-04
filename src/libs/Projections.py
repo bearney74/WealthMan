@@ -73,8 +73,8 @@ class Projections:
         else:
             self._inflation = 0
 
-        _is_married=dv.relationStatus == "Married"
-        
+        _is_married = dv.relationStatus == "Married"
+
         self._begin_year = datetime.now().year
 
         self._withdrawOrder = dv.withdrawOrder
