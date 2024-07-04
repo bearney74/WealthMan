@@ -16,20 +16,13 @@ class Person:
         assert isinstance(birthDate, date)
         self.birthDate = birthDate  # date of birth
 
-        assert isinstance(retirementAge, int)
+        assert retirementAge is None or isinstance(retirementAge, int)
         self.retirementAge = retirementAge
 
-        assert isinstance(lifeSpanAge, int)
+        assert lifeSpanAge is None or isinstance(lifeSpanAge, int)
         self.lifeSpanAge = lifeSpanAge  # date of death (Dec 31st of year)
         # todo..
         self.relationship = relationship
-
-    # def set_BirthDate_by_age(self, age: int):
-    #    assert isinstance(age, int)
-    #    _now = datetime.now()
-    #    self.BirthDate = date(
-    #        _now.year - age, _now.month, _now.day
-    #    )  # set to today - age
 
     def calc_date_by_age(self, age: int) -> date:
         return date(self.birthdate.year + age, self.birthdate.month, self.birthdate.day)
