@@ -4,20 +4,25 @@
 This is a desktop application for financial planning.
 
 ## Features
-Users can enter basic personal information, income sources, expenses, and basic asset information.
-Certain assumptions such as inflation rate, and asset rate of return can be entered by
-the user.
+Users can enter basic personal information, income sources, expenses, and basic 
+asset information. Certain assumptions such as inflation rate, and asset rate of 
+return can be entered by the user.
 
-From that information, projections (forecasts) can be made for several years in the 
-future showing how income, assets, and expenses affect a person's net worth.
+From that information, projections (forecasts) can be made for several years in 
+the future showing how income, assets, and expenses affect a person's net worth.
 
-Currently, users can output the projection data in csv format, that can be imported into a spreadsheet
-application (Excel, Libre Calc) for further analysis.
+Currently, users can output the projection data in csv format, that can be imported 
+into a spreadsheet application (Excel, Libre Calc) for further analysis.
 
-Charts can be generated for each projection variable, as well as custom charts for asset totals, asset contri
+Charts can be generated for each projection variable, as well as custom charts for 
+asset totals, income totals and asset contribution totals.
 
 ## Future Plans / Development
-I plan on using historic market returns, as well as Monte Carlo simulations to calculate risk.
+I plan on using historic market returns, as well as Monte Carlo simulations to 
+calculate risk.
+
+I would also like to create an interface for "what if" scenarios, which will include possible
+cost savings if roth conversions are done, etc.
 
 
 
