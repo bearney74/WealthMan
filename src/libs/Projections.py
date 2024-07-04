@@ -73,6 +73,8 @@ class Projections:
         else:
             self._inflation = 0
 
+        _is_married=dv.relationStatus == "Married"
+        
         self._begin_year = datetime.now().year
 
         self._withdrawOrder = dv.withdrawOrder
@@ -86,7 +88,7 @@ class Projections:
         )
 
         self._spouse = None
-        if dv.relationStatus == "Married":
+        if _is_married:
             self._spouse = Person(
                 name=dv.spouseName,
                 birthDate=dv.spouseBirthDate,
@@ -108,7 +110,7 @@ class Projections:
             )
             self._IncomeSources.append(_client_ss)
 
-        if dv.relationStatus == "Married":
+        if _is_married:
             if dv.spouseSSAmount is not None:
                 _spouse_ss = SocialSecurity(
                     Name="Spouse Social Security",
@@ -175,10 +177,9 @@ class Projections:
             if _record.owner == AccountOwnerType.Spouse:
                 _birthdate = dv.spouseBirthDate
 
-            if _record.begin_age is None:
-                _record.begin_age = 0
-
             if _record.amount is not None:
+                if _record.begin_age is None:
+                    _record.begin_age = 0
                 if _record.end_age is None:
                     _record.end_age = 99
                 if _record.COLA is None:
@@ -210,9 +211,9 @@ class Projections:
             if _record.owner == AccountOwnerType.Spouse:
                 _birthdate = dv.spouseBirthDate
 
-            if _record.begin_age is None:
-                _record.begin_age = 0
             if _record.amount is not None:
+                if _record.begin_age is None:
+                    _record.begin_age = 0
                 if _record.end_age is None:
                     _record.end_age = 99
                 if _record.COLA is None:
@@ -230,10 +231,6 @@ class Projections:
 
                 self._Expenses.append(_e)
             else:
-                if _record.begin_age is None:
-                    logger.Error(
-                        "Expense '%s' not used since begin date not set" % _record.descr
-                    )
                 if _record.amount is None:
                     logger.Error(
                         "Expense '%s' not used since amount not set" % _record._descr
