@@ -49,7 +49,6 @@ class GlobalVariablesTab(QWidget):
         d.inflation = self._Inflation.get_float(Default=3.0)
         d.withdrawOrder = self._WithdrawOrder.currentText()
         d.forecastYears = self._forecast_years.get_int(Default=30)
-
         d.inTodaysDollars = self._InTodaysDollars.isChecked()
 
     def import_data(self, d: DataVariables):
@@ -57,4 +56,10 @@ class GlobalVariablesTab(QWidget):
         self._Inflation.setText(d.inflation)
         self._WithdrawOrder.setCurrentText(d.withdrawOrder)
         self._forecast_years.setText(d.forecastYears)
-        self._InTodaysDollars.setChecked(d.inTodaysDollars)
+        # use hasattr to "upgrade" a saved file to use a new version of
+        # WealthMan..  For example, a saved version did not have inTodaysDollars
+        # so checking before importing the attribute works.  We could also use
+        # the __version__ variable to see what version of WealthMan was saved
+        # with and then add default values for new variables
+        if hasattr(d, "inTodaysDollars"):
+            self._InTodaysDollars.setChecked(d.inTodaysDollars)
