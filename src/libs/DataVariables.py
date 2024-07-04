@@ -58,7 +58,7 @@ class ExpenseRecord(BaseRecord):
 
 class DataVariables:
     def __init__(self):
-        self.__version__ = 0.1
+        self.__version__ = "0.1 alpha"
         # BasicInfo
 
         self.clientName: str = ""
