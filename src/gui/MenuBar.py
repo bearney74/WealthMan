@@ -24,6 +24,7 @@ class MenuBar:
         filemenu.addAction(self.file_new_action())
         filemenu.addAction(self.file_open_action())
         filemenu.addAction(self.file_save_action())
+        filemenu.addAction(self.file_save_as_action())
         filemenu.addAction(self.file_exit_action())
 
         help_menu = self.menuBar.addMenu("&Help")
@@ -51,6 +52,12 @@ class MenuBar:
         _action.triggered.connect(lambda x: self.file_save())
         return _action
 
+    def file_save_as_action(self):
+        _action = QAction("Save as...", self.parent)
+        _action.setStatusTip("Save as...")
+        _action.triggered.connect(lambda x: self.file_save_as())
+        return _action
+
     def file_exit_action(self):
         _action = QAction("Exit", self.parent)
         _action.setStatusTip("Exit WealthMan")
@@ -65,10 +72,14 @@ class MenuBar:
             "",
             "WealthMan Data Files (*.wmd)",
         )
-        logger.debug("filename:%s" % _fname)
+        logger.info("filename:%s" % _fname)
+        if _fname == "":
+            return
+
         with open(_fname, "rb") as _fp:
             dv = pickle.load(_fp)
 
+        logger.info("__version__ = '%s'" % dv.__version__)
         self.parent.InputsTab.clear_forms()
         self.parent.InputsTab.BasicInfoTab.import_data(dv)
         self.parent.InputsTab.IncomeInfoTab.import_data(dv)
@@ -97,10 +108,12 @@ class MenuBar:
         logger.debug("save file '%s'" % self._filename)
         if self._filename is None:
             self._filename, _x = QFileDialog.getSaveFileName(self.parent, "Save File")
-            print(self._filename)
-            print(_x)
+            # print(self._filename)
+            # print(_x)
             logger.debug("using '%s' as filename.." % self._filename)
 
+        if self._filename == "":
+            return
         # for every tab in the inputs, we need to retrieve the xml and save them.
         dv = DataVariables()
 
