@@ -7,10 +7,19 @@ from Inputs import InputsTab
 from Logs import Logs
 from Analysis import AnalysisTab
 
+try:
+    from ctypes import windll  # Only exists on Windows.
+    myappid = 'WealthMan'
+    windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+except ImportError:
+    pass
+
+import os
 import logging
 
 logger = logging.getLogger(__name__)
 
+basename=os.path.dirname(__file__)
 __version__ = "0.1 alpha"
 
 
@@ -44,7 +53,7 @@ class Main(QMainWindow):
 
         self._createMenuBar()
 
-        self.setWindowIcon(QIcon("resources/icons8-w-67.png"))
+        #self.setWindowIcon(QIcon("resources/app.ico"))
 
         self.show()
         logger.debug("ending Main Window")
@@ -78,5 +87,7 @@ if __name__ == "__main__":
     from PyQt6.QtWidgets import QApplication
 
     _app = QApplication(sys.argv)
+    _app.setWindowIcon(QIcon(os.path.join(basename, "resources/app.ico")))
+
     _main = Main()
     sys.exit(_app.exec())

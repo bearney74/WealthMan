@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 
 from .EnumTypes import FederalTaxStatusType
-from imports.ImportHelper import ImportHelper
+from .ImportHelper import ImportHelper
 
 
 class FederalTax(ImportHelper):
