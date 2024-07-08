@@ -12,7 +12,7 @@ class FederalTax(ImportHelper):
 
         self.Brackets = None
         self.StandardDeduction = None
-        self.LongTermCapitalGains=None
+        self.LongTermCapitalGains = None
 
         self._import_data()
 
@@ -22,7 +22,7 @@ class FederalTax(ImportHelper):
 
         # sort the values by keys to guarantee that we know that the lowest brackets are first..
         self.Brackets = dict(sorted(self.Brackets.items()))
-        self.LongTermCapitalGains=dict(sorted(self.LongTermCapitalGains.items()))
+        self.LongTermCapitalGains = dict(sorted(self.LongTermCapitalGains.items()))
 
     def _import_data(self):
         _xml = ET.parse("../../data/FederalTaxBrackets.xml")
@@ -44,20 +44,20 @@ class FederalTax(ImportHelper):
             if FederalTaxStatusType[_status] == self.FileStatus:
                 self.StandardDeduction = int(_file.text)
 
-        #tax brackets
+        # tax brackets
         _b = self._root.findall("./TaxBrackets")
         assert len(_b) == 1
         _files = _b[0].findall("File")
-        self.Brackets=self._import_file_tax_data(_files)
-        
-        #long term capital gains..
-        _ltcg=self._root.findall("./LongTermCapitalGains")
+        self.Brackets = self._import_file_tax_data(_files)
+
+        # long term capital gains..
+        _ltcg = self._root.findall("./LongTermCapitalGains")
         assert len(_ltcg) == 1
         _files = _ltcg[0].findall("File")
-        self.LongTermCapitalGains=self._import_file_tax_data(_files)
-        
+        self.LongTermCapitalGains = self._import_file_tax_data(_files)
+
     def _import_file_tax_data(self, _file_xml):
-        _dict={}
+        _dict = {}
         for _file in _file_xml:
             _status = _file.attrib["Status"]
             if FederalTaxStatusType[_status] == self.FileStatus:
@@ -76,7 +76,7 @@ class FederalTax(ImportHelper):
 
         return _dict
 
-    #long term capital gains..
+    # long term capital gains..
     def calc_ltcg_taxes(self, capital_gains: int) -> int:
         _total = 0
         # print(self.Brackets)
@@ -91,7 +91,7 @@ class FederalTax(ImportHelper):
                     _total += (capital_gains - _begin) * _rate / 100.0
                 elif capital_gains > _end:
                     _total += (_end - _begin) * _rate / 100.0
-                
+
         return int(_total)
 
     def calc_taxes(self, taxable_income: int) -> int:

@@ -3,7 +3,6 @@ from datetime import datetime, date
 
 
 class ImportHelper:
-    
     def str2float(self, s: str):
         s = s.strip()
         if s == "":

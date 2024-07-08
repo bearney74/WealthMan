@@ -1,6 +1,7 @@
 from datetime import date
 
-from .EnumTypes import RelationStatus, AccountOwnerType
+from .EnumTypes import RelationStatus, AccountOwnerType, FederalTaxStatusType
+from .Version import APP_VERSION
 
 
 class BaseRecord:
@@ -58,7 +59,7 @@ class ExpenseRecord(BaseRecord):
 
 class DataVariables:
     def __init__(self):
-        self.__version__ = "0.2 alpha"
+        self.__version__ = APP_VERSION
         # BasicInfo
 
         self.clientName: str = ""
@@ -137,5 +138,4 @@ class DataVariables:
         self.forecastYears: int = None
         self.inTodaysDollars: bool = False
         self.federalFilingStatus: FederalTaxStatusType = None
-        self.federalFilingStatusOnceWidowed:FederalTaxStatusType=None
-        
+        self.federalFilingStatusOnceWidowed: FederalTaxStatusType = None
