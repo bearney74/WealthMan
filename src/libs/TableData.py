@@ -114,6 +114,10 @@ class TableData:
             if _header_flag:
                 _header.append("Asset Withdraw")
             _list.append(_record.assetWithdraw)
+            
+            if _header_flag:
+                _header.append("Long Term\nCapital Gains")
+            _list.append(_record.longTermCapitalGainsTaxes)
 
             if _header_flag:
                 _header.append("Surplus/Deficit")

@@ -7,6 +7,7 @@ from Inputs import InputsTab
 from Logs import Logs
 from Analysis import AnalysisTab
 
+#this will allow the app window under Windows OS to display a custom icon
 try:
     from ctypes import windll  # Only exists on Windows.
     myappid = 'WealthMan'
@@ -20,7 +21,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 basename=os.path.dirname(__file__)
-__version__ = "0.1 alpha"
+__version__ = "0.2 alpha"
 
 
 class Main(QMainWindow):
@@ -90,4 +91,8 @@ if __name__ == "__main__":
     _app.setWindowIcon(QIcon(os.path.join(basename, "resources/app.ico")))
 
     _main = Main()
+    if getattr(sys, 'frozen', False):    #this is running via pyinstaller
+        import pyi_splash
+        pyi_splash.close()
+        
     sys.exit(_app.exec())

@@ -58,7 +58,7 @@ class ExpenseRecord(BaseRecord):
 
 class DataVariables:
     def __init__(self):
-        self.__version__ = "0.1 alpha"
+        self.__version__ = "0.2 alpha"
         # BasicInfo
 
         self.clientName: str = ""
@@ -136,3 +136,6 @@ class DataVariables:
         self.withdrawOrder: str = None
         self.forecastYears: int = None
         self.inTodaysDollars: bool = False
+        self.federalFilingStatus: FederalTaxStatusType = None
+        self.federalFilingStatusOnceWidowed:FederalTaxStatusType=None
+        

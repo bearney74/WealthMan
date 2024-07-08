@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QComboBox, QCheckBox
 from gui.guihelpers.Entry import AgeEntry, PercentEntry
 
 from libs.DataVariables import DataVariables
-
+from libs.EnumTypes import FederalTaxStatusType
 
 class GlobalVariablesTab(QWidget):
     def __init__(self, parent=None):
@@ -31,6 +31,22 @@ class GlobalVariablesTab(QWidget):
         )
         formlayout.addRow(QLabel("Withdrawal Order"), self._WithdrawOrder)
 
+        _filing=["Single",
+                 "MarriedFilingJointly",
+                 "MarriedFilingSeparately",
+                 "HeadOfHousehold"]
+        
+        self._FilingStatus= QComboBox()
+        self._FilingStatus.setFixedWidth(200)
+        self._FilingStatus.addItems(_filing)
+        formlayout.addRow(QLabel("Federal Filing Status:"), self._FilingStatus)
+
+        self._FilingStatusOnceWidowed= QComboBox()
+        self._FilingStatusOnceWidowed.setFixedWidth(200)
+        self._FilingStatusOnceWidowed.addItems(_filing)
+        formlayout.addRow(QLabel("Federal Filing Status once Widowed"),
+                          self._FilingStatusOnceWidowed)
+
         self._InTodaysDollars = QCheckBox("", self)
         formlayout.addRow(QLabel("In Todays Dollars"), self._InTodaysDollars)
 
@@ -50,6 +66,8 @@ class GlobalVariablesTab(QWidget):
         d.withdrawOrder = self._WithdrawOrder.currentText()
         d.forecastYears = self._forecast_years.get_int(Default=30)
         d.inTodaysDollars = self._InTodaysDollars.isChecked()
+        d.federalFilingStatus=FederalTaxStatusType[self._FilingStatus.currentText()]
+        d.federalFilingStatusOnceWidowed=FederalTaxStatusType[self._FilingStatusOnceWidowed.currentText()]
 
     def import_data(self, d: DataVariables):
         """imports variables to the Global Variables tab"""
@@ -63,3 +81,9 @@ class GlobalVariablesTab(QWidget):
         # with and then add default values for new variables
         if hasattr(d, "inTodaysDollars"):
             self._InTodaysDollars.setChecked(d.inTodaysDollars)
+
+        #if hasattr(d, "federalFilingStatus") and d.federalFilingStatus is not None:
+        print(d.federalFilingStatus.name)
+        self._FilingStatus.setCurrentText(d.federalFilingStatus.name)
+        #if hasattr(d, "federalFilingStatusOnceWidowed") and d.federalFilingStatusOnceWidowed is not None:   
+        self._FilingStatusOnceWidowed.setCurrentText(d.federalFilingStatusOnceWidowed.name)

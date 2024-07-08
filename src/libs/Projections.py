@@ -42,6 +42,8 @@ class ProjectionYearData:
         self.thisYearsFederalTaxes: int = 0
         self.lastYearsFederalTaxes: int = 0
 
+        self.longTermCapitalGainsTaxes: int = 0
+            
         # cash flow is just incometotal-expenseTotal - federaltaxes
 
         # how much we had to pull from assets because expenses > income
@@ -313,7 +315,7 @@ class Projections:
 
         self._end_year = self._begin_year + dv.forecastYears
         # TODO fix me
-        self._federal_tax_status = FederalTaxStatusType.MarriedJointly
+        self._federal_tax_status =  dv.federalFilingStatus #FederalTaxStatusType.MarriedJointly
         # self._federal_tax_status = self._vars["GlobalVars"].FederalTaxStatus
 
     def execute(self):
@@ -474,11 +476,14 @@ class Projections:
 
             # federal taxes
             _ft = FederalTax(self._federal_tax_status, 2024)
-            _taxable_income = max(
-                _pyd.assetWithdraw + _income_total - _ft.StandardDeduction, 0
+            _taxable_income = max(_income_total - _ft.StandardDeduction, 0
             )
             _pyd.taxableIncome = _taxable_income
-            _pyd.thisYearsFederalTaxes = _ft.calc_taxes(_taxable_income)
+            
+            _pyd.thisYearsIncomeTaxes= _ft.calc_taxes(_taxable_income)
+            _pyd.longTermCapitalGainsTaxes = _ft.calc_ltcg_taxes(_pyd.assetWithdraw)
+            _pyd.thisYearsFederalTaxes = _pyd.thisYearsIncomeTaxes + _pyd.longTermCapitalGainsTaxes
+
 
             _pyd.lastYearsFederalTaxes = _lastYearsFederalTaxes
             _lastYearsFederalTaxes = _pyd.thisYearsFederalTaxes
@@ -486,8 +491,9 @@ class Projections:
             _pyd.federalEffectiveTaxRate = _ft.effective_tax_rate(
                 _taxable_income, _pyd.incomeTotal + _pyd.assetWithdraw
             )
+            #print(_pyd.thisYearsFederalTaxes, _pyd.incomeTotal + _pyd.assetWithdraw, _pyd.federalEffectiveTaxRate)
             _pyd.federalMarginalTaxRate = _ft.marginal_tax_rate(
-                _pyd.incomeTotal + _pyd.assetWithdraw
+                _pyd.incomeTotal #+ _pyd.assetWithdraw
             )
 
             _projection_data.append(_pyd)

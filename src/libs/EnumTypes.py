@@ -43,6 +43,6 @@ class IncomeSourceType(Enum):
 
 class FederalTaxStatusType(Enum):
     Single = 1
-    MarriedJointly = 2
-    MarriedSeparate = 3
+    MarriedFilingJointly = 2
+    MarriedFilingSeparately = 3
     HeadOfHousehold = 4

@@ -12,14 +12,17 @@ class FederalTax(ImportHelper):
 
         self.Brackets = None
         self.StandardDeduction = None
+        self.LongTermCapitalGains=None
 
         self._import_data()
 
         # if things were imported correctly from the xml, the vars below should be dicts..
         assert isinstance(self.Brackets, dict)
+        assert isinstance(self.LongTermCapitalGains, dict)
 
         # sort the values by keys to guarantee that we know that the lowest brackets are first..
         self.Brackets = dict(sorted(self.Brackets.items()))
+        self.LongTermCapitalGains=dict(sorted(self.LongTermCapitalGains.items()))
 
     def _import_data(self):
         _xml = ET.parse("../../data/FederalTaxBrackets.xml")
@@ -41,18 +44,26 @@ class FederalTax(ImportHelper):
             if FederalTaxStatusType[_status] == self.FileStatus:
                 self.StandardDeduction = int(_file.text)
 
-        _b = self._root.findall("./Brackets")
+        #tax brackets
+        _b = self._root.findall("./TaxBrackets")
         assert len(_b) == 1
-
         _files = _b[0].findall("File")
-
-        for _file in _files:
+        self.Brackets=self._import_file_tax_data(_files)
+        
+        #long term capital gains..
+        _ltcg=self._root.findall("./LongTermCapitalGains")
+        assert len(_ltcg) == 1
+        _files = _ltcg[0].findall("File")
+        self.LongTermCapitalGains=self._import_file_tax_data(_files)
+        
+    def _import_file_tax_data(self, _file_xml):
+        _dict={}
+        for _file in _file_xml:
             _status = _file.attrib["Status"]
             if FederalTaxStatusType[_status] == self.FileStatus:
                 _taxes = _file.findall("Tax")
                 assert len(_taxes) > 1
 
-                self.Brackets = {}
                 for _tax in _taxes:
                     _rate = _tax.attrib["Rate"]
                     _rate = self.strpct2int(_rate)
@@ -61,7 +72,27 @@ class FederalTax(ImportHelper):
                     _end = _tax.attrib["End"]
                     _end = self.str2int(_end)
 
-                    self.Brackets[_rate] = {"Begin": _begin, "End": _end}
+                    _dict[_rate] = {"Begin": _begin, "End": _end}
+
+        return _dict
+
+    #long term capital gains..
+    def calc_ltcg_taxes(self, capital_gains: int) -> int:
+        _total = 0
+        # print(self.Brackets)
+        for _rate, _dict in self.LongTermCapitalGains.items():
+            _begin = _dict["Begin"]
+            if _begin is None:
+                _begin = 0
+            _end = _dict["End"]
+
+            if capital_gains >= _begin:
+                if _end is None or capital_gains <= _end:
+                    _total += (capital_gains - _begin) * _rate / 100.0
+                elif capital_gains > _end:
+                    _total += (_end - _begin) * _rate / 100.0
+                
+        return int(_total)
 
     def calc_taxes(self, taxable_income: int) -> int:
         _total = 0
