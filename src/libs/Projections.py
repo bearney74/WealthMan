@@ -485,7 +485,7 @@ class Projections:
             _pyd.assetContributionTotal = _contribution_total
 
             # federal taxes
-            _ft = FederalTax(self._federal_tax_status, 2024)
+            _ft = FederalTax(_pyd.federalTaxFilingStatus, 2024)
             _taxable_income = max(_income_total - _ft.StandardDeduction, 0)
             _pyd.taxableIncome = _taxable_income
 
@@ -499,9 +499,10 @@ class Projections:
             _lastYearsFederalTaxes = _pyd.thisYearsFederalTaxes
 
             _pyd.federalEffectiveTaxRate = _ft.effective_tax_rate(
-                _taxable_income, _pyd.incomeTotal + _pyd.assetWithdraw
+                _taxable_income,
+                _pyd.incomeTotal,  # + _pyd.assetWithdraw
             )
-            # print(_pyd.thisYearsFederalTaxes, _pyd.incomeTotal + _pyd.assetWithdraw, _pyd.federalEffectiveTaxRate)
+
             _pyd.federalMarginalTaxRate = _ft.marginal_tax_rate(
                 _pyd.incomeTotal  # + _pyd.assetWithdraw
             )
