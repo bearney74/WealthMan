@@ -1,9 +1,7 @@
 from datetime import datetime, date
 
 from .Account import Account
-from .IncomeSources import IncomeSource, SocialSecurity
-from .Expense import Expense
-from .RequiredMinimalDistributions import RMD
+from .DataVariables import DataVariables
 from .EnumTypes import (
     AccountType,
     AccountOwnerType,
@@ -11,10 +9,12 @@ from .EnumTypes import (
     FederalTaxStatusType,
     IncomeSourceType,
 )
+from .Expense import Expense
 from .FederalTax import FederalTax
-
+from .IncomeSources import IncomeSource, SocialSecurity
 from .Person import Person
-from .DataVariables import DataVariables
+from .ProvisionalIncome import ProvisionalIncome
+from .RequiredMinimalDistributions import RMD
 from .WithdrawStrategy import WithdrawStrategy
 
 import logging
@@ -35,6 +35,9 @@ class ProjectionYearData:
 
         self.incomeSources: dict = {}  # key is Name, #value is income value
         self.incomeTotal: int = 0
+        
+        self.ssIncomeTotal: int=0
+        self.ssTaxableIncome: int=0
 
         self.expenseSources: dict = {}
         self.expenseTotal: int = 0
@@ -370,15 +373,20 @@ class Projections:
                 _pyd.federalTaxFilingStatus = self._federal_tax_status
 
             _income_total = 0
+            _ss_income_total=0
             for _src in self._IncomeSources:
                 _income = _src.calc_balance_by_year(_year)
 
                 _pyd.incomeSources[_src.Name] = _income
 
                 _income_total += _income  # _src.calc_income_by_year(_year)
+                if _src.IncomeType == IncomeSourceType.SocialSecurity:
+                    _ss_income_total+=_income
 
             _pyd.incomeTotal = _income_total
-
+            _pyd.ssIncomeTotal=_ss_income_total
+            
+            
             _expense_total = 0
             for _src in self._Expenses:
                 _expense = _src.calc_balance_by_year(_year)
@@ -484,9 +492,19 @@ class Projections:
             _pyd.assetTotal = _total
             _pyd.assetContributionTotal = _contribution_total
 
+            if _pyd.ssIncomeTotal > 0:
+               print(pow(1-self._inflation/100.0, _year - self._begin_year))
+               _pi=ProvisionalIncome(_pyd.federalTaxFilingStatus, pow(1- self._inflation/100.0, _year - self._begin_year))
+               _pyd.ssTaxRate= _pi.get_rate(_income_total - _ss_income_total + _pyd.assetWithdraw, _ss_income_total) * 1.0
+               _pyd.ssTaxableIncome=_pi.calc_ss_taxable(_income_total - _ss_income_total + _pyd.assetWithdraw, _ss_income_total)
+            else:
+               _pyd.ssTaxableIncome=0
+               _pyd.ssTaxRate=0.0
+
+
             # federal taxes
             _ft = FederalTax(_pyd.federalTaxFilingStatus, 2024)
-            _taxable_income = max(_income_total - _ft.StandardDeduction, 0)
+            _taxable_income = max(_income_total + _pyd.ssTaxableIncome - _ft.StandardDeduction, 0)
             _pyd.taxableIncome = _taxable_income
 
             _pyd.thisYearsIncomeTaxes = _ft.calc_taxes(_taxable_income)

@@ -72,6 +72,18 @@ class TableData:
             if _header_flag:
                 _header.append("Income Total")
             _list.append(_record.incomeTotal)
+            
+            if _header_flag:
+                _header.append("SS Income Total")
+            _list.append(_record.ssIncomeTotal)
+            
+            if _header_flag:
+                _header.append("SS Taxable Income")
+            _list.append(_record.ssTaxableIncome)
+            
+            if _header_flag:
+                _header.append("SS Tax Rate")
+            _list.append(_record.ssTaxRate)
 
             for _name, _balance in _record.expenseSources.items():
                 if _header_flag:
