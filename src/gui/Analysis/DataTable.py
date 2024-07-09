@@ -1,4 +1,5 @@
 import csv
+from enum import Enum
 
 from PyQt6.QtWidgets import (
     QFileDialog,
@@ -14,6 +15,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor, QAction, QIcon
 
+from libs.EnumTypes import FederalTaxStatusType
 import logging
 
 logger = logging.getLogger(__name__)
@@ -30,8 +32,11 @@ class InitialDelegate(QStyledItemDelegate):
             Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
         )
         text = index.model().data(index, Qt.ItemDataRole.DisplayRole)
+        # print(type(text))
         if text is None:
             option.text = ""
+        elif FederalTaxStatusType.has_member(text):
+            option.text = text
         elif "%" in text:
             option.text = text
         else:
@@ -90,6 +95,9 @@ class DataTableTab(QWidget):
                     if _col.strip().startswith("-"):
                         _value.setForeground(QBrush(QColor(255, 0, 0)))
                     self.table.setItem(_i, _j, _value)
+                elif isinstance(_col, Enum):
+                    # print(_col)
+                    self.table.setItem(_i, _j, QTableWidgetItem(_col.name))
                 else:
                     self.table.setItem(_i, _j, QTableWidgetItem(_col))
                 _j += 1

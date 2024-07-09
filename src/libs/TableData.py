@@ -83,6 +83,10 @@ class TableData:
             _list.append(_record.expenseTotal)
 
             if _header_flag:
+                _header.append("Federal Filing Status")
+            _list.append(_record.federalTaxFilingStatus)
+
+            if _header_flag:
                 _header.append("Last Years\nFederal Taxes")
             _list.append(_record.lastYearsFederalTaxes)
 

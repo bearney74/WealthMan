@@ -88,10 +88,12 @@ class GlobalVariablesTab(QWidget):
         if hasattr(d, "inTodaysDollars"):
             self._InTodaysDollars.setChecked(d.inTodaysDollars)
 
-        # if hasattr(d, "federalFilingStatus") and d.federalFilingStatus is not None:
-        print(d.federalFilingStatus.name)
-        self._FilingStatus.setCurrentText(d.federalFilingStatus.name)
-        # if hasattr(d, "federalFilingStatusOnceWidowed") and d.federalFilingStatusOnceWidowed is not None:
-        self._FilingStatusOnceWidowed.setCurrentText(
-            d.federalFilingStatusOnceWidowed.name
-        )
+        if hasattr(d, "federalFilingStatus") and d.federalFilingStatus is not None:
+            self._FilingStatus.setCurrentText(d.federalFilingStatus.name)
+        if (
+            hasattr(d, "federalFilingStatusOnceWidowed")
+            and d.federalFilingStatusOnceWidowed is not None
+        ):
+            self._FilingStatusOnceWidowed.setCurrentText(
+                d.federalFilingStatusOnceWidowed.name
+            )

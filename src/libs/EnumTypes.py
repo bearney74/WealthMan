@@ -46,3 +46,7 @@ class FederalTaxStatusType(Enum):
     MarriedFilingJointly = 2
     MarriedFilingSeparately = 3
     HeadOfHousehold = 4
+
+    @classmethod
+    def has_member(cls, s):
+        return s in cls.__members__

@@ -8,6 +8,7 @@ from .EnumTypes import (
     AccountType,
     AccountOwnerType,
     AmountPeriodType,
+    FederalTaxStatusType,
     IncomeSourceType,
 )
 from .FederalTax import FederalTax
@@ -38,6 +39,7 @@ class ProjectionYearData:
         self.expenseSources: dict = {}
         self.expenseTotal: int = 0
 
+        self.federalTaxFilingStatus: FederalTaxStatusType = None
         self.thisYearsFederalTaxes: int = 0
         self.lastYearsFederalTaxes: int = 0
 
@@ -314,9 +316,9 @@ class Projections:
 
         self._end_year = self._begin_year + dv.forecastYears
         # TODO fix me
-        self._federal_tax_status = (
-            dv.federalFilingStatus
-        )  # FederalTaxStatusType.MarriedJointly
+        self._federal_tax_status = dv.federalFilingStatus
+        self._federal_tax_status_once_widowed = dv.federalFilingStatusOnceWidowed
+        # FederalTaxStatusType.MarriedJointly
         # self._federal_tax_status = self._vars["GlobalVars"].FederalTaxStatus
 
     def execute(self):
@@ -351,6 +353,7 @@ class Projections:
                 if _spouseage == self._spouse.lifeSpanAge + 1:
                     _spouseRMD.death_event(self._spouse)
 
+            # check to see if client (and spouse) are dead...
             if not _clientIsAlive:
                 if self._client.relationship == "Single":
                     _projection_data.append(_pyd)
@@ -360,6 +363,12 @@ class Projections:
                     continue
 
             # at least one person is still alive...  do the projection for that year...
+
+            if not _clientIsAlive or not _spouseIsAlive:
+                _pyd.federalTaxFilingStatus = self._federal_tax_status_once_widowed
+            else:
+                _pyd.federalTaxFilingStatus = self._federal_tax_status
+
             _income_total = 0
             for _src in self._IncomeSources:
                 _income = _src.calc_balance_by_year(_year)
