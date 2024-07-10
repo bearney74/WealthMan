@@ -140,7 +140,8 @@ class InputsTab(QMainWindow):
         _projectionData = _p.execute()
         self.parent.AnalysisTab.projectionData = _projectionData
         self.parent.AnalysisTab.tableData = TableData(
-            _projectionData, _p.InTodaysDollars
+            _projectionData, InTodaysDollars=_p.InTodaysDollars,
+            UseSurplusAccount=_p.UseSurplusAccount
         )
 
         # self.parent.AnalysisTab.reset()

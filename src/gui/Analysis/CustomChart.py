@@ -115,8 +115,11 @@ class CustomChartTab(QWidget):
         self.setLayout(layout)
 
         self.variables.currentIndexChanged.connect(self._selectionchange)
-
+        
     def _selectionchange(self, i):
+        if self.parent.projectionData is None:
+            return
+        
         match self.variables.currentText():
             case "Asset Totals":
                 self.AssetTotals()

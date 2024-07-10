@@ -63,6 +63,7 @@ class WithdrawStrategy:
     def reconcile_required_withdraw(self, deficit: int):
         # todo.  how to deal with taxes from asset sells???
         for _asset in self._assets:
+            assert _asset.Balance >= 0
             if _asset.Type in (AccountType.TaxDeferred, AccountType.TaxFree):
                 # need to check that owner is old enough to take withdraw
                 match _asset.Owner:
@@ -79,5 +80,6 @@ class WithdrawStrategy:
             else:  # deficit is greater than balance
                 deficit -= _asset.Balance
                 _asset.Balance = 0
+                print(deficit)
 
         return deficit

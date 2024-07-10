@@ -1,4 +1,8 @@
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 # since the single and married jointly values don't change with inflation, how do I work with these values
 # when looking at "todays dollars"?   I know I can pass a variable in to do this calc..
 #for example if "inflation" is 3.0, we could assume 0.97 for each year of decrease for each value.
@@ -39,5 +43,5 @@ class ProvisionalIncome:
               #print(_income, _begin, _end)
               if _income >= _begin and _income <= _end:
                   return int(_rate)
-                
+      
       logger.error("We shouldn't get here...")

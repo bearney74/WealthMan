@@ -70,6 +70,9 @@ class ProjectionYearData:
 
         self.totalRMD: int = 0
         self.totalRMDPercent: float = 0.0
+        
+        #surplus account
+        self.surplusBalance: int = 0
 
 
 class Projections:
@@ -81,6 +84,10 @@ class Projections:
             self._inflation = dv.inflation
         else:
             self._inflation = 0
+
+        self.UseSurplusAccount=dv.SurplusAccount
+        self.SurplusAccountInterestRate = dv.SurplusAccountInterestRate
+      
 
         _is_married = dv.relationStatus == "Married"
 
@@ -336,6 +343,9 @@ class Projections:
         if self._spouse is not None:
             _spouseRMD = RMD(self._spouse, self._client)
 
+        _surplusBalance=0
+        _surplusInterestRate=self.SurplusAccountInterestRate
+
         _lastYearsFederalTaxes = 0
         for _year in range(self._begin_year, self._end_year + 1):
             _pyd = ProjectionYearData(_year)
@@ -379,14 +389,17 @@ class Projections:
             _income_total = 0
             _ss_income_total=0
             for _src in self._IncomeSources:
-                _income = _src.calc_balance_by_year(_year)
-
-                _pyd.incomeSources[_src.Name] = _income
-
-                _income_total += _income  # _src.calc_income_by_year(_year)
+                #_income = _src.calc_balance_by_year(_year)
                 if _src.IncomeType == IncomeSourceType.SocialSecurity:
-                    _ss_income_total+=_income
-
+                    _income = _src.calc_balance_by_year(_year)
+                    _ss_income_total+=_income    
+                else:
+                    _income = _src.calc_balance_by_year(_year)
+                
+                _pyd.incomeSources[_src.Name] = _income
+                
+                _income_total += _income  # _src.calc_income_by_year(_year)
+                
             _pyd.incomeTotal = _income_total
             _pyd.ssIncomeTotal=_ss_income_total
             
@@ -412,10 +425,6 @@ class Projections:
                         _client_ira_total += _src.Balance
                     elif _src.Owner == AccountOwnerType.Spouse:
                         _spouse_ira_total += _src.Balance
-
-            #    _total += _balance
-
-            # _pyd.assetTotal = _total
 
             # do RMD calcs
             _rmd_pct = _clientRMD.calc(date(_year, 12, 31))
@@ -450,7 +459,8 @@ class Projections:
                 )
                 _pyd.assetWithdraw = max(abs(_pyd.cashFlow), _pyd.totalRMD)
                 _deficit = _ws.reconcile_required_withdraw(_pyd.assetWithdraw)
-                assert _deficit <= 0
+                #print(_year, _deficit)
+                #assert _deficit <= 0
                 _pyd.surplusDeficit = _pyd.cashFlow + _pyd.assetWithdraw - _deficit
                 #_pyd.assetWithdraw = max(abs(_cash_flow), _pyd.totalRMD)
                 
@@ -529,7 +539,13 @@ class Projections:
                 _pyd.incomeTotal  # + _pyd.assetWithdraw
             )
 
-            #_pyd.surplusDeficit = _pyd.incomeTotal - _pyd.expenseTotal - _pyd.lastYearsFederalTaxes - _pyd.assetContributionTotal
+            if self.UseSurplusAccount:
+               _surplusBalance=int(_surplusBalance*(1.0 + self.SurplusAccountInterestRate/100.0))
+               _surplusBalance+= _pyd.surplusDeficit
+               _pyd.surplusBalance=_surplusBalance
+               
+               _pyd.assetTotal+=_pyd.surplusBalance
+               
 
             _projection_data.append(_pyd)
 

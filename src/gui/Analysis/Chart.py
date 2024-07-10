@@ -116,12 +116,12 @@ class ChartTab(QWidget):
         self.setLayout(layout)
 
         self.variables.currentIndexChanged.connect(self._selectionchange)
-
+        
     def setCategories(self):
         self.variables.clear()
         _categories = self.parent.tableData.getCategories()
         self.variables.addItems(_categories)
-        self.variables.setCurrentText("AssetTotal")
+        self.variables.setCurrentText("Asset Total")
 
     def _selectionchange(self, i):
         # print("selection change")

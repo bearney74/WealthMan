@@ -104,7 +104,7 @@ class IncomeExpenseBase:
             self._annual_balance = self._calc_annual_balance()
             return self._annual_balance
 
-        if self.COLA != 0 and self.COLA is not None:
+        if self.COLA != 0: # and self.COLA is not None:
             self._annual_balance = int(self._annual_balance * (1.0 + self.COLA / 100.0))
             return self._annual_balance
 

@@ -54,7 +54,18 @@ class GlobalVariablesTab(QWidget):
         self._InTodaysDollars = QCheckBox("", self)
         formlayout.addRow(QLabel("In Todays Dollars"), self._InTodaysDollars)
 
+        self._SurplusAccount=QCheckBox("", self)
+        formlayout.addRow(QLabel("Add surplus to a surplus account:"), self._SurplusAccount)
+        self._SurplusAccount.clicked.connect(self._enable_disable_surplus_interest)
+        
+        self._SurplusAccountInterestRate = PercentEntry(min=-10.0, max=10.0, num_decimal_places=1)
+        formlayout.addRow(QLabel("Surplus Account Interest Rate:"), self._SurplusAccountInterestRate)
+        self._SurplusAccountInterestRate.setEnabled(False)
+
         self.setLayout(formlayout)
+
+    def _enable_disable_surplus_interest(self, e):
+        self._SurplusAccountInterestRate.setEnabled(self._SurplusAccount.isChecked())
 
     def is_valid(self) -> bool:
         return self._forecast_years.is_valid() and self._Inflation.is_valid()
@@ -64,6 +75,8 @@ class GlobalVariablesTab(QWidget):
         self._forecast_years.setText("")
         self._Inflation.setText("")
         self._InTodaysDollars.setChecked(False)
+        self._SurplusAccount.setChecked(False)
+        self._SurplusAccountInterestRate.setText("")
 
     def export_data(self, d: DataVariables):
         d.inflation = self._Inflation.get_float(Default=3.0)
@@ -74,6 +87,11 @@ class GlobalVariablesTab(QWidget):
         d.federalFilingStatusOnceWidowed = FederalTaxStatusType[
             self._FilingStatusOnceWidowed.currentText()
         ]
+        d.SurplusAccount=self._SurplusAccount.isChecked()
+        if self._SurplusAccount.isChecked():
+            d.SurplusAccountInterestRate=self._SurplusAccountInterestRate.get_float(Default=1.0)
+        else:
+            d.SurplusAccountInterestRate=None
 
     def import_data(self, d: DataVariables):
         """imports variables to the Global Variables tab"""
@@ -97,3 +115,8 @@ class GlobalVariablesTab(QWidget):
             self._FilingStatusOnceWidowed.setCurrentText(
                 d.federalFilingStatusOnceWidowed.name
             )
+
+        if hasattr(d, "SurplusAccount"):
+           self._SurplusAccount.setChecked(d.SurplusAccount)
+           self._SurplusAccountInterestRate.setText(d.SurplusAccountInterestRate)
+           self._SurplusAccountInterestRate.setEnabled(d.SurplusAccount)

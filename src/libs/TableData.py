@@ -2,7 +2,7 @@ from .Projections import ProjectionYearData
 
 
 class TableData:
-    def __init__(self, Data: [ProjectionYearData], InTodaysDollars: bool):
+    def __init__(self, Data: [ProjectionYearData], UseSurplusAccount:bool, InTodaysDollars: bool):
         assert Data is not None
         self.projectionData = Data
 
@@ -10,6 +10,7 @@ class TableData:
         self.vheader = None
         self.data = None
         self.InTodaysDollars = InTodaysDollars
+        self.UseSurplusAccount = UseSurplusAccount
 
     def getCategories(self):
         if self.categories is None:
@@ -147,6 +148,11 @@ class TableData:
                 if _header_flag:
                     _header.append(_name)
                 _list.append(_balance)
+
+            if self.UseSurplusAccount:
+                if _header_flag:
+                    _header.append("Surplus Account")
+                _list.append(_record.surplusBalance)
 
             if _header_flag:
                 _header.append("Asset Total")
