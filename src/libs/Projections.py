@@ -35,15 +35,15 @@ class ProjectionYearData:
 
         self.incomeSources: dict = {}  # key is Name, #value is income value
         self.incomeTotal: int = 0
-        
-        self.ssIncomeTotal: int=0
-        self.ssTaxableIncome: int=0
+
+        self.ssIncomeTotal: int = 0
+        self.ssTaxableIncome: int = 0
 
         self.expenseSources: dict = {}
         self.expenseTotal: int = 0
 
-        self.cashFlow:int=0     # income total - expense total - - lastYearsFederal Taxes - asset contributions
-        self.surplusDeficit: int=0   #cashFlow - assetWithdraws
+        self.cashFlow: int = 0  # income total - expense total - - lastYearsFederal Taxes - asset contributions
+        self.surplusDeficit: int = 0  # cashFlow - assetWithdraws
 
         self.federalTaxFilingStatus: FederalTaxStatusType = None
         self.thisYearsFederalTaxes: int = 0
@@ -55,7 +55,7 @@ class ProjectionYearData:
 
         # how much we had to pull from assets because expenses > income
         self.assetWithdraw: int = 0
-        #self.surplus_deficit: int = 0
+        # self.surplus_deficit: int = 0
 
         self.assetSources: dict = {}
         self.assetContributions: dict = {}
@@ -70,8 +70,8 @@ class ProjectionYearData:
 
         self.totalRMD: int = 0
         self.totalRMDPercent: float = 0.0
-        
-        #surplus account
+
+        # surplus account
         self.surplusBalance: int = 0
 
 
@@ -85,9 +85,8 @@ class Projections:
         else:
             self._inflation = 0
 
-        self.UseSurplusAccount=dv.SurplusAccount
+        self.UseSurplusAccount = dv.SurplusAccount
         self.SurplusAccountInterestRate = dv.SurplusAccountInterestRate
-      
 
         _is_married = dv.relationStatus == "Married"
 
@@ -334,7 +333,6 @@ class Projections:
         # FederalTaxStatusType.MarriedJointly
         # self._federal_tax_status = self._vars["GlobalVars"].FederalTaxStatus
 
-
     def execute(self):
         _projection_data = []
         # _data = []
@@ -343,8 +341,8 @@ class Projections:
         if self._spouse is not None:
             _spouseRMD = RMD(self._spouse, self._client)
 
-        _surplusBalance=0
-        _surplusInterestRate=self.SurplusAccountInterestRate
+        _surplusBalance = 0
+        _surplusInterestRate = self.SurplusAccountInterestRate
 
         _lastYearsFederalTaxes = 0
         for _year in range(self._begin_year, self._end_year + 1):
@@ -387,23 +385,22 @@ class Projections:
                 _pyd.federalTaxFilingStatus = self._federal_tax_status
 
             _income_total = 0
-            _ss_income_total=0
+            _ss_income_total = 0
             for _src in self._IncomeSources:
-                #_income = _src.calc_balance_by_year(_year)
+                # _income = _src.calc_balance_by_year(_year)
                 if _src.IncomeType == IncomeSourceType.SocialSecurity:
                     _income = _src.calc_balance_by_year(_year)
-                    _ss_income_total+=_income    
+                    _ss_income_total += _income
                 else:
                     _income = _src.calc_balance_by_year(_year)
-                
+
                 _pyd.incomeSources[_src.Name] = _income
-                
+
                 _income_total += _income  # _src.calc_income_by_year(_year)
-                
+
             _pyd.incomeTotal = _income_total
-            _pyd.ssIncomeTotal=_ss_income_total
-            
-            
+            _pyd.ssIncomeTotal = _ss_income_total
+
             _expense_total = 0
             for _src in self._Expenses:
                 _expense = _src.calc_balance_by_year(_year)
@@ -448,7 +445,7 @@ class Projections:
 
             # print(_income_total, _expense_total, _income_total - _expense_total, _pyd.totalRMD)
             if _pyd.cashFlow < 0 or _pyd.totalRMD > 0:
-                #we need to withdraw money from assets to make up for the cash flow deficit
+                # we need to withdraw money from assets to make up for the cash flow deficit
                 _ws = WithdrawStrategy(
                     self._withdrawOrder,
                     _clientage,
@@ -459,16 +456,15 @@ class Projections:
                 )
                 _pyd.assetWithdraw = max(abs(_pyd.cashFlow), _pyd.totalRMD)
                 _deficit = _ws.reconcile_required_withdraw(_pyd.assetWithdraw)
-                #print(_year, _deficit)
-                #assert _deficit <= 0
+                # print(_year, _deficit)
+                # assert _deficit <= 0
                 _pyd.surplusDeficit = _pyd.cashFlow + _pyd.assetWithdraw - _deficit
-                #_pyd.assetWithdraw = max(abs(_cash_flow), _pyd.totalRMD)
-                
+                # _pyd.assetWithdraw = max(abs(_cash_flow), _pyd.totalRMD)
+
             else:
                 _pyd.assetWithdraw = 0
-                _pyd.surplusDeficit = _pyd.cashFlow 
-            
-            
+                _pyd.surplusDeficit = _pyd.cashFlow
+
             _total = 0
             _client_ira_total = 0
             _spouse_ira_total = 0
@@ -498,27 +494,37 @@ class Projections:
             _pyd.assetTotal = _total
             _pyd.assetContributionTotal = _contribution_total
 
-            _pyd.cashFlow-=_contribution_total
-            _pyd.surplusDeficit-=_contribution_total
+            _pyd.cashFlow -= _contribution_total
+            _pyd.surplusDeficit -= _contribution_total
 
             if _pyd.ssIncomeTotal > 0:
-               #print(pow(1-self._inflation/100.0, _year - self._begin_year))
-                #if we are calculating in todays dollars, we need to deflate the value of provisional income amounts for rates
+                # print(pow(1-self._inflation/100.0, _year - self._begin_year))
+                # if we are calculating in todays dollars, we need to deflate the value of provisional income amounts for rates
                 if self.InTodaysDollars:
-                    _cpi=pow(1-self._inflation/100.0, _year - self._begin_year)
+                    _cpi = pow(1 - self._inflation / 100.0, _year - self._begin_year)
                 else:
-                    _cpi=1
-                _pi=ProvisionalIncome(_pyd.federalTaxFilingStatus, _cpi)
-                _pyd.ssTaxRate= _pi.get_rate(_income_total - _ss_income_total + _pyd.assetWithdraw, _ss_income_total) * 1.0
-                _pyd.ssTaxableIncome=_pi.calc_ss_taxable(_income_total - _ss_income_total + _pyd.assetWithdraw, _ss_income_total)
+                    _cpi = 1
+                _pi = ProvisionalIncome(_pyd.federalTaxFilingStatus, _cpi)
+                _pyd.ssTaxRate = (
+                    _pi.get_rate(
+                        _income_total - _ss_income_total + _pyd.assetWithdraw,
+                        _ss_income_total,
+                    )
+                    * 1.0
+                )
+                _pyd.ssTaxableIncome = _pi.calc_ss_taxable(
+                    _income_total - _ss_income_total + _pyd.assetWithdraw,
+                    _ss_income_total,
+                )
             else:
-                _pyd.ssTaxableIncome=0
-                _pyd.ssTaxRate=0.0
-
+                _pyd.ssTaxableIncome = 0
+                _pyd.ssTaxRate = 0.0
 
             # federal taxes
             _ft = FederalTax(_pyd.federalTaxFilingStatus, 2024)
-            _taxable_income = max(_income_total + _pyd.ssTaxableIncome - _ft.StandardDeduction, 0)
+            _taxable_income = max(
+                _income_total + _pyd.ssTaxableIncome - _ft.StandardDeduction, 0
+            )
             _pyd.taxableIncome = _taxable_income
 
             _pyd.thisYearsIncomeTaxes = _ft.calc_taxes(_taxable_income)
@@ -540,12 +546,13 @@ class Projections:
             )
 
             if self.UseSurplusAccount:
-               _surplusBalance=int(_surplusBalance*(1.0 + self.SurplusAccountInterestRate/100.0))
-               _surplusBalance+= _pyd.surplusDeficit
-               _pyd.surplusBalance=_surplusBalance
-               
-               _pyd.assetTotal+=_pyd.surplusBalance
-               
+                _surplusBalance = int(
+                    _surplusBalance * (1.0 + self.SurplusAccountInterestRate / 100.0)
+                )
+                _surplusBalance += _pyd.surplusDeficit
+                _pyd.surplusBalance = _surplusBalance
+
+                _pyd.assetTotal += _pyd.surplusBalance
 
             _projection_data.append(_pyd)
 

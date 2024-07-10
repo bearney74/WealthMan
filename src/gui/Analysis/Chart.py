@@ -116,7 +116,7 @@ class ChartTab(QWidget):
         self.setLayout(layout)
 
         self.variables.currentIndexChanged.connect(self._selectionchange)
-        
+
     def setCategories(self):
         self.variables.clear()
         _categories = self.parent.tableData.getCategories()

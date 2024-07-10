@@ -22,7 +22,7 @@ class AnalysisTab(QWidget):
         self.CustomChartTab = CustomChartTab(self)
 
         # self.tabs.currentChanged.connect(self.onTabChange)
-        #self.tabs.addTab(QWidget(), "Dashboard")
+        # self.tabs.addTab(QWidget(), "Dashboard")
         self.tabs.addTab(self.DataTableTab, "Details")
         self.tabs.addTab(self.ChartTab, "Charts")
         self.tabs.addTab(self.CustomChartTab, "Custom Charts")

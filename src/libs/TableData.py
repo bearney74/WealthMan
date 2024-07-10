@@ -2,7 +2,9 @@ from .Projections import ProjectionYearData
 
 
 class TableData:
-    def __init__(self, Data: [ProjectionYearData], UseSurplusAccount:bool, InTodaysDollars: bool):
+    def __init__(
+        self, Data: [ProjectionYearData], UseSurplusAccount: bool, InTodaysDollars: bool
+    ):
         assert Data is not None
         self.projectionData = Data
 
@@ -73,15 +75,15 @@ class TableData:
             if _header_flag:
                 _header.append("Income Total")
             _list.append(_record.incomeTotal)
-            
+
             if _header_flag:
                 _header.append("SS Income Total")
             _list.append(_record.ssIncomeTotal)
-            
+
             if _header_flag:
                 _header.append("SS Taxable Income")
             _list.append(_record.ssTaxableIncome)
-            
+
             if _header_flag:
                 _header.append("SS Tax Rate")
             _list.append(_record.ssTaxRate)
@@ -135,7 +137,7 @@ class TableData:
             if _header_flag:
                 _header.append("Cash Flow")
             _list.append(_record.cashFlow)
-            
+
             if _header_flag:
                 _header.append("Long Term\nCapital Gains")
             _list.append(_record.longTermCapitalGainsTaxes)

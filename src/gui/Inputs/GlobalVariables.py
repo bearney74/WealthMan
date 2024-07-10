@@ -54,12 +54,18 @@ class GlobalVariablesTab(QWidget):
         self._InTodaysDollars = QCheckBox("", self)
         formlayout.addRow(QLabel("In Todays Dollars"), self._InTodaysDollars)
 
-        self._SurplusAccount=QCheckBox("", self)
-        formlayout.addRow(QLabel("Add surplus to a surplus account:"), self._SurplusAccount)
+        self._SurplusAccount = QCheckBox("", self)
+        formlayout.addRow(
+            QLabel("Add surplus to a surplus account:"), self._SurplusAccount
+        )
         self._SurplusAccount.clicked.connect(self._enable_disable_surplus_interest)
-        
-        self._SurplusAccountInterestRate = PercentEntry(min=-10.0, max=10.0, num_decimal_places=1)
-        formlayout.addRow(QLabel("Surplus Account Interest Rate:"), self._SurplusAccountInterestRate)
+
+        self._SurplusAccountInterestRate = PercentEntry(
+            min=-10.0, max=10.0, num_decimal_places=1
+        )
+        formlayout.addRow(
+            QLabel("Surplus Account Interest Rate:"), self._SurplusAccountInterestRate
+        )
         self._SurplusAccountInterestRate.setEnabled(False)
 
         self.setLayout(formlayout)
@@ -87,11 +93,13 @@ class GlobalVariablesTab(QWidget):
         d.federalFilingStatusOnceWidowed = FederalTaxStatusType[
             self._FilingStatusOnceWidowed.currentText()
         ]
-        d.SurplusAccount=self._SurplusAccount.isChecked()
+        d.SurplusAccount = self._SurplusAccount.isChecked()
         if self._SurplusAccount.isChecked():
-            d.SurplusAccountInterestRate=self._SurplusAccountInterestRate.get_float(Default=1.0)
+            d.SurplusAccountInterestRate = self._SurplusAccountInterestRate.get_float(
+                Default=1.0
+            )
         else:
-            d.SurplusAccountInterestRate=None
+            d.SurplusAccountInterestRate = None
 
     def import_data(self, d: DataVariables):
         """imports variables to the Global Variables tab"""
@@ -117,6 +125,6 @@ class GlobalVariablesTab(QWidget):
             )
 
         if hasattr(d, "SurplusAccount"):
-           self._SurplusAccount.setChecked(d.SurplusAccount)
-           self._SurplusAccountInterestRate.setText(d.SurplusAccountInterestRate)
-           self._SurplusAccountInterestRate.setEnabled(d.SurplusAccount)
+            self._SurplusAccount.setChecked(d.SurplusAccount)
+            self._SurplusAccountInterestRate.setText(d.SurplusAccountInterestRate)
+            self._SurplusAccountInterestRate.setEnabled(d.SurplusAccount)
