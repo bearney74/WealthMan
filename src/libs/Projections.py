@@ -42,6 +42,9 @@ class ProjectionYearData:
         self.expenseSources: dict = {}
         self.expenseTotal: int = 0
 
+        self.cashFlow:int=0     # income total - expense total - - lastYearsFederal Taxes - asset contributions
+        self.surplusDeficit: int=0   #cashFlow - assetWithdraws
+
         self.federalTaxFilingStatus: FederalTaxStatusType = None
         self.thisYearsFederalTaxes: int = 0
         self.lastYearsFederalTaxes: int = 0
@@ -52,7 +55,7 @@ class ProjectionYearData:
 
         # how much we had to pull from assets because expenses > income
         self.assetWithdraw: int = 0
-        self.surplus_deficit: int = 0
+        #self.surplus_deficit: int = 0
 
         self.assetSources: dict = {}
         self.assetContributions: dict = {}
@@ -324,6 +327,7 @@ class Projections:
         # FederalTaxStatusType.MarriedJointly
         # self._federal_tax_status = self._vars["GlobalVars"].FederalTaxStatus
 
+
     def execute(self):
         _projection_data = []
         # _data = []
@@ -431,22 +435,11 @@ class Projections:
                     100.0 * _pyd.totalRMD / (_client_ira_total + _spouse_ira_total)
                 )
 
-            # ??? should we include TotalRMD as part of cashflow?
-            _cash_flow = _income_total - _expense_total - _lastYearsFederalTaxes
+            _pyd.cashFlow = _income_total - _expense_total - _lastYearsFederalTaxes
 
             # print(_income_total, _expense_total, _income_total - _expense_total, _pyd.totalRMD)
-            if _cash_flow < 0:
-                _pyd.assetWithdraw = max(abs(_cash_flow), _pyd.totalRMD)
-            else:
-                _pyd.assetWithdraw = 0
-
-            if _pyd.assetWithdraw == 0:
-                # _pyd.assetWithdraw = 0
-                _pyd.surplus_deficit = _cash_flow
-            else:
-                # we need to pull money from Assets..
-                # define a new class that takes care of this logic, etc
-                # print(_cash_flow, _pyd.totalRMD, max(abs(_cash_flow), _pyd.totalRMD))
+            if _pyd.cashFlow < 0 or _pyd.totalRMD > 0:
+                #we need to withdraw money from assets to make up for the cash flow deficit
                 _ws = WithdrawStrategy(
                     self._withdrawOrder,
                     _clientage,
@@ -455,14 +448,17 @@ class Projections:
                     _spouseIsAlive,
                     self._Assets,
                 )
-                # _pyd.assetWithdraw = max(abs(_cash_flow), _pyd.totalRMD)
+                _pyd.assetWithdraw = max(abs(_pyd.cashFlow), _pyd.totalRMD)
                 _deficit = _ws.reconcile_required_withdraw(_pyd.assetWithdraw)
-                # if _deficit > 0.. we have run out of money...
-                if _deficit > 0:
-                    _pyd.surplus_deficit = -_deficit
-                else:
-                    _pyd.surplus_deficit = _pyd.assetWithdraw + _cash_flow
-
+                assert _deficit <= 0
+                _pyd.surplusDeficit = _pyd.cashFlow + _pyd.assetWithdraw - _deficit
+                #_pyd.assetWithdraw = max(abs(_cash_flow), _pyd.totalRMD)
+                
+            else:
+                _pyd.assetWithdraw = 0
+                _pyd.surplusDeficit = _pyd.cashFlow 
+            
+            
             _total = 0
             _client_ira_total = 0
             _spouse_ira_total = 0
@@ -492,14 +488,22 @@ class Projections:
             _pyd.assetTotal = _total
             _pyd.assetContributionTotal = _contribution_total
 
+            _pyd.cashFlow-=_contribution_total
+            _pyd.surplusDeficit-=_contribution_total
+
             if _pyd.ssIncomeTotal > 0:
-               print(pow(1-self._inflation/100.0, _year - self._begin_year))
-               _pi=ProvisionalIncome(_pyd.federalTaxFilingStatus, pow(1- self._inflation/100.0, _year - self._begin_year))
-               _pyd.ssTaxRate= _pi.get_rate(_income_total - _ss_income_total + _pyd.assetWithdraw, _ss_income_total) * 1.0
-               _pyd.ssTaxableIncome=_pi.calc_ss_taxable(_income_total - _ss_income_total + _pyd.assetWithdraw, _ss_income_total)
+               #print(pow(1-self._inflation/100.0, _year - self._begin_year))
+                #if we are calculating in todays dollars, we need to deflate the value of provisional income amounts for rates
+                if self.InTodaysDollars:
+                    _cpi=pow(1-self._inflation/100.0, _year - self._begin_year)
+                else:
+                    _cpi=1
+                _pi=ProvisionalIncome(_pyd.federalTaxFilingStatus, _cpi)
+                _pyd.ssTaxRate= _pi.get_rate(_income_total - _ss_income_total + _pyd.assetWithdraw, _ss_income_total) * 1.0
+                _pyd.ssTaxableIncome=_pi.calc_ss_taxable(_income_total - _ss_income_total + _pyd.assetWithdraw, _ss_income_total)
             else:
-               _pyd.ssTaxableIncome=0
-               _pyd.ssTaxRate=0.0
+                _pyd.ssTaxableIncome=0
+                _pyd.ssTaxRate=0.0
 
 
             # federal taxes
@@ -524,6 +528,8 @@ class Projections:
             _pyd.federalMarginalTaxRate = _ft.marginal_tax_rate(
                 _pyd.incomeTotal  # + _pyd.assetWithdraw
             )
+
+            #_pyd.surplusDeficit = _pyd.incomeTotal - _pyd.expenseTotal - _pyd.lastYearsFederalTaxes - _pyd.assetContributionTotal
 
             _projection_data.append(_pyd)
 

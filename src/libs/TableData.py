@@ -23,7 +23,7 @@ class TableData:
             _categories, self.vheader, self.data = self._get_data_sheet()
             self.categories = [_x.replace("\n", " ") for _x in _categories]
 
-        return self.categories, self.vheader, self.data
+        return _categories, self.vheader, self.data
 
     def _get_data_sheet(self):
         # _header = ["Year", "Age(s)"]
@@ -95,7 +95,7 @@ class TableData:
             _list.append(_record.expenseTotal)
 
             if _header_flag:
-                _header.append("Federal Filing Status")
+                _header.append("Federal\nFiling Status")
             _list.append(_record.federalTaxFilingStatus)
 
             if _header_flag:
@@ -132,12 +132,16 @@ class TableData:
             _list.append(_record.assetWithdraw)
 
             if _header_flag:
+                _header.append("Cash Flow")
+            _list.append(_record.cashFlow)
+            
+            if _header_flag:
                 _header.append("Long Term\nCapital Gains")
             _list.append(_record.longTermCapitalGainsTaxes)
 
             if _header_flag:
                 _header.append("Surplus/Deficit")
-            _list.append(_record.surplus_deficit)
+            _list.append(_record.surplusDeficit)
 
             for _name, _balance in _record.assetSources.items():
                 if _header_flag:
@@ -145,7 +149,7 @@ class TableData:
                 _list.append(_balance)
 
             if _header_flag:
-                _header.append("AssetTotal")
+                _header.append("Asset Total")
             _list.append(_record.assetTotal)
 
             if _header_flag:
