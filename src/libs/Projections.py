@@ -1,5 +1,7 @@
 from datetime import datetime, date
 
+from PyQt6.QtCore import QRunnable, QObject, pyqtSignal, pyqtSlot
+
 from .Account import Account
 from .DataVariables import DataVariables
 from .EnumTypes import (
@@ -20,6 +22,28 @@ from .WithdrawStrategy import WithdrawStrategy
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+class WorkerSignals(QObject):
+    """
+    Defines the signals available from a running worker thread.
+
+    Supported signals are:
+
+    finished
+        No data
+
+    error
+        tuple (exctype, value, traceback.format_exc() )
+
+    result
+        object data returned from processing, anything
+
+    """
+
+    finished = pyqtSignal()
+    error = pyqtSignal(tuple)
+    result = pyqtSignal(object)
 
 
 class ProjectionYearData:
@@ -75,8 +99,11 @@ class ProjectionYearData:
         self.surplusBalance: int = 0
 
 
-class Projections:
+class Projections(QRunnable):
     def __init__(self, dv: DataVariables):
+        super(Projections, self).__init__()
+
+        self.signals = WorkerSignals()
         # can set this to see todays dollars
         self.InTodaysDollars = dv.inTodaysDollars
 
@@ -326,11 +353,11 @@ class Projections:
             )
 
         self._end_year = self._begin_year + dv.forecastYears
-        # TODO fix me
         self._federal_tax_status = dv.federalFilingStatus
         self._federal_tax_status_once_widowed = dv.federalFilingStatusOnceWidowed
 
-    def execute(self):
+    @pyqtSlot()
+    def run(self):
         _projection_data = []
 
         _clientRMD = RMD(self._client, self._spouse)
@@ -544,4 +571,4 @@ class Projections:
 
             _projection_data.append(_pyd)
 
-        return _projection_data
+        self.signals.result.emit(_projection_data)

@@ -16,17 +16,17 @@ class TableData:
 
     def getCategories(self):
         if self.categories is None:
-            _categories, self.vheader, self.data = self._get_data_sheet()
-            self.categories = [_x.replace("\n", " ") for _x in _categories]
+            self.categories, self.vheader, self.data = self._get_data_sheet()
+            self.categories = [_x.replace("\n", " ") for _x in self.categories]
 
         return self.categories
 
     def get_data_sheet(self):
         if self.data is None:
-            _categories, self.vheader, self.data = self._get_data_sheet()
-            self.categories = [_x.replace("\n", " ") for _x in _categories]
+            self.categories, self.vheader, self.data = self._get_data_sheet()
+            self.categories = [_x.replace("\n", " ") for _x in self.categories]
 
-        return _categories, self.vheader, self.data
+        return self.categories, self.vheader, self.data
 
     def _get_data_sheet(self):
         # _header = ["Year", "Age(s)"]

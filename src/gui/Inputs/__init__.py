@@ -1,5 +1,13 @@
-from PyQt6.QtWidgets import QTabWidget, QToolBar, QMainWindow, QComboBox, QStyle
+from PyQt6.QtWidgets import (
+    QTabWidget,
+    QToolBar,
+    QMainWindow,
+    QComboBox,
+    QStyle,
+    QProgressDialog,
+)
 from PyQt6.QtGui import QAction
+from PyQt6.QtCore import QThreadPool, Qt
 
 from libs.DataVariables import DataVariables
 from libs.Projections import Projections
@@ -17,7 +25,6 @@ class InputsTab(QMainWindow):
         super(InputsTab, self).__init__(parent)
 
         self.parent = parent
-        # self._previous_tab_name = None
         _toolbar = QToolBar("Inputs Toolbar")
         _toolbar.addAction(self.clear_forms_action())
         _toolbar.addAction(self.file_open_action())
@@ -42,6 +49,8 @@ class InputsTab(QMainWindow):
         self.tabs.addTab(self.GlobalVariablesTab, "Global Variables")
 
         self.setCentralWidget(self.tabs)
+
+        self.threadpool = QThreadPool()
 
     def onTabChange(self, i):
         _tabName = self.tabs.tabText(i)
@@ -134,17 +143,28 @@ class InputsTab(QMainWindow):
         self.GlobalVariablesTab.export_data(dv)
 
         self.parent.statusbar.showMessage("Calculating projections")
-        _p = Projections(dv)
-        _projectionData = _p.execute()
-        self.parent.AnalysisTab.projectionData = _projectionData
+        self.progressDialog = QProgressDialog("Projection in progress...", None, 0, 100)
+        self.progressDialog.setWindowModality(Qt.WindowModality.WindowModal)
+        self.progressDialog.setMinimumDuration(0)
+        self.progressDialog.setValue(0)
+        self.progressDialog.setAutoClose(False)
+        self.project = Projections(dv)
+        self.project.signals.result.connect(self.populate_analysis_tab)
+        self.threadpool.start(self.project)
+        self.progressDialog.setValue(25)
+
+    def populate_analysis_tab(self, data):
+        self.progressDialog.setValue(50)
+        self.parent.AnalysisTab.projectionData = data
         self.parent.AnalysisTab.tableData = TableData(
-            _projectionData,
-            InTodaysDollars=_p.InTodaysDollars,
-            UseSurplusAccount=_p.UseSurplusAccount,
+            data,
+            InTodaysDollars=self.project.InTodaysDollars,
+            UseSurplusAccount=self.project.UseSurplusAccount,
         )
 
-        # self.parent.AnalysisTab.reset()
+        self.progressDialog.setValue(75)
         self.parent.showAnalysisTab(True)
+        self.progressDialog.hide()
 
     def file_open(self):
         self.parent.menubar.file_open()

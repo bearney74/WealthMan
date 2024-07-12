@@ -78,11 +78,13 @@ class DataTableTab(QWidget):
     def createTable(self):
         _header, _vheader, _data = self.parent.tableData.get_data_sheet()
 
-        self.table.hide()
-        self.table.clear()
+        self.table.setUpdatesEnabled(False)
+        # self.table.hide()
+        self.table.clearContents()  # just clear the data not the headers... (setting headers is slow after first time)
         self.table.setRowCount(len(_data))
         self.table.setColumnCount(len(_data[0]))
 
+        # print("populating table..")
         _i = 0
         for _row in _data:
             _j = 0
@@ -100,15 +102,24 @@ class DataTableTab(QWidget):
                 _j += 1
             _i += 1
 
+        # print("done populating table")
         # have to put data in table before setting the header, (or header won't display)
-        self.table.setHorizontalHeaderLabels(_header)
-        self.table.setVerticalHeaderLabels(_vheader)
+        # print(self.table.horizontalHeaderItem(0))
+        if (
+            self.table.horizontalHeaderItem(0) is None
+        ):  # check to see if headers are already there..
+            self.table.setHorizontalHeaderLabels(
+                _header
+            )  # bottleneck is here when reloading data... :(
+            self.table.setVerticalHeaderLabels(_vheader)
 
+        # print("done populating headers..")
         # Table will fit the screen horizontally
-        self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.horizontalHeader().setSectionResizeMode(
-            QHeaderView.ResizeMode.ResizeToContents
-        )
+        _hheader = self.table.horizontalHeader()
+        _hheader.setStretchLastSection(True)
+        _hheader.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+        # print("done stretching...")
+        self.table.setUpdatesEnabled(True)
         self.table.show()
 
     def get_csv_action(self):
