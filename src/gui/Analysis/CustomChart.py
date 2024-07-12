@@ -26,7 +26,6 @@ class StackChart(QWidget):
 
         _layout = QVBoxLayout()
         self.canvas = MplCanvas(self, width=width, height=height, dpi=dpi)
-        # print(dir(self.canvas.axes))
         self.canvas.axes.set_xlabel("Year")
         self.canvas.axes.set_ylabel("Dollars")
         _layout.addWidget(self.canvas)
@@ -71,15 +70,10 @@ class StackChart(QWidget):
             self.canvas.fig.draw(self.canvas.fig.canvas.renderer)
             return
 
-        # print(_output)
-
         self.canvas.fig.suptitle(self.title)
-        # self.canvas.axes.set_title(self.title)
         if self.subtitle != "":
             self.canvas.fig.text(0.5, 0.9, self.subtitle, horizontalalignment="center")
         self.canvas.axes.legend(loc=legend_location)
-
-        # self.canvas.axes.clear()
 
         def format_string(x, pos):
             _str = ""
@@ -87,7 +81,6 @@ class StackChart(QWidget):
             return f"${x:,d}"
 
         self.canvas.axes.yaxis.set_major_formatter(FuncFormatter(format_string))
-        # self.canvas.axes.fill_between(values, 0, years, alpha=0.7)
         for _line in _output:
             if _line.figure is not None:
                 _line.figure.canvas.draw()
@@ -104,7 +97,6 @@ class CustomChartTab(QWidget):
         )
 
         self.chart = StackChart(self, width=5, height=45, dpi=100)
-        # self.chart.show(False)
 
         layout = QVBoxLayout()
         hlayout = QHBoxLayout()
@@ -171,7 +163,6 @@ class CustomChartTab(QWidget):
                         _data[_name] = []
                     _data[_name].append(_value)
 
-        # self.chart.show(False)
         self.chart.setTitle("Income Totals")
         if self.parent.tableData.InTodaysDollars:
             self.chart.setSubTitle("In Today's Dollars")
@@ -195,7 +186,6 @@ class CustomChartTab(QWidget):
                         _data[_name] = []
                     _data[_name].append(_value)
 
-        # self.chart.show(False)
         self.chart.setTitle("Asset Contribution Totals")
         if self.parent.tableData.InTodaysDollars:
             self.chart.setSubTitle("In Today's Dollars")

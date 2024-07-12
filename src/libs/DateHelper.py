@@ -10,7 +10,6 @@ class DateHelper:
 
         # this class should only be used for a single year  (ie where begin_date and end_date occur in the same year)
         if self._begin_date is not None and self._end_date is not None:
-            # print(self._begin_date.year, self._end_date.year)
             assert self._begin_date.year == self._end_date.year
 
     def days_in_year(self) -> float:

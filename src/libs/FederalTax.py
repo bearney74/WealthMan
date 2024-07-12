@@ -6,7 +6,6 @@ from .ImportHelper import ImportHelper
 
 class FederalTax(ImportHelper):
     def __init__(self, FileStatus: FederalTaxStatusType, Year: int):
-        # ImportHelper.__init__(self)
         self.FileStatus = FileStatus
         self.Year = Year
 
@@ -79,7 +78,6 @@ class FederalTax(ImportHelper):
     # long term capital gains..
     def calc_ltcg_taxes(self, capital_gains: int) -> int:
         _total = 0
-        # print(self.Brackets)
         for _rate, _dict in self.LongTermCapitalGains.items():
             _begin = _dict["Begin"]
             if _begin is None:
@@ -96,7 +94,6 @@ class FederalTax(ImportHelper):
 
     def calc_taxes(self, taxable_income: int) -> int:
         _total = 0
-        # print(self.Brackets)
         for _rate, _dict in self.Brackets.items():
             _begin = _dict["Begin"]
             if _begin is None:
@@ -108,10 +105,6 @@ class FederalTax(ImportHelper):
                     _total += (taxable_income - _begin) * _rate / 100.0
                 elif taxable_income > _end:
                     _total += (_end - _begin) * _rate / 100.0
-                # elif _taxable_income < _end:
-                #   _total+=(taxable_income - _begin) * _rate
-
-            # print(_total)
 
         return int(_total)
 

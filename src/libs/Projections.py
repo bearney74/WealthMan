@@ -33,7 +33,7 @@ class ProjectionYearData:
         self.spouseAge: int = None
         self.spouseIsAlive: bool = None
 
-        self.incomeSources: dict = {}  # key is Name, #value is income value
+        self.incomeSources: dict = {}  # key is Name, #value is income
         self.incomeTotal: int = 0
 
         self.ssIncomeTotal: int = 0
@@ -167,7 +167,6 @@ class Projections:
             self._IncomeSources.append(_is)
 
         if dv.pension2Name is not None and dv.pension2Name.strip() != "":
-            # print("pension2Name='%s'" % dv.pension2Name)
             _birthdate = dv.clientBirthDate
             _lifespan = dv.clientLifeSpanAge
             if dv.pension2Owner == AccountOwnerType.Spouse:
@@ -330,12 +329,10 @@ class Projections:
         # TODO fix me
         self._federal_tax_status = dv.federalFilingStatus
         self._federal_tax_status_once_widowed = dv.federalFilingStatusOnceWidowed
-        # FederalTaxStatusType.MarriedJointly
-        # self._federal_tax_status = self._vars["GlobalVars"].FederalTaxStatus
 
     def execute(self):
         _projection_data = []
-        # _data = []
+
         _clientRMD = RMD(self._client, self._spouse)
         _spouseRMD = None
         if self._spouse is not None:
@@ -443,7 +440,6 @@ class Projections:
 
             _pyd.cashFlow = _income_total - _expense_total - _lastYearsFederalTaxes
 
-            # print(_income_total, _expense_total, _income_total - _expense_total, _pyd.totalRMD)
             if _pyd.cashFlow < 0 or _pyd.totalRMD > 0:
                 # we need to withdraw money from assets to make up for the cash flow deficit
                 _ws = WithdrawStrategy(
@@ -456,11 +452,7 @@ class Projections:
                 )
                 _pyd.assetWithdraw = max(abs(_pyd.cashFlow), _pyd.totalRMD)
                 _deficit = _ws.reconcile_required_withdraw(_pyd.assetWithdraw)
-                # print(_year, _deficit)
-                # assert _deficit <= 0
                 _pyd.surplusDeficit = _pyd.cashFlow + _pyd.assetWithdraw - _deficit
-                # _pyd.assetWithdraw = max(abs(_cash_flow), _pyd.totalRMD)
-
             else:
                 _pyd.assetWithdraw = 0
                 _pyd.surplusDeficit = _pyd.cashFlow
@@ -498,19 +490,15 @@ class Projections:
             _pyd.surplusDeficit -= _contribution_total
 
             if _pyd.ssIncomeTotal > 0:
-                # print(pow(1-self._inflation/100.0, _year - self._begin_year))
                 # if we are calculating in todays dollars, we need to deflate the value of provisional income amounts for rates
                 if self.InTodaysDollars:
                     _cpi = pow(1 - self._inflation / 100.0, _year - self._begin_year)
                 else:
                     _cpi = 1
                 _pi = ProvisionalIncome(_pyd.federalTaxFilingStatus, _cpi)
-                _pyd.ssTaxRate = (
-                    _pi.get_rate(
-                        _income_total - _ss_income_total + _pyd.assetWithdraw,
-                        _ss_income_total,
-                    )
-                    * 1.0
+                _pyd.ssTaxRate = _pi.get_rate(
+                    _income_total - _ss_income_total + _pyd.assetWithdraw,
+                    _ss_income_total,
                 )
                 _pyd.ssTaxableIncome = _pi.calc_ss_taxable(
                     _income_total - _ss_income_total + _pyd.assetWithdraw,
@@ -538,7 +526,7 @@ class Projections:
 
             _pyd.federalEffectiveTaxRate = _ft.effective_tax_rate(
                 _taxable_income,
-                _pyd.incomeTotal,  # + _pyd.assetWithdraw
+                _pyd.incomeTotal,
             )
 
             _pyd.federalMarginalTaxRate = _ft.marginal_tax_rate(

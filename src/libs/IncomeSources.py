@@ -37,18 +37,9 @@ class IncomeSource(IncomeExpenseBase):
         assert isinstance(Owner, AccountOwnerType) or Owner is None
         self.Owner = Owner
 
-        # if LifeSpanAge is None:
-        #    self.LifeSpanDate=None
-        # else:
-        #    self.LifeSpanDate=date(BirthDate.year + LifeSpanAge, BirthDate.month, BirthDate.day)
-
-        # self.SurvivorPercent = SurvivorPercent
-        # self.Taxable = Taxable
-
     def calc_balance_by_year(self, year):
         _balance = IncomeExpenseBase.calc_balance_by_year(self, year)
 
-        # print(self.Name, self.SurvivorPercent)
         if self.LifeSpanDate is not None and self.LifeSpanDate.year < year:
             return int(self.SurvivorPercent / 100.0 * _balance)
 
@@ -81,7 +72,8 @@ class SocialSecurity(IncomeSource):
         }
 
         self.FRAAmount = FRAAmount
-        # todo: need to calculate Amount from FRAAmount and birthdate...
+
+        # need to calculate Amount from FRAAmount and birthdate...
         assert BeginAge in self._table.keys()
         Amount = int(self.FRAAmount * self._table[BeginAge])
 
@@ -100,8 +92,7 @@ class SocialSecurity(IncomeSource):
         )
 
     def set_SpouseSS(self, SpouseObj):
-        # assert isinstance(SpouseObj, SocialSecurity)
-
+        # this is used for survivor benefits (ie max(clientBenefit, spouse Benefit)
         self.SpouseObj = SpouseObj
 
     def IamDead(self, year) -> bool:

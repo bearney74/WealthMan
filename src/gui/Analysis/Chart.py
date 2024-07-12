@@ -24,7 +24,6 @@ class Chart(QWidget):
 
         _layout = QVBoxLayout()
         self.canvas = MplCanvas(self, width=width, height=height, dpi=dpi)
-        # print(dir(self.canvas.axes))
         self.canvas.axes.set_xlabel("Year")
         self.canvas.axes.set_ylabel("Dollars")
         _layout.addWidget(self.canvas)
@@ -80,14 +79,12 @@ class Chart(QWidget):
     def plot(self, data):
         _x_data = []
         _y_data = []
-        # print(data)
         for _x, _y in data:
             _x_data.append(_x)
             _y_data.append(_y)
 
         self.canvas.axes.clear()
         self.canvas.fig.suptitle(self.title)
-        # self.canvas.axes.set_title(self.title)
         if self.subtitle != "":
             self.canvas.fig.text(0.5, 0.9, self.subtitle, horizontalalignment="center")
         (_line,) = self.canvas.axes.plot(_x_data, _y_data)
@@ -124,7 +121,6 @@ class ChartTab(QWidget):
         self.variables.setCurrentText("Asset Total")
 
     def _selectionchange(self, i):
-        # print("selection change")
         _ndx = self.variables.currentIndex()
 
         _data = []

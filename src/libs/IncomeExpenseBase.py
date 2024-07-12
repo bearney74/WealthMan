@@ -19,14 +19,12 @@ class IncomeExpenseBase:
         EndAge: int = None,
         LifeSpanAge: int = None,
         SurvivorPercent: float = 0.0,
-        # Taxable: bool = None,
         COLA: float = 0.0,
     ):
         self.BirthDate = BirthDate
 
         assert isinstance(Name, str)
         self.Name = Name
-        # self.IncomeSource=IncomeType
 
         assert isinstance(Amount, int)
         self.Amount = Amount
@@ -48,16 +46,11 @@ class IncomeExpenseBase:
         )
         self.EndDate = date(BirthDate.year + EndAge, BirthDate.month, BirthDate.day)
 
-        # self.Owner=Owner
         self.SurvivorPercent = SurvivorPercent
-        # self.Taxable = Taxable
         assert isinstance(COLA, float) or COLA is None
         if COLA is None:
             COLA = 0.0
         self.COLA = COLA
-
-        # assert isinstance(EndDate, date) or EndDate is None
-        # self.EndDate = EndDate
 
         self._annual_balance = 0
 
@@ -91,8 +84,11 @@ class IncomeExpenseBase:
                 return int(_dh.percent_of_year() / 100.0 * self._calc_balance())
 
         # we shouldn't get here..
-        # print(year, self.BeginDate, self.EndDate)
         logger.error("Something went wrong calculating balance for income/expense")
+        logger.error(
+            "year=%s, Begin Year=%s, End Year=%s"
+            % (year, self.BeginDate.year, self.EndDate.year)
+        )
         assert False
 
     def _calc_annual_balance(self) -> int:
@@ -104,7 +100,7 @@ class IncomeExpenseBase:
             self._annual_balance = self._calc_annual_balance()
             return self._annual_balance
 
-        if self.COLA != 0:  # and self.COLA is not None:
+        if self.COLA != 0:
             self._annual_balance = int(self._annual_balance * (1.0 + self.COLA / 100.0))
             return self._annual_balance
 

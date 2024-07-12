@@ -41,11 +41,11 @@ class TableData:
                 if not _record.spouseIsAlive:
                     continue
 
-            # print("got here for year ", _record.projectionYear)
             _header_flag = _data == []
-            # get year header (year, age1, age2)
+            # set year header (year)
             _list = [_record.projectionYear]
-            # _list = []
+
+            # TODO: Eventually remove all the if _header_flag statements and put all the _header strings here..
             if _header_flag:
                 _header.append("Year")
 
@@ -186,5 +186,5 @@ class TableData:
                 _list.append(_record.totalRMDPercent)
 
             _data.append(_list)
-        # print(_data)
+
         return _header, _vheader, _data

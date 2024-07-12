@@ -62,6 +62,7 @@ class Account:
         return self.Balance
 
 
+##  maybe implement Allocation Periods sometime in the future??
 # todo delete stuff below this line
 """
     def set_AllocationPeriods(self, periods):
@@ -109,9 +110,7 @@ class Account:
 
         self.Balance = _balance_stocks + _balance_bonds + _balance_money_market
         return self.Balance
-        # print(allocation_period.PercentStocks, allocation_period.PercentBonds, allocation_period.PercentMoneyMarket)
-        # print(asset_class.StockAssetClass.RateOfReturn, asset_class.StockAssetClass.StandardDeviation)
-
+        
     def _get_correct_allocation_period(self, year):
         for _ap in self.AllocationPeriods:
             if (

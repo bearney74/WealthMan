@@ -32,7 +32,6 @@ class InitialDelegate(QStyledItemDelegate):
             Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
         )
         text = index.model().data(index, Qt.ItemDataRole.DisplayRole)
-        # print(type(text))
         if text is None:
             option.text = ""
         elif FederalTaxStatusType.has_member(text):
@@ -84,7 +83,6 @@ class DataTableTab(QWidget):
         self.table.setRowCount(len(_data))
         self.table.setColumnCount(len(_data[0]))
 
-        # print("populating table")
         _i = 0
         for _row in _data:
             _j = 0
@@ -96,17 +94,16 @@ class DataTableTab(QWidget):
                         _value.setForeground(QBrush(QColor(255, 0, 0)))
                     self.table.setItem(_i, _j, _value)
                 elif isinstance(_col, Enum):
-                    # print(_col)
                     self.table.setItem(_i, _j, QTableWidgetItem(_col.name))
                 else:
                     self.table.setItem(_i, _j, QTableWidgetItem(_col))
                 _j += 1
             _i += 1
-        # print("done populating table")
 
         # have to put data in table before setting the header, (or header won't display)
         self.table.setHorizontalHeaderLabels(_header)
         self.table.setVerticalHeaderLabels(_vheader)
+
         # Table will fit the screen horizontally
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.horizontalHeader().setSectionResizeMode(

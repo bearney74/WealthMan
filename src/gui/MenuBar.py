@@ -108,13 +108,12 @@ class MenuBar:
         logger.debug("save file '%s'" % self._filename)
         if self._filename is None:
             self._filename, _x = QFileDialog.getSaveFileName(self.parent, "Save File")
-            # print(self._filename)
-            # print(_x)
             logger.debug("using '%s' as filename.." % self._filename)
 
         if self._filename == "":
             return
-        # for every tab in the inputs, we need to retrieve the xml and save them.
+
+        # for every tab in the inputs, we need to retrieve the fields and put in DataVariables (dv).
         dv = DataVariables()
 
         self.parent.InputsTab.BasicInfoTab.export_data(dv)

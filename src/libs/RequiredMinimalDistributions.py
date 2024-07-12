@@ -2,6 +2,10 @@ from datetime import date
 
 from .Person import Person
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 # for now just assume the usual (most common case)
 ULT = {
     72: 27.4,
@@ -62,7 +66,6 @@ def calc_age(date1: date, date2: date) -> int:
     return int(abs(_diff.days) / 365.2466)
 
 
-# todo..  should we only deal with one person at a time?
 class RMD:
     def __init__(self, person1: Person, person2: Person):
         self.Person1 = person1
@@ -79,7 +82,7 @@ class RMD:
                 self._table = ULT
             else:
                 # TODO
-                assert False, "RMD for spouses 10 years younger not implemented yet"
+                logger.error("RMD for spouses 10 years younger not implemented yet")
 
     def death_event(self, person):
         if person == self.Person1 and self.Person2 is not None:
@@ -94,7 +97,6 @@ class RMD:
 
     def calc(self, currdate: date) -> float:
         _age = calc_age(self.Person1.birthDate, currdate)
-        # print(_age)
         if _age <= 72:
             return 0.0
 

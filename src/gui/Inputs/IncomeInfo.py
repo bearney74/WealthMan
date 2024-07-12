@@ -166,7 +166,6 @@ class IncomeInfoTab(QWidget):
         # even after you delete some elements (ie, rows)
         # _len = self.gridLayout.rowCount()
         _row = self.gridLayout.count() // 6
-        # print("line 170, row = ", _row)
 
         _descr = QLineEdit()
         _descr.setMaximumWidth(300)
@@ -193,7 +192,6 @@ class IncomeInfoTab(QWidget):
         self.clientSS.clear_form()
         self.spouseSS.clear_form()
 
-        # print(self.gridLayout.takeAt(0))
         _item = self.gridLayout.takeAt(0)
         while _item is not None:
             _item.widget().deleteLater()
@@ -240,9 +238,7 @@ class IncomeInfoTab(QWidget):
         dv.pension2EndAge = self.pension2EndAge.get_int()
 
         dv.otherIncomes = []
-        # print(self.gridLayout.count())
         for _row in range(1, self.gridLayout.count() // 6):
-            # _row=_i
             _item = self.gridLayout.itemAtPosition(_row, 0)
             _descr = _item.widget().text()
 
