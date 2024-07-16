@@ -113,6 +113,7 @@ class Projections(QRunnable):
             self._inflation = 0
 
         self.UseSurplusAccount = dv.SurplusAccount
+        # print(self.UseSurplusAccount)
         self.SurplusAccountInterestRate = dv.SurplusAccountInterestRate
 
         _is_married = dv.relationStatus == "Married"
@@ -478,11 +479,23 @@ class Projections(QRunnable):
                     self._Assets,
                 )
                 _pyd.assetWithdraw = max(abs(_pyd.cashFlow), _pyd.totalRMD)
-                _deficit = _ws.reconcile_required_withdraw(_pyd.assetWithdraw)
+                _deficit, _withdraw_dict = _ws.reconcile_required_withdraw(
+                    _pyd.assetWithdraw
+                )
                 _pyd.surplusDeficit = _pyd.cashFlow + _pyd.assetWithdraw - _deficit
             else:
                 _pyd.assetWithdraw = 0
                 _pyd.surplusDeficit = _pyd.cashFlow
+                _withdraw_dict = {
+                    AccountType.Regular: 0,
+                    AccountType.TaxDeferred: 0,
+                }  # no withdraws...
+
+            for _asset_type, _amount in _withdraw_dict.items():
+                if (
+                    _asset_type == AccountType.TaxDeferred
+                ):  # these withdraws are seen as regular income
+                    _income_total += _amount
 
             _total = 0
             _client_ira_total = 0
@@ -524,26 +537,64 @@ class Projections(QRunnable):
                     _cpi = 1
                 _pi = ProvisionalIncome(_pyd.federalTaxFilingStatus, _cpi)
                 _pyd.ssTaxRate = _pi.get_rate(
-                    _income_total - _ss_income_total + _pyd.assetWithdraw,
+                    _income_total - _ss_income_total,
                     _ss_income_total,
                 )
                 _pyd.ssTaxableIncome = _pi.calc_ss_taxable(
-                    _income_total - _ss_income_total + _pyd.assetWithdraw,
+                    _income_total
+                    - _ss_income_total,  # + _pyd.assetWithdraw, to we need to add in Regular Brockerage withdraws?
                     _ss_income_total,
                 )
+                # print(_year, _cpi, _income_total - _ss_income_total, _pyd.ssTaxRate, _pyd.ssTaxableIncome)
             else:
                 _pyd.ssTaxableIncome = 0
                 _pyd.ssTaxRate = 0.0
 
+            _surplusWithdraw = 0
+            if self.UseSurplusAccount:
+                # should we calculate this years interest after deposits/withdraws or before?
+                # does it really matter?
+                _surplusBalance = int(
+                    _surplusBalance * (1.0 + self.SurplusAccountInterestRate / 100.0)
+                )
+                if (
+                    _pyd.surplusDeficit < 0
+                ):  # we have a deficit, so let us take it from the surplus account
+                    if (
+                        _surplusBalance >= _pyd.surplusDeficit
+                    ):  # we have enough to take care of the full deficit
+                        _surplusWithdraw = abs(_pyd.surplusDeficit)
+                        _surplusBalance -= _surplusWithdraw
+                        # _surplusWithdraw = -_pyd.surplusDeficit
+                        _pyd.surplusDeficit = 0
+                        _pyd.surplusBalance = _surplusBalance
+                    else:
+                        _surplusWithdraw = _surplusBalance
+                        _pyd.surplusDeficit -= _surplusWithdraw
+                        # _surplusWithdraw = _surplusBalance
+                        _pyd.surplusBalance = _surplusBalance = 0
+                else:  # we have no deficit, and possibly a surplus...
+                    _surplusBalance += _pyd.surplusDeficit
+                    _surplusWithdraw = 0
+                    _pyd.surplusBalance = _surplusBalance
+
+                _pyd.assetTotal += _pyd.surplusBalance
+
             # federal taxes
             _ft = FederalTax(_pyd.federalTaxFilingStatus, 2024)
-            _taxable_income = max(
-                _income_total + _pyd.ssTaxableIncome - _ft.StandardDeduction, 0
-            )
+            _taxable_income = (
+                _income_total - _ss_income_total + _pyd.ssTaxableIncome
+            )  # + _surplusWithdraw
+
+            # print(_year, _income_total, _ss_income_total, _pyd.ssTaxableIncome) #, _surplusWithdraw)
             _pyd.taxableIncome = _taxable_income
 
-            _pyd.thisYearsIncomeTaxes = _ft.calc_taxes(_taxable_income)
-            _pyd.longTermCapitalGainsTaxes = _ft.calc_ltcg_taxes(_pyd.assetWithdraw)
+            _pyd.thisYearsIncomeTaxes = _ft.calc_taxes(
+                max(_taxable_income - _ft.StandardDeduction, 0)
+            )
+            _pyd.longTermCapitalGainsTaxes = _ft.calc_ltcg_taxes(
+                _withdraw_dict[AccountType.Regular] + _surplusWithdraw
+            )
             _pyd.thisYearsFederalTaxes = (
                 _pyd.thisYearsIncomeTaxes + _pyd.longTermCapitalGainsTaxes
             )
@@ -552,22 +603,15 @@ class Projections(QRunnable):
             _lastYearsFederalTaxes = _pyd.thisYearsFederalTaxes
 
             _pyd.federalEffectiveTaxRate = _ft.effective_tax_rate(
-                _taxable_income,
-                _pyd.incomeTotal,
+                _pyd.thisYearsIncomeTaxes,
+                _income_total,
             )
 
-            _pyd.federalMarginalTaxRate = _ft.marginal_tax_rate(
-                _pyd.incomeTotal  # + _pyd.assetWithdraw
-            )
+            # print(_pyd.federalEffectiveTaxRate, _pyd.thisYearsIncomeTaxes, _pyd.incomeTotal)
 
-            if self.UseSurplusAccount:
-                _surplusBalance = int(
-                    _surplusBalance * (1.0 + self.SurplusAccountInterestRate / 100.0)
-                )
-                _surplusBalance += _pyd.surplusDeficit
-                _pyd.surplusBalance = _surplusBalance
+            _pyd.federalMarginalTaxRate = _ft.marginal_tax_rate(_pyd.taxableIncome)
 
-                _pyd.assetTotal += _pyd.surplusBalance
+            # print(_pyd.taxableIncome, _pyd.federalMarginalTaxRate)
 
             _projection_data.append(_pyd)
 

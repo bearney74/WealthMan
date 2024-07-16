@@ -141,7 +141,7 @@ class MenuBar:
         d = QDialog()
         d.setWindowTitle("About WealthMan")
         _info = QLabel(
-            "WealthMan is an open source financial planning tool that one day hopes to rival standard tools used by Certified Financial Planners (CFP), and other individuals in the Financial field."
+            "WealthMan is an open source financial planning tool that one day hopes to rival standard tools used by Certified Financial Planners (CFP) in the Financial planning field."
         )
         _info.setWordWrap(True)
 

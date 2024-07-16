@@ -21,7 +21,7 @@ class AnalysisTab(QWidget):
         self.ChartTab = ChartTab(self)
         self.CustomChartTab = CustomChartTab(self)
 
-        # self.tabs.currentChanged.connect(self.onTabChange)
+        self.tabs.currentChanged.connect(self.onTabChange)
         # self.tabs.addTab(QWidget(), "Dashboard")
         self.tabs.addTab(self.DataTableTab, "Details")
         self.tabs.addTab(self.ChartTab, "Charts")
@@ -40,3 +40,9 @@ class AnalysisTab(QWidget):
         self.ChartTab.setCategories()
         # self.CustomChartTab.AssetTotals()
         self.parent.statusbar.showMessage("Done updating Analysis GUI", 2000)
+
+    def onTabChange(self, i):
+        _tabName = self.tabs.tabText(i)
+        match _tabName:
+            case "Custom Charts":
+                self.CustomChartTab.AssetTotals()

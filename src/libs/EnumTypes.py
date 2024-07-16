@@ -30,9 +30,10 @@ class Relationship(Enum):
 
 
 class AccountType(Enum):
-    Regular = 1  # Brokerage, Savings, Checking, Money Market, etc
+    Regular = 1  # Savings, Checking, Money Market, etc
     TaxDeferred = 2  # 401k, IRA, etc
     TaxFree = 3  # Roth IRA, Life Insurance Payout, etc
+    Brokerage = 4  # for long term capital gains taxes...
 
 
 class IncomeSourceType(Enum):

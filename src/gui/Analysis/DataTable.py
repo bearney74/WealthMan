@@ -80,7 +80,11 @@ class DataTableTab(QWidget):
 
         self.table.setUpdatesEnabled(False)
         # self.table.hide()
-        self.table.clearContents()  # just clear the data not the headers... (setting headers is slow after first time)
+        if len(_data) != self.table.columnCount():
+            self.table.clear()
+        else:
+            self.table.clearContents()  # just clear the data not the headers... (setting headers is slow after first time)
+
         self.table.setRowCount(len(_data))
         self.table.setColumnCount(len(_data[0]))
 

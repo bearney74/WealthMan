@@ -12,6 +12,7 @@ class TableData:
         self.vheader = None
         self.data = None
         self.InTodaysDollars = InTodaysDollars
+        # print(UseSurplusAccount)
         self.UseSurplusAccount = UseSurplusAccount
 
     def getCategories(self):

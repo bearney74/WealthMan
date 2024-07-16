@@ -133,6 +133,9 @@ class CustomChartTab(QWidget):
         _data["Spouse IRA"] = []
         _data["Spouse Roth IRA"] = []
         _data["Regular"] = []
+        _data["Surplus"] = []
+
+        _surplus_flag = False
         for _record in self.parent.projectionData:
             if _record.clientIsAlive or _record.spouseIsAlive:
                 if _record.projectionYear not in _years:
@@ -141,7 +144,15 @@ class CustomChartTab(QWidget):
                 for _name, _value in _record.assetSources.items():
                     _data[_name].append(_value)
 
-        # self.chart.show(False)
+                if _record.surplusBalance > 0:
+                    _surplus_flag = True
+                _data["Surplus"].append(_record.surplusBalance)
+
+        if (
+            not _surplus_flag
+        ):  # we have no surplus data, so lets delete that from the legend..
+            del _data["Surplus"]
+
         self.chart.setTitle("Asset Totals")
         if self.parent.tableData.InTodaysDollars:
             self.chart.setSubTitle("In Today's Dollars")

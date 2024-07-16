@@ -108,10 +108,10 @@ class FederalTax(ImportHelper):
 
         return int(_total)
 
-    def effective_tax_rate(self, taxable_income: int, total_income: int) -> float:
+    def effective_tax_rate(self, taxes: int, total_income: int) -> float:
         if total_income == 0:
             return 0.0
-        return 100.0 * self.calc_taxes(taxable_income) / total_income
+        return 100.0 * taxes / total_income
 
     def marginal_tax_rate(self, taxable_income) -> int:
         for _rate, _dict in self.Brackets.items():

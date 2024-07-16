@@ -61,6 +61,10 @@ class WithdrawStrategy:
                     logger.error("invalid asset type '%s'" % _type)
 
     def reconcile_required_withdraw(self, deficit: int):
+        _dict = {}
+        _dict[AccountType.TaxDeferred] = 0
+        _dict[AccountType.TaxFree] = 0
+        _dict[AccountType.Regular] = 0
         for _asset in self._assets:
             assert _asset.Balance >= 0
             if _asset.Type in (AccountType.TaxDeferred, AccountType.TaxFree):
@@ -74,13 +78,15 @@ class WithdrawStrategy:
                             continue
             # if we get here, we can take some money from the account..
             if deficit <= _asset.Balance:
+                _dict[_asset.Type] += deficit
                 _asset.Balance -= deficit
                 logger.debug(
                     "taking %s from %s when client is %s, spouse is %s"
                     % (deficit, _asset.Name, self.clientAge, self.spouseAge)
                 )
-                return 0  # resulting deficit
+                return 0, _dict  # resulting deficit
             else:  # deficit is greater than balance
+                _dict[_asset.Type] += _asset.Balance
                 deficit -= _asset.Balance
                 _asset.Balance = 0
                 logger.debug(
@@ -88,4 +94,4 @@ class WithdrawStrategy:
                     % (deficit, _asset.Name, self.clientAge, self.spouseAge)
                 )
 
-        return deficit
+        return deficit, _dict

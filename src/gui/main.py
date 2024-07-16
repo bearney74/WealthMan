@@ -13,8 +13,7 @@ from libs.Version import APP_VERSION
 try:
     from ctypes import windll  # Only exists on Windows.
 
-    myappid = "WealthMan"
-    windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    windll.shell32.SetCurrentProcessExplicitAppUserModelID("WealthMan")
 except ImportError:
     pass
 
