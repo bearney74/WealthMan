@@ -97,9 +97,9 @@ class ProjectionYearData:
 
         # surplus account
         self.surplusBalance: int = 0
-        
-        self.AW: int=0             #TAD = Total Asset Drawdown
-        self.AWR: float=0    
+
+        self.AW: int = 0  # TAD = Total Asset Drawdown
+        self.AWR: float = 0
 
 
 class Projections(QRunnable):
@@ -616,14 +616,14 @@ class Projections(QRunnable):
 
             # print(_pyd.taxableIncome, _pyd.federalMarginalTaxRate)
 
-            #asset withdraw rate  (AWR)
+            # asset withdraw rate  (AWR)
             if self.UseSurplusAccount:
-                _pyd.AW=-_pyd.cashFlow
+                _pyd.AW = -_pyd.cashFlow
             else:
-                _pyd.AW=_pyd.assetWithdraw
-                
+                _pyd.AW = _pyd.assetWithdraw
+
             _pyd.AWR = 100.0 * _pyd.AW / _pyd.assetTotal
-            
+
             _projection_data.append(_pyd)
 
         self.signals.result.emit(_projection_data)

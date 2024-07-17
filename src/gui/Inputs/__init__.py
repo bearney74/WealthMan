@@ -91,6 +91,10 @@ class InputsTab(QMainWindow):
                     ):  # this is probably a person/owner
                         _item.widget().setEnabled(self.BasicInfoTab.client_is_married())
 
+            case "Global Variables":
+                self.GlobalVariablesTab._FilingStatusOnceWidowed.setEnabled(
+                    self.BasicInfoTab.client_is_married()
+                )
         # self._previous_tab_name = _tabName
 
     def clear_forms_action(self):

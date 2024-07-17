@@ -11,7 +11,7 @@
       <Tax Rate="12%" Begin="11601" End="47150" />
       <Tax Rate="22%" Begin="47151" End="100525" />
       <Tax Rate="24%" Begin="100526" End="191950" />
-      <Tax Rate="32%" Begin="1919551" End="243725" />
+      <Tax Rate="32%" Begin="191951" End="243725" />
       <Tax Rate="35%" Begin="243726" End="609350" />
       <Tax Rate="37%" Begin="609351" End="" />
    </File>

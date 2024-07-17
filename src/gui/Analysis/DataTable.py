@@ -40,7 +40,9 @@ class InitialDelegate(QStyledItemDelegate):
             option.text = text
         else:
             try:
-                if "." in text:
+                if text.strip() == "":
+                    option.text = ""
+                elif "." in text:
                     number = float(text)
                     option.text = f"{number:.1f}%"
                 else:
