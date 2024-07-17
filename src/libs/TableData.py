@@ -185,6 +185,14 @@ class TableData:
                 if _header_flag:
                     _header.append("Total RMD %")
                 _list.append(_record.totalRMDPercent)
+                
+                if _header_flag:
+                    _header.append("AW")
+                _list.append(_record.AW)
+
+                if _header_flag:
+                    _header.append("AWR")
+                _list.append(_record.AWR)
 
             _data.append(_list)
 
