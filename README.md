@@ -34,8 +34,29 @@ I would also like to create an interface for "what if" scenarios, which will inc
 cost savings if roth conversions are done, etc.
 
 
-
 FYI.   This project is still under HEAVY development and is not ready for use by end users.  
 Developers and early adopters can use the program, but should be suspicious of any generated output.
 I am interested in feedback.  Please submit any issues/bugs, feature requests to the issues tab above.
 
+## Screenshots
+
+### Basic Info
+![Basic Info](../README/media/basic_info_v0_2.jpg)
+
+### Income Tab
+![Income Tab](../README/media/income_v0_2.jpg)
+
+### Expenses Tab
+![Expenses Tab](../README/media/expenses_v0_2.jpg)
+
+### Assets Tab 
+![Assets Tab](../README/media/assets_v0_2.jpg)
+
+### Global Variables
+![Global Variables Tab](../README/media/globalvariables_v0_2.jpg)
+
+### Output (Details)
+![Details Tab](../README/media/details_v0_2.jpg)
+
+### CSV Output
+[details.csv](../README/media/details_v0_2.csv)
