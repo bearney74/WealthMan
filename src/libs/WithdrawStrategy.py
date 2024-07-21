@@ -85,7 +85,7 @@ class WithdrawStrategy:
                     % (deficit, _asset.Name, self.clientAge, self.spouseAge)
                 )
                 return 0, _dict  # resulting deficit
-            else:  # deficit is greater than balance
+            elif _asset.Balance > 0:  # deficit is greater than balance
                 _dict[_asset.Type] += _asset.Balance
                 deficit -= _asset.Balance
                 _asset.Balance = 0

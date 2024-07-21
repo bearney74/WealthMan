@@ -134,27 +134,32 @@ class AssetInfoTab(QWidget):
         self.RegularContribution.BeginAge.setText(d.regularContributionBeginAge)
         self.RegularContribution.EndAge.setText(d.regularContributionEndAge)
 
-        self._spouseinfo.IRABalance.setText(d.spouseIRABalance)
-        self._spouseinfo.IRACola.setText(d.spouseIRACola)
-        # self._spouseinfo.IRAContribution.setText(d.spouseIRAContribution)
-        self._spouseinfo.IRAContribution.Contribution.setText(d.spouseIRAContribution)
-        self._spouseinfo.IRAContribution.BeginAge.setText(
-            d.spouseIRAContributionBeginAge
-        )
-        self._spouseinfo.IRAContribution.EndAge.setText(d.spouseIRAContributionEndAge)
+        if self.BasicInfoTab.client_is_married():
+            self._spouseinfo.IRABalance.setText(d.spouseIRABalance)
+            self._spouseinfo.IRACola.setText(d.spouseIRACola)
+            # self._spouseinfo.IRAContribution.setText(d.spouseIRAContribution)
+            self._spouseinfo.IRAContribution.Contribution.setText(
+                d.spouseIRAContribution
+            )
+            self._spouseinfo.IRAContribution.BeginAge.setText(
+                d.spouseIRAContributionBeginAge
+            )
+            self._spouseinfo.IRAContribution.EndAge.setText(
+                d.spouseIRAContributionEndAge
+            )
 
-        self._spouseinfo.RothIRABalance.setText(d.spouseRothIRABalance)
-        self._spouseinfo.RothIRACola.setText(d.spouseRothIRACola)
-        # self._spouseinfo.RothIRAContribution.setText(d.spouseRothIRAContribution)
-        self._spouseinfo.RothIRAContribution.Contribution.setText(
-            d.spouseRothIRAContribution
-        )
-        self._spouseinfo.RothIRAContribution.BeginAge.setText(
-            d.spouseRothIRAContributionBeginAge
-        )
-        self._spouseinfo.RothIRAContribution.EndAge.setText(
-            d.spouseRothIRAContributionEndAge
-        )
+            self._spouseinfo.RothIRABalance.setText(d.spouseRothIRABalance)
+            self._spouseinfo.RothIRACola.setText(d.spouseRothIRACola)
+            # self._spouseinfo.RothIRAContribution.setText(d.spouseRothIRAContribution)
+            self._spouseinfo.RothIRAContribution.Contribution.setText(
+                d.spouseRothIRAContribution
+            )
+            self._spouseinfo.RothIRAContribution.BeginAge.setText(
+                d.spouseRothIRAContributionBeginAge
+            )
+            self._spouseinfo.RothIRAContribution.EndAge.setText(
+                d.spouseRothIRAContributionEndAge
+            )
 
 
 class AssetContributionForm(QWidget):

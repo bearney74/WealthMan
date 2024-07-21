@@ -311,7 +311,7 @@ class IncomeInfoTab(QWidget):
                     _owner = "Client"
             else:
                 _owner = "Client"
-                _item.setEnabled(False)
+                _item.widget().setEnabled(False)
 
             _item.widget().setCurrentText(_owner)
 

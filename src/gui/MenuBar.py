@@ -3,9 +3,6 @@ from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QFil
 
 import os
 import pickle
-import sys
-
-sys.path.append("..")
 
 from libs.DataVariables import DataVariables
 

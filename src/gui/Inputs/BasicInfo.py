@@ -113,7 +113,9 @@ class PersonBasicInfo(QWidget):
 
         if self._person_type == "Client":
             self._status = QComboBox()
-            self._status.addItems(["Single", "Married"])
+            self._status.addItems(
+                [RelationStatus.Single.name, RelationStatus.Married.name]
+            )  # "Single", "Married"])
             self._status.currentIndexChanged.connect(self.selectionchange)
             formlayout.addRow(QLabel("Married Status:"), self._status)
 

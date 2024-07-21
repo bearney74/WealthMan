@@ -78,6 +78,10 @@ class TableData:
             _list.append(_record.incomeTotal)
 
             if _header_flag:
+                _header.append("FPL")
+            _list.append(_record.FPL)
+
+            if _header_flag:
                 _header.append("SS Income Total")
             _list.append(_record.ssIncomeTotal)
 
@@ -132,6 +136,18 @@ class TableData:
             _list.append(_record.assetContributionTotal)
 
             if _header_flag:
+                _header.append("Tax Deferred Withdraws")
+            _list.append(_record.assetTaxDeferredWithdraw)
+
+            if _header_flag:
+                _header.append("Regular Withdraws")
+            _list.append(_record.assetRegularWithdraw)
+
+            if _header_flag:
+                _header.append("Tax Free Withdraws")
+            _list.append(_record.assetTaxFreeWithdraw)
+
+            if _header_flag:
                 _header.append("Asset Withdraw")
             _list.append(_record.assetWithdraw)
 
@@ -154,7 +170,9 @@ class TableData:
 
             if self.UseSurplusAccount:
                 if _header_flag:
+                    _header.append("Surplus Withdraw")
                     _header.append("Surplus Account")
+                _list.append(_record.surplusWithdraw)
                 _list.append(_record.surplusBalance)
 
             if _header_flag:
@@ -186,13 +204,13 @@ class TableData:
                     _header.append("Total RMD %")
                 _list.append(_record.totalRMDPercent)
 
-                if _header_flag:
-                    _header.append("AW")
-                _list.append(_record.AW)
+            if _header_flag:
+                _header.append("AW")
+            _list.append(_record.AW)
 
-                if _header_flag:
-                    _header.append("AWR")
-                _list.append(_record.AWR)
+            if _header_flag:
+                _header.append("AWR")
+            _list.append(_record.AWR)
 
             _data.append(_list)
 

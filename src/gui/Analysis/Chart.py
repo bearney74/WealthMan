@@ -48,6 +48,7 @@ class Chart(QWidget):
                 | "Total RMD %"
                 | "Federal Marginal Tax Rate"
                 | "Federal Effective Tax Rate"
+                | "AWR"
             ):
                 self.canvas.axes.set_xlabel("Year")
                 self.canvas.axes.set_ylabel("Percent")

@@ -2,10 +2,10 @@ from PyQt6.QtWidgets import QMainWindow, QTabWidget
 from PyQt6.QtWidgets import QStatusBar
 from PyQt6.QtGui import QIcon
 
-from MenuBar import MenuBar
-from Inputs import InputsTab
-from Logs import Logs
-from Analysis import AnalysisTab
+from gui.MenuBar import MenuBar
+from gui.Inputs import InputsTab
+from gui.Logs import Logs
+from gui.Analysis import AnalysisTab
 
 from libs.Version import APP_VERSION
 

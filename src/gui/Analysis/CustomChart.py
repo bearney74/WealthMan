@@ -1,3 +1,4 @@
+import collections
 import matplotlib
 
 matplotlib.use("QtAgg")
@@ -127,13 +128,7 @@ class CustomChartTab(QWidget):
     def AssetTotals(self):
         _years = []
 
-        _data = {}
-        _data["Client IRA"] = []
-        _data["Client Roth IRA"] = []
-        _data["Spouse IRA"] = []
-        _data["Spouse Roth IRA"] = []
-        _data["Regular"] = []
-        _data["Surplus"] = []
+        _data = collections.defaultdict(list)
 
         _surplus_flag = False
         for _record in self.parent.projectionData:
@@ -163,15 +158,13 @@ class CustomChartTab(QWidget):
     def IncomeTotals(self):
         _years = []
 
-        _data = {}
+        _data = collections.defaultdict(list)
         for _record in self.parent.projectionData:
             if _record.clientIsAlive or _record.spouseIsAlive:
                 if _record.projectionYear not in _years:
                     _years.append(_record.projectionYear)
 
                 for _name, _value in _record.incomeSources.items():
-                    if _name not in _data:
-                        _data[_name] = []
                     _data[_name].append(_value)
 
         self.chart.setTitle("Income Totals")
@@ -186,15 +179,13 @@ class CustomChartTab(QWidget):
     def AssetContributionTotals(self):
         _years = []
 
-        _data = {}
+        _data = collections.defaultdict(list)
         for _record in self.parent.projectionData:
             if _record.clientIsAlive or _record.spouseIsAlive:
                 if _record.projectionYear not in _years:
                     _years.append(_record.projectionYear)
 
                 for _name, _value in _record.assetContributions.items():
-                    if _name not in _data:
-                        _data[_name] = []
                     _data[_name].append(_value)
 
         self.chart.setTitle("Asset Contribution Totals")

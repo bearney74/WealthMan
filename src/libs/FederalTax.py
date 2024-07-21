@@ -1,3 +1,4 @@
+import os
 import xml.etree.ElementTree as ET
 
 from .EnumTypes import FederalTaxStatusType
@@ -24,7 +25,9 @@ class FederalTax(ImportHelper):
         self.LongTermCapitalGains = dict(sorted(self.LongTermCapitalGains.items()))
 
     def _import_data(self):
-        _xml = ET.parse("../../data/FederalTaxBrackets.xml")
+        _dir = os.path.dirname(__file__)
+        # print(__file__)
+        _xml = ET.parse(os.path.join(_dir, "data/FederalTaxBrackets.xml"))
         self._root = _xml.getroot()
 
         assert self._root.tag == "xml"
