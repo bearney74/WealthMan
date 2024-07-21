@@ -60,3 +60,9 @@ I am interested in feedback.  Please submit any issues/bugs, feature requests to
 
 ### CSV Output
 [details.csv](../README/media/details_v0_2.csv)
+
+### Asset Total Chart
+[details.csv](../README/media/chart_asset_total_v0_2.jpg)
+
+### Asset Total Chart (By Assets)
+[details.csv](../README/media/custom_charts_asset_totals_v0_2.jpg)
