@@ -41,7 +41,7 @@ I am interested in feedback.  Please submit any issues/bugs, feature requests to
 ## Screenshots
 
 ### Basic Info
-![Basic Info](README/media/basic_info_v0_2.jpg)
+![Basic Info](../README/media/basic_info_v0_2.jpg)
 
 ### Income Tab
 ![Income Tab](README/media/income_v0_2.jpg)
