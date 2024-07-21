@@ -23,6 +23,7 @@ Install the modules in the requirements.txt file:
 pip install -r requirements.txt
 
 Start the gui:
+
 python src/main.py
 
 ## Future Plans / Development
