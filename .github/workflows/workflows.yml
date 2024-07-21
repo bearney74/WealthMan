@@ -28,6 +28,7 @@ jobs:
       run: |
          PWD=$(pwd)
          echo "PYTHONPATH=$PWD/src:$PYTHONPATH" >> $GITHUB_ENV
+         echo "QT_QPA_PLATFORM=offscreen" >> $GITHUB_ENV
     - name: Running Unit Tests
       run: |
         cd tests
