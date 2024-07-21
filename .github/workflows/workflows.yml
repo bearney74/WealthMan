@@ -28,6 +28,7 @@ jobs:
       run: |
          PWD=$(pwd)
          echo "$PWD"
+         ls $PWD/src
          echo "PYTHONPATH=$PWD/src:$PYTHONPATH" >> $GITHUB_ENV
     - name: Running Unit Tests
       run: |
