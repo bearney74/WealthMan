@@ -16,7 +16,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        sudo apt update && sudo apt install -y libegl1-mesa-dev libxcb-cursor0
+        sudo apt update && sudo apt install -y libegl1-mesa-dev libxcb-cursor0 libxkbcommon-x11-0
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Installing Ruff
