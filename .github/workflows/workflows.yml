@@ -26,7 +26,9 @@ jobs:
       uses: chartboost/ruff-action@v1
     - name: set pythonpath
       run: |
-         echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
+         PWD=$(pwd)
+         echo "$PWD"
+         echo "PYTHONPATH=$PWD:$PYTHONPATH" >> $GITHUB_ENV
     - name: Running Unit Tests
       run: |
         cd tests
