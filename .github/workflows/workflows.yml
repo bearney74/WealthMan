@@ -16,7 +16,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        sudo apt update && sudo apt install -y libegl1-mesa-dev
+        sudo apt update && sudo apt install -y libegl1-mesa-dev libxcb-cursor0
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Installing Ruff
@@ -28,7 +28,6 @@ jobs:
       run: |
          PWD=$(pwd)
          echo "PYTHONPATH=$PWD/src:$PYTHONPATH" >> $GITHUB_ENV
-         echo "PYTHONPATH=$PWD/src:$PYTHONPATH"
     - name: Running Unit Tests
       run: |
         cd tests
