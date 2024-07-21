@@ -18,9 +18,11 @@ Charts can be generated for each projection variable, as well as custom charts f
 asset totals, income totals and asset contribution totals.
 
 ## How to run..
-install the modules in the requirements.txt file
+Install the modules in the requirements.txt file:
+
 pip install -r requirements.txt
 
+Start the gui:
 python src/main.py
 
 ## Future Plans / Development
