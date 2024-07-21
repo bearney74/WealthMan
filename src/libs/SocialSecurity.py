@@ -45,13 +45,13 @@ class SocialSecurity:
                 return round(self.FRAAmount * self._table[70])
 
     def calc_full_retirement_age(self):
-        if self.person.BirthDate >= date(1960, 1, 1):
+        if self.person.birthDate >= date(1960, 1, 1):
             return 67
         return 66
 
     def calc_end_date(self, person: Person):
         self.end_date = date(
-            person.Birthdate.year + person.LifeExpectancy,
-            person.BirthDate.month,
-            person.BirthDate.day,
+            person.birthdate.year + person.lifeExpectancy,
+            person.birthDate.month,
+            person.birthDate.day,
         )

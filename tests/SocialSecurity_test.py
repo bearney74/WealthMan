@@ -16,21 +16,21 @@ class SocialSecurityFRA67Test(unittest.TestCase):
 
     def test_FRA_calcs(self):
         # anyone born after Jan 1st 1960 FRA is 67
-        _p = Person(Name="Jane", BirthDate=date(1963, 1, 1))
+        _p = Person(name="Jane", birthDate=date(1963, 1, 1))
         _ss = SocialSecurity(FRAAmount=0, person=_p)
         self.assertEqual(_ss.calc_full_retirement_age(), 67)
 
-        _p = Person(Name="Jane60", BirthDate=date(1960, 1, 1))
+        _p = Person(name="Jane60", birthDate=date(1960, 1, 1))
         _ss = SocialSecurity(FRAAmount=0, person=_p)
         self.assertEqual(_ss.calc_full_retirement_age(), 67)
 
         # anyone born before Jan 1st 1960 FRA is 66
-        _p = Person(Name="Jane60", BirthDate=date(1959, 12, 31))
+        _p = Person(name="Jane60", birthDate=date(1959, 12, 31))
         _ss = SocialSecurity(FRAAmount=0, person=_p)
         self.assertEqual(_ss.calc_full_retirement_age(), 66)
 
     def test_benefits_by_age(self):
-        _p = Person(Name="Jane", BirthDate=date(1963, 1, 1))
+        _p = Person(name="Jane", birthDate=date(1963, 1, 1))
         _ss = SocialSecurity(FRAAmount=3000, person=_p)
 
         for _age, _amount in (

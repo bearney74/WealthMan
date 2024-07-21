@@ -14,7 +14,7 @@ class RMDTest(unittest.TestCase):
     """tests to verify that early/late SS payment calcs are correct"""
 
     def test_single(self):
-        _p = Person(Name="Jane", BirthDate=date(1960, 1, 1))
+        _p = Person(name="Jane", birthDate=date(1960, 1, 1))
         _rmd = RMD(_p, None)
 
         # before age 73 (30 years of age)

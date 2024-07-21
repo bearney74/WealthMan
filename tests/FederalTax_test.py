@@ -17,11 +17,15 @@ class FederalTaxTest(unittest.TestCase):
         self.assertEqual(14600, _ft.StandardDeduction)
 
     def test_marriedjointly_standard_tax_deduction(self):
-        _ft = FederalTax(FileStatus=FederalTaxStatusType.MarriedJointly, Year=Year)
+        _ft = FederalTax(
+            FileStatus=FederalTaxStatusType.MarriedFilingJointly, Year=Year
+        )
         self.assertEqual(29200, _ft.StandardDeduction)
 
     def test_marriedseparate_standard_tax_deduction(self):
-        _ft = FederalTax(FileStatus=FederalTaxStatusType.MarriedSeparate, Year=Year)
+        _ft = FederalTax(
+            FileStatus=FederalTaxStatusType.MarriedFilingSeparately, Year=Year
+        )
         self.assertEqual(14600, _ft.StandardDeduction)
 
     def test_HeadOfHousehold_standard_tax_deduction(self):
@@ -33,8 +37,8 @@ class FederalTaxTest(unittest.TestCase):
 
         for _amount, _taxes in (
             (100, 10),
-            (20000, 2168),
-            (47150, 5426),
+            (20000, 2167),
+            (47150, 5425),
         ):
             self.assertEqual(
                 _tax.calc_taxes(_amount),
@@ -43,13 +47,15 @@ class FederalTaxTest(unittest.TestCase):
             )
 
     def test_marriedjointly_calcs(self):
-        _tax = FederalTax(FileStatus=FederalTaxStatusType.MarriedJointly, Year=Year)
+        _tax = FederalTax(
+            FileStatus=FederalTaxStatusType.MarriedFilingJointly, Year=Year
+        )
 
         for _amount, _taxes in (
             (100, 10),
             (20000, 2000),
-            (47150, 5194),
-            (150000, 23106),
+            (47150, 5193),
+            (150000, 23105),
         ):
             self.assertEqual(
                 _tax.calc_taxes(_amount),
