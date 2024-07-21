@@ -44,20 +44,19 @@ I am interested in feedback.  Please submit any issues/bugs, feature requests to
 ![Basic Info](../README/media/basic_info_v0_2.jpg)
 
 ### Income Tab
-![Income Tab](README/media/income_v0_2.jpg)
+![Income Tab](../README/media/income_v0_2.jpg)
 
 ### Expenses Tab
-![Expenses Tab](README/media/expenses_v0_2.jpg)
+![Expenses Tab](../README/media/expenses_v0_2.jpg)
 
 ### Assets Tab 
-![Assets Tab](README/media/assets_v0_2.jpg)
+![Assets Tab](../README/media/assets_v0_2.jpg)
 
 ### Global Variables
-![Global Variables Tab](README/media/globalvariables_v0_2.jpg)
+![Global Variables Tab](../README/media/globalvariables_v0_2.jpg)
 
 ### Output (Details)
-![Details Tab](README/media/details_v0_2.jpg)
+![Details Tab](../README/media/details_v0_2.jpg)
 
 ### CSV Output
-[details.csv][README/media/details_v0_2.csv)
-
+[details.csv](../README/media/details_v0_2.csv)
