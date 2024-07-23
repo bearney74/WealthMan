@@ -55,7 +55,7 @@ def qt_message_handler(mode, context, message):
         mode = 'WARNING'
         if 'propagateSizeHints' in message:
             return
-    elif mode == .QtCriticalMsg:
+    elif mode == QtCriticalMsg:
         mode = 'CRITICAL'
     elif mode == QtFatalMsg:
         mode = 'FATAL'
