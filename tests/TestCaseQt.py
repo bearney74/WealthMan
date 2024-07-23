@@ -34,24 +34,20 @@ __date__ = "22/11/2023"
 import gc
 import logging
 import unittest
-import time
+
+# import time
 import functools
 import sys
 import os
 
-_logger = logging.getLogger(__name__)
-
-#from silx.gui import qt
-#from silx.gui.qt import inspect as _inspect
-#import inspect as _inspect
-
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication, QToolButton
 from PyQt6.QtCore import Qt
-#from PyQt6.QtCore import inspect as _inspect
 from PyQt6.QtTest import QTest
 
 from PyQt6.sip import ispycreated as createdByPython
-#_inspect = Qt.inspect
+
+_logger = logging.getLogger(__name__)
+
 
 def qWaitForWindowExposedAndActivate(window, timeout=None):
     """Waits until the window is shown in the screen.
@@ -165,10 +161,7 @@ class TestCaseQt(unittest.TestCase):
         widgets = [
             widget
             for widget in self.qapp.allWidgets()
-            if (
-                widget not in self.__previousWidgets
-                and createdByPython(widget)
-            )
+            if (widget not in self.__previousWidgets and createdByPython(widget))
         ]
         self.__previousWidgets = None
 
@@ -181,9 +174,9 @@ class TestCaseQt(unittest.TestCase):
             )
 
         if len(widgets) > allowedLeakingWidgets:
-            #TODO: fix me...
-            #raise RuntimeError("Test ended with widgets alive: %s" % str(widgets))
-            #raise RuntimeError("Test ended with widgets alive: %s" % str(widgets))
+            # TODO: fix me...
+            # raise RuntimeError("Test ended with widgets alive: %s" % str(widgets))
+            # raise RuntimeError("Test ended with widgets alive: %s" % str(widgets))
             pass
 
     def tearDown(self):
@@ -224,7 +217,9 @@ class TestCaseQt(unittest.TestCase):
         QTest.keyClick(widget, key, modifier, delay)
         self.qWait(20)
 
-    def keyClicks(self, widget, sequence, modifier=Qt.KeyboardModifier.NoModifier, delay=-1):
+    def keyClicks(
+        self, widget, sequence, modifier=Qt.KeyboardModifier.NoModifier, delay=-1
+    ):
         """Simulate clicking a sequence of keys.
 
         See QTest.keyClick for details.
@@ -232,7 +227,9 @@ class TestCaseQt(unittest.TestCase):
         QTest.keyClicks(widget, sequence, modifier, delay)
         self.qWait(20)
 
-    def keyEvent(self, action, widget, key, modifier=Qt.KeyboardModifier.NoModifier, delay=-1):
+    def keyEvent(
+        self, action, widget, key, modifier=Qt.KeyboardModifier.NoModifier, delay=-1
+    ):
         """Sends a Qt key event.
 
         See QTest.keyEvent for details.
@@ -248,7 +245,9 @@ class TestCaseQt(unittest.TestCase):
         QTest.keyPress(widget, key, modifier, delay)
         self.qWait(20)
 
-    def keyRelease(self, widget, key, modifier=Qt.KeyboardModifier.NoModifier, delay=-1):
+    def keyRelease(
+        self, widget, key, modifier=Qt.KeyboardModifier.NoModifier, delay=-1
+    ):
         """Sends a Qt key release event.
 
         See QTest.keyRelease for details.
@@ -263,7 +262,7 @@ class TestCaseQt(unittest.TestCase):
         """
         if modifier is None:
             modifier = self.qapp.keyboardModifiers()
-        pos = qt.QPoint(int(pos[0]), int(pos[1])) if pos is not None else qt.QPoint()
+        pos = Qt.QPoint(int(pos[0]), int(pos[1])) if pos is not None else Qt.QPoint()
         QTest.mouseClick(widget, button, modifier, pos, delay)
         self.qWait(20)
 
@@ -274,7 +273,7 @@ class TestCaseQt(unittest.TestCase):
         """
         if modifier is None:
             modifier = self.qapp.keyboardModifiers()
-        pos = qt.QPoint(int(pos[0]), int(pos[1])) if pos is not None else qt.QPoint()
+        pos = Qt.QPoint(int(pos[0]), int(pos[1])) if pos is not None else Qt.QPoint()
         QTest.mouseDClick(widget, button, modifier, pos, delay)
         self.qWait(20)
 
@@ -283,7 +282,7 @@ class TestCaseQt(unittest.TestCase):
 
         See QTest.mouseMove for details.
         """
-        pos = qt.QPoint(int(pos[0]), int(pos[1])) if pos is not None else qt.QPoint()
+        pos = Qt.QPoint(int(pos[0]), int(pos[1])) if pos is not None else Qt.QPoint()
         QTest.mouseMove(widget, pos, delay)
         self.qWait(20)
 
@@ -294,7 +293,7 @@ class TestCaseQt(unittest.TestCase):
         """
         if modifier is None:
             modifier = self.qapp.keyboardModifiers()
-        pos = qt.QPoint(int(pos[0]), int(pos[1])) if pos is not None else qt.QPoint()
+        pos = Qt.QPoint(int(pos[0]), int(pos[1])) if pos is not None else Qt.QPoint()
         QTest.mousePress(widget, button, modifier, pos, delay)
         self.qWait(20)
 
@@ -305,7 +304,7 @@ class TestCaseQt(unittest.TestCase):
         """
         if modifier is None:
             modifier = self.qapp.keyboardModifiers()
-        pos = qt.QPoint(int(pos[0]), int(pos[1])) if pos is not None else qt.QPoint()
+        pos = Qt.QPoint(int(pos[0]), int(pos[1])) if pos is not None else Qt.QPoint()
         QTest.mouseRelease(widget, button, modifier, pos, delay)
         self.qWait(20)
 
@@ -325,16 +324,7 @@ class TestCaseQt(unittest.TestCase):
         if ms is None:
             ms = cls.DEFAULT_TIMEOUT_WAIT
 
-        if qt.BINDING == "PySide6":
-            # PySide has no qWait, provide a replacement
-            timeout = int(ms)
-            endTimeMS = int(time.time() * 1000) + timeout
-            qapp = qt.QApplication.instance()
-            while timeout > 0:
-                qapp.processEvents(qt.QEventLoop.AllEvents, timeout)
-                timeout = endTimeMS - int(time.time() * 1000)
-        else:
-            QTest.qWait(int(ms) + cls.TIMEOUT_WAIT)
+        QTest.qWait(int(ms) + cls.TIMEOUT_WAIT)
 
     def qWaitForWindowExposed(self, window, timeout=None):
         """Waits until the window is shown in the screen.
@@ -352,7 +342,7 @@ class TestCaseQt(unittest.TestCase):
         """Wait for expose a widget, flag it delete on close, and close it."""
         self.qWaitForWindowExposed(widget)
         self.qapp.processEvents()
-        widget.setAttribute(qt.Qt.WA_DeleteOnClose)
+        widget.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         widget.close()
 
     _qobject_destroyed = False
@@ -493,23 +483,14 @@ def getQToolButtonFromAction(action):
     :param QAction action: The QAction from which to get QToolButton.
     :return: A QToolButton associated to action or None.
     """
-    if qt.BINDING in ("PySide6", "PyQt6"):
-        widgets = action.associatedObjects()
-    else:
-        widgets = action.associatedWidgets()
+
+    widgets = action.associatedObjects()
 
     for widget in widgets:
-        if isinstance(widget, qt.QToolButton):
+        if isinstance(widget, QToolButton):
             return widget
     return None
 
 
 def findChildren(parent, kind, name=None):
-    if qt.BINDING == "PySide6" and name is not None:
-        result = []
-        for obj in parent.findChildren(kind):
-            if obj.objectName() == name:
-                result.append(obj)
-        return result
-    else:
-        return parent.findChildren(kind, name=name)
+    return parent.findChildren(kind, name=name)

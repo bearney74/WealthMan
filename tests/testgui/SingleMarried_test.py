@@ -1,25 +1,19 @@
-import sys
 import unittest
-
-from PyQt6.QtGui import QGuiApplication
-from PyQt6.QtWidgets import QApplication
-#from PyQt6.QtCore import QCoreApplication as QApplication
-# from PyQt6.QtTest import QTest
 
 from libs.EnumTypes import RelationStatus
 from main import Main
 
 from tests.TestCaseQt import TestCaseQt
-#app = QApplication(sys.argv)
+# app = QApplication(sys.argv)
 
 
 class SingleMarried(TestCaseQt):
     def setUp(self):
         TestCaseQt.setUp(self)
-        
-        #self.app=QApplication.instance() or QApplication(sys.argv) #QApplication(["--platform offscreen"])
-        #self.app=QApplication(sys.argv)
-        #self.app.processEvents()
+
+        # self.app=QApplication.instance() or QApplication(sys.argv) #QApplication(["--platform offscreen"])
+        # self.app=QApplication(sys.argv)
+        # self.app.processEvents()
         self.form = Main()
         self.BasicInfoTab = self.form.InputsTab.BasicInfoTab
         self.AssetInfoTab = self.form.InputsTab.AssetInfoTab
@@ -28,9 +22,9 @@ class SingleMarried(TestCaseQt):
 
     def tearDown(self):
         TestCaseQt.tearDown(self)
-        #self.app.processEvents()
+        # self.app.processEvents()
         self.qapp.exit()
-        #del self.qapp
+        # del self.qapp
 
     def test_main(self):
         _status = self.BasicInfoTab._clientinfo._status
