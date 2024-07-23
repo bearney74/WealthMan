@@ -31,12 +31,14 @@ jobs:
          echo "QT_QPA_PLATFORM=offscreen" >> $GITHUB_ENV
     - name: Running Unit Tests
       run: |
-        python -m unittest discover -v -p "*_test.py"
+         cd src/tests
+         python -m unittest discover -v -p "*_test.py"
     - name: Installing Coverage
       run: |
          pip install coverage
     - name: Running Coverage
       run: |
+         cd src/tests
          coverage run -m unittest discover -p "*_test.py"
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
