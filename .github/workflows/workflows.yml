@@ -19,9 +19,6 @@ jobs:
         sudo apt-get install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Installing Ruff
-      run: |
-         pip install ruff
     - name: Running Ruff
       uses: chartboost/ruff-action@v1
     - name: set pythonpath
