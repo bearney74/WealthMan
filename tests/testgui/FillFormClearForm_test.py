@@ -1,22 +1,37 @@
 import sys
 import unittest
 
+#from PyQt6.QtGui import QGuiApplication
 from PyQt6.QtWidgets import QApplication
+#from PyQt6.QtCore import QCoreApplication as QApplication
+
 # from PyQt6.QtTest import QTest
 
 from libs.EnumTypes import RelationStatus
 from main import Main
 
-app = QApplication(sys.argv)
+from tests.TestCaseQt import TestCaseQt
+#app = QApplication(sys.argv)
 
 
-class FillFormClearForm(unittest.TestCase):
+class FillFormClearForm(TestCaseQt):
+    
+    
     def setUp(self):
+        TestCaseQt.setUp(self)
+        #self.app = QApplication.instance() or QApplication(sys.argv)
+        #self.app.processEvents()
         self.form = Main()
         self.BasicInfoTab = self.form.InputsTab.BasicInfoTab
         self.AssetInfoTab = self.form.InputsTab.AssetInfoTab
         self.IncomeInfoTab = self.form.InputsTab.IncomeInfoTab
         self.GlobalVariablesTab = self.form.InputsTab.GlobalVariablesTab
+
+    def tearDown(self):
+        TestCaseQt.tearDown(self)
+        self.qapp.processEvents()
+        self.qapp.exit()
+        #del self.qapp
 
     def test_BasicInfoTab_client(self):
         _client=self.BasicInfoTab._clientinfo
