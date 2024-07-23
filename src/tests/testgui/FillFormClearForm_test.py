@@ -88,5 +88,34 @@ class FillFormClearForm(TestCaseQt):
         self.assertEqual(_spouse._lifespan_age.get_int(), None)
 
 
+    def test_IncomeTab_SocialSecurity(self):
+        _clientSS=self.IncomeInfoTab.clientSS
+        
+        for _widget in (self.IncomeInfoTab.clientSS, self.IncomeInfoTab.spouseSS):
+            _widget.Amount.setText("1234")
+            self.assertEqual(_widget.Amount.text(), "1234")
+            self.assertEqual(_widget.Amount.get_int(), 1234)
+        
+            _widget.Amount.setText("")
+            self.assertEqual(_widget.Amount.text(), "")
+            self.assertEqual(_widget.Amount.get_int(), None)
+        
+            _widget.Cola.setText("6.9")
+            self.assertEqual(_widget.Cola.text(), "6.9")
+            self.assertEqual(_widget.Cola.get_float(), 6.9)
+        
+            _widget.Cola.setText("")
+            self.assertEqual(_widget.Cola.text(), "")
+            self.assertEqual(_widget.Cola.get_float(), None)
+        
+            _widget.BeginAge.setText("69")
+            self.assertEqual(_widget.BeginAge.text(), "69")
+            self.assertEqual(_widget.BeginAge.get_int(), 69)
+        
+            _widget.BeginAge.setText("")
+            self.assertEqual(_widget.BeginAge.text(), "")
+            self.assertEqual(_widget.BeginAge.get_int(), None)
+        
+
 if __name__ == "__main__":
     unittest.main()
