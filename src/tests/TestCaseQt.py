@@ -48,25 +48,30 @@ from PyQt6.sip import ispycreated as createdByPython
 
 _logger = logging.getLogger(__name__)
 
+
 # silence this warning.. this-plugin-does-not-support-propagatesizehints
 def qt_message_handler(mode, context, message):
     if mode == QtMsgType.QtInfoMsg:
-        mode = 'INFO'
+        mode = "INFO"
     elif mode == QtMsgType.QtWarningMsg:
-        mode = 'WARNING'
-        if 'propagateSizeHints' in message:
+        mode = "WARNING"
+        if "propagateSizeHints" in message:
             return
     elif mode == QtMsgType.QtCriticalMsg:
-        mode = 'CRITICAL'
+        mode = "CRITICAL"
     elif mode == QtMsgType.QtFatalMsg:
-        mode = 'FATAL'
+        mode = "FATAL"
     else:
-        mode = 'DEBUG'
-    print('qt_message_handler: line: %d, func: %s(), file: %s' % (
-          context.line, context.function, context.file))
-    print('  %s: %s\n' % (mode, message))
+        mode = "DEBUG"
+    print(
+        "qt_message_handler: line: %d, func: %s(), file: %s"
+        % (context.line, context.function, context.file)
+    )
+    print("  %s: %s\n" % (mode, message))
+
 
 qInstallMessageHandler(qt_message_handler)
+
 
 def qWaitForWindowExposedAndActivate(window, timeout=None):
     """Waits until the window is shown in the screen.
