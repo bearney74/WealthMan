@@ -41,13 +41,31 @@ import sys
 import os
 
 from PyQt6.QtWidgets import QApplication, QToolButton
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, qInstallMessageHandler
 from PyQt6.QtTest import QTest
 
 from PyQt6.sip import ispycreated as createdByPython
 
 _logger = logging.getLogger(__name__)
 
+def qt_message_handler(mode, context, message):
+    if mode == QtCore.QtInfoMsg:
+        mode = 'INFO'
+    elif mode == QtCore.QtWarningMsg:
+        mode = 'WARNING'
+        if 'propagateSizeHints' in message:
+            return
+    elif mode == QtCore.QtCriticalMsg:
+        mode = 'CRITICAL'
+    elif mode == QtCore.QtFatalMsg:
+        mode = 'FATAL'
+    else:
+        mode = 'DEBUG'
+    print('qt_message_handler: line: %d, func: %s(), file: %s' % (
+          context.line, context.function, context.file))
+    print('  %s: %s\n' % (mode, message))
+
+qInstallMessageHandler(qt_message_handler)
 
 def qWaitForWindowExposedAndActivate(window, timeout=None):
     """Waits until the window is shown in the screen.
