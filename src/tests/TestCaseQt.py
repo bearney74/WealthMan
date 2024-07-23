@@ -48,6 +48,7 @@ from PyQt6.sip import ispycreated as createdByPython
 
 _logger = logging.getLogger(__name__)
 
+# silence this warning.. this-plugin-does-not-support-propagatesizehints
 def qt_message_handler(mode, context, message):
     if mode == QtMsgType.QtInfoMsg:
         mode = 'INFO'
