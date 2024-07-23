@@ -41,7 +41,7 @@ import sys
 import os
 
 from PyQt6.QtWidgets import QApplication, QToolButton
-from PyQt6.QtCore import Qt, qInstallMessageHandler, QtInfoMsg, QtWarningMsg, QtCriticalMsg, QtFatalMsg
+from PyQt6.QtCore import Qt, qInstallMessageHandler, QtMsgType
 from PyQt6.QtTest import QTest
 
 from PyQt6.sip import ispycreated as createdByPython
@@ -49,15 +49,15 @@ from PyQt6.sip import ispycreated as createdByPython
 _logger = logging.getLogger(__name__)
 
 def qt_message_handler(mode, context, message):
-    if mode == QtInfoMsg:
+    if mode == QtMsgType.QtInfoMsg:
         mode = 'INFO'
-    elif mode == QtWarningMsg:
+    elif mode == QtMsgType.QtWarningMsg:
         mode = 'WARNING'
         if 'propagateSizeHints' in message:
             return
-    elif mode == QtCriticalMsg:
+    elif mode == QtMsgType.QtCriticalMsg:
         mode = 'CRITICAL'
-    elif mode == QtFatalMsg:
+    elif mode == QtMsgType.QtFatalMsg:
         mode = 'FATAL'
     else:
         mode = 'DEBUG'
