@@ -31,7 +31,6 @@ jobs:
          echo "QT_QPA_PLATFORM=offscreen" >> $GITHUB_ENV
     - name: Running Unit Tests
       run: |
-        cd tests
         python -m unittest discover -v -p "*_test.py"
     - name: Installing Coverage
       run: |
