@@ -145,7 +145,7 @@ class FillFormClearForm(TestCaseQt):
 
         _incometab.pension1BeginAge.setText("60")
         self.assertEqual(_incometab.pension1BeginAge.text(), "60")
-        self.assertEqual(_incometab.pension1SurvivorBenefits.get_float(), 60)
+        self.assertEqual(_incometab.pension1BeginAge.get_int(), 60)
 
         _incometab.pension1BeginAge.setText("")
         self.assertEqual(_incometab.pension1BeginAge.text(), "")
@@ -187,7 +187,7 @@ class FillFormClearForm(TestCaseQt):
 
         _incometab.pension2BeginAge.setText("60")
         self.assertEqual(_incometab.pension2BeginAge.text(), "60")
-        self.assertEqual(_incometab.pension2SurvivorBenefits.get_int(), 60)
+        self.assertEqual(_incometab.pension2BeginAge.get_int(), 60)
 
         _incometab.pension2BeginAge.setText("")
         self.assertEqual(_incometab.pension2BeginAge.text(), "")
