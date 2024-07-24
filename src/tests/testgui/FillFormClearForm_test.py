@@ -21,9 +21,48 @@ class FillFormClearForm(TestCaseQt):
 
     def tearDown(self):
         TestCaseQt.tearDown(self)
-        self.qapp.processEvents()
-        self.qapp.exit()
+        #self.qapp.processEvents()
+        #self.qapp.exit()
         # del self.qapp
+
+    def _testString(self, variable, s):
+        variable.setText(s)
+        self.assertEqual(variable.text(), s)
+
+        
+    def _testAge(self, variable, age):
+        variable.setText(age)
+        self.assertEqual(variable.text(), age)
+        
+        if age == "":
+           self.assertIsNone(variable.get_int())
+        else:
+            self.assertEqual(variable.get_int(), int(age))
+
+    def _testMoney(self, variable, amount):
+        variable.setText(amount)
+        self.assertEqual(variable.text(), amount)
+        
+        if amount == "":
+           self.assertIsNone(variable.get_int())
+        else:
+            self.assertEqual(variable.get_int(), int(amount))
+
+    def _testPercent(self, variable, pct):
+        variable.setText(pct)
+        self.assertEqual(variable.text(), pct)
+        
+        if pct == "":
+           self.assertIsNone(variable.get_float())
+        else:
+            self.assertEqual(variable.get_float(), float(pct))
+
+
+    def _testCheckBox(self, variable, value):
+        assert isinstance(value, bool)
+        variable.setChecked(value)
+        self.assertEqual(variable.isChecked(), value)
+        
 
     def test_BasicInfoTab_client(self):
         _client = self.BasicInfoTab._clientinfo
@@ -31,30 +70,15 @@ class FillFormClearForm(TestCaseQt):
 
         _status = self.BasicInfoTab._clientinfo._status
 
-        _client._name.setText("Hairy Johnson")
-        self.assertEqual(_client._name.text(), "Hairy Johnson")
-
-        _client._name.setText("")
-        self.assertEqual(_client._name.text(), "")
-
-        # self.assertEqual(_client._birthDate.setDate())
-
-        _client._retirement_age.setText("69")
-        self.assertEqual(_client._retirement_age.text(), "69")
-        self.assertEqual(_client._retirement_age.get_int(), 69)
-
-        _client._retirement_age.setText("")
-        self.assertEqual(_client._retirement_age.text(), "")
-        self.assertEqual(_client._retirement_age.get_int(), None)
-
-        _client._lifespan_age.setText("69")
-        self.assertEqual(_client._lifespan_age.text(), "69")
-        self.assertEqual(_client._lifespan_age.get_int(), 69)
-
-        _client._lifespan_age.setText("")
-        self.assertEqual(_client._lifespan_age.text(), "")
-        self.assertEqual(_client._lifespan_age.get_int(), None)
-
+        self._testString(_client._name, "Hairy Johnson")
+        self._testString(_client._name, "")
+        
+        self._testAge(_client._retirement_age, "69")
+        self._testAge(_client._retirement_age, "")
+        
+        self._testAge(_client._lifespan_age, "69")
+        self._testAge(_client._lifespan_age, "")
+        
         self.assertEqual(RelationStatus[_status.currentText()], RelationStatus.Single)
 
         _status.setCurrentText(RelationStatus.Married.name)
@@ -63,146 +87,92 @@ class FillFormClearForm(TestCaseQt):
     def test_BasicInfoTab_spouse(self):
         _spouse = self.BasicInfoTab._spouseinfo
 
-        _spouse._name.setText("Hairy Johnson")
-        self.assertEqual(_spouse._name.text(), "Hairy Johnson")
-
-        _spouse._name.setText("")
-        self.assertEqual(_spouse._name.text(), "")
-
-        # self.assertEqual(_client._birthDate.setDate())
-
-        _spouse._retirement_age.setText("69")
-        self.assertEqual(_spouse._retirement_age.text(), "69")
-        self.assertEqual(_spouse._retirement_age.get_int(), 69)
-
-        _spouse._retirement_age.setText("")
-        self.assertEqual(_spouse._retirement_age.text(), "")
-        self.assertEqual(_spouse._retirement_age.get_int(), None)
-
-        _spouse._lifespan_age.setText("69")
-        self.assertEqual(_spouse._lifespan_age.text(), "69")
-        self.assertEqual(_spouse._lifespan_age.get_int(), 69)
-
-        _spouse._lifespan_age.setText("")
-        self.assertEqual(_spouse._lifespan_age.text(), "")
-        self.assertEqual(_spouse._lifespan_age.get_int(), None)
-
+        self._testString(_spouse._name, "Hairy Johnson")
+        self._testString(_spouse._name, "")
+        
+        self._testAge(_spouse._retirement_age, "69")
+        self._testAge(_spouse._retirement_age, "")
+        
+        self._testAge(_spouse._lifespan_age, "69")
+        self._testAge(_spouse._lifespan_age, "")
+        
+        
     def test_IncomeTab_SocialSecurity(self):
         _clientSS = self.IncomeInfoTab.clientSS
 
         for _widget in (self.IncomeInfoTab.clientSS, self.IncomeInfoTab.spouseSS):
-            _widget.Amount.setText("1234")
-            self.assertEqual(_widget.Amount.text(), "1234")
-            self.assertEqual(_widget.Amount.get_int(), 1234)
-
-            _widget.Amount.setText("")
-            self.assertEqual(_widget.Amount.text(), "")
-            self.assertEqual(_widget.Amount.get_int(), None)
-
-            _widget.Cola.setText("6.9")
-            self.assertEqual(_widget.Cola.text(), "6.9")
-            self.assertEqual(_widget.Cola.get_float(), 6.9)
-
-            _widget.Cola.setText("")
-            self.assertEqual(_widget.Cola.text(), "")
-            self.assertEqual(_widget.Cola.get_float(), None)
-
-            _widget.BeginAge.setText("69")
-            self.assertEqual(_widget.BeginAge.text(), "69")
-            self.assertEqual(_widget.BeginAge.get_int(), 69)
-
-            _widget.BeginAge.setText("")
-            self.assertEqual(_widget.BeginAge.text(), "")
-            self.assertEqual(_widget.BeginAge.get_int(), None)
-
+            self._testMoney(_widget.Amount, "1234")
+            self._testMoney(_widget.Amount, "")
+        
+            self._testPercent(_widget.Cola, "6.9")
+            self._testPercent(_widget.Cola, "")
+            
+            self._testAge(_widget.BeginAge, "69")
+            self._testAge(_widget.BeginAge, "")
+            
         # pension data....
         _incometab = self.IncomeInfoTab
         self.assertEqual(_incometab.pension1Owner.currentText(), "Client")
 
-        _incometab.pension1Amount.setText("1234")
-        self.assertEqual(_incometab.pension1Amount.text(), "1234")
-        self.assertEqual(_incometab.pension1Amount.get_int(), 1234)
-
-        _incometab.pension1Amount.setText("")
-        self.assertEqual(_incometab.pension1Amount.text(), "")
-        self.assertEqual(_incometab.pension1Amount.get_int(), None)
-
-        _incometab.pension1Cola.setText("1.2")
-        self.assertEqual(_incometab.pension1Cola.text(), "1.2")
-        self.assertEqual(_incometab.pension1Cola.get_float(), 1.2)
-
-        _incometab.pension1Cola.setText("")
-        self.assertEqual(_incometab.pension1Cola.text(), "")
-        self.assertEqual(_incometab.pension1Cola.get_float(), None)
-
-        _incometab.pension1SurvivorBenefits.setText("50.0")
-        self.assertEqual(_incometab.pension1SurvivorBenefits.text(), "50.0")
-        self.assertEqual(_incometab.pension1SurvivorBenefits.get_float(), 50.0)
-
-        _incometab.pension1SurvivorBenefits.setText("")
-        self.assertEqual(_incometab.pension1SurvivorBenefits.text(), "")
-        self.assertEqual(_incometab.pension1SurvivorBenefits.get_float(), None)
-
-        _incometab.pension1BeginAge.setText("60")
-        self.assertEqual(_incometab.pension1BeginAge.text(), "60")
-        self.assertEqual(_incometab.pension1BeginAge.get_int(), 60)
-
-        _incometab.pension1BeginAge.setText("")
-        self.assertEqual(_incometab.pension1BeginAge.text(), "")
-        self.assertEqual(_incometab.pension1BeginAge.get_int(), None)
-
-        _incometab.pension1EndAge.setText("60")
-        self.assertEqual(_incometab.pension1EndAge.text(), "60")
-        self.assertEqual(_incometab.pension1EndAge.get_int(), 60)
-
-        _incometab.pension1EndAge.setText("")
-        self.assertEqual(_incometab.pension1EndAge.text(), "")
-        self.assertEqual(_incometab.pension1EndAge.get_int(), None)
-
+        self._testMoney(_incometab.pension1Amount, "1234")
+        self._testMoney(_incometab.pension1Amount, "")
+        
+        self._testPercent(_incometab.pension1Cola, "1.2")
+        self._testPercent(_incometab.pension1Cola, "")
+        
+        self._testPercent(_incometab.pension1SurvivorBenefits, "50.0")
+        self._testPercent(_incometab.pension1SurvivorBenefits, "")
+        
+        self._testAge(_incometab.pension1BeginAge, "60")
+        self._testAge(_incometab.pension1BeginAge, "")
+        
+        self._testAge(_incometab.pension1EndAge, "60")
+        self._testAge(_incometab.pension1EndAge, "")
+        
         # pension 2
 
-        _incometab.pension2Amount.setText("1234")
-        self.assertEqual(_incometab.pension2Amount.text(), "1234")
-        self.assertEqual(_incometab.pension2Amount.get_int(), 1234)
-
-        _incometab.pension2Amount.setText("")
-        self.assertEqual(_incometab.pension2Amount.text(), "")
-        self.assertEqual(_incometab.pension2Amount.get_int(), None)
-
-        _incometab.pension2Cola.setText("1.2")
-        self.assertEqual(_incometab.pension2Cola.text(), "1.2")
-        self.assertEqual(_incometab.pension2Cola.get_float(), 1.2)
-
-        _incometab.pension2Cola.setText("")
-        self.assertEqual(_incometab.pension2Cola.text(), "")
-        self.assertEqual(_incometab.pension2Cola.get_float(), None)
-
-        _incometab.pension2SurvivorBenefits.setText("50.0")
-        self.assertEqual(_incometab.pension2SurvivorBenefits.text(), "50.0")
-        self.assertEqual(_incometab.pension2SurvivorBenefits.get_float(), 50.0)
-
-        _incometab.pension2SurvivorBenefits.setText("")
-        self.assertEqual(_incometab.pension2SurvivorBenefits.text(), "")
-        self.assertEqual(_incometab.pension2SurvivorBenefits.get_float(), None)
-
-        _incometab.pension2BeginAge.setText("60")
-        self.assertEqual(_incometab.pension2BeginAge.text(), "60")
-        self.assertEqual(_incometab.pension2BeginAge.get_int(), 60)
-
-        _incometab.pension2BeginAge.setText("")
-        self.assertEqual(_incometab.pension2BeginAge.text(), "")
-        self.assertEqual(_incometab.pension2BeginAge.get_int(), None)
-
-        _incometab.pension2EndAge.setText("60")
-        self.assertEqual(_incometab.pension2EndAge.text(), "60")
-        self.assertEqual(_incometab.pension2EndAge.get_int(), 60)
-
-        _incometab.pension2EndAge.setText("")
-        self.assertEqual(_incometab.pension2EndAge.text(), "")
-        self.assertEqual(_incometab.pension2EndAge.get_int(), None)
-
+        self._testMoney(_incometab.pension2Amount, "1234")
+        self._testMoney(_incometab.pension2Amount, "")
+        
+        self._testPercent(_incometab.pension2Cola, "1.2")
+        self._testPercent(_incometab.pension2Cola, "")
+        
+        self._testPercent(_incometab.pension2SurvivorBenefits, "50.0")
+        self._testPercent(_incometab.pension2SurvivorBenefits, "")
+        
+        self._testAge(_incometab.pension2BeginAge, "60")
+        self._testAge(_incometab.pension2BeginAge, "")
+        
+        self._testAge(_incometab.pension2EndAge, "60")
+        self._testAge(_incometab.pension2EndAge, "")
+        
         self.assertEqual(_incometab.gridLayout.count(), 0)
 
-
+        #need to add income sources...
+        
+    def test_GlobalVariablesTab(self):
+        _gvt=self.GlobalVariablesTab
+        self._testAge(_gvt._forecast_years, "33")
+        self._testAge(_gvt._forecast_years, "")
+        
+        self._testPercent(_gvt._Inflation, "33")
+        self._testPercent(_gvt._Inflation, "")
+        
+        self._testCheckBox(_gvt._InTodaysDollars, True)
+        self._testCheckBox(_gvt._InTodaysDollars, False)
+        
+        self._testCheckBox(_gvt._SurplusAccount, True)
+        
+        #need to click on checkbox for this assert to work
+        #self.assertTrue(_gvt._SurplusAccountInterestRate.isEnabled())
+        
+        self._testCheckBox(_gvt._SurplusAccount, False)
+        
+        #need to click on checkbox for this assert to work
+        #self.assertFalse(_gvt._SurplusAccountInterestRate.isEnabled())
+        
+        self._testPercent(_gvt._SurplusAccountInterestRate, "2.9")
+        self._testPercent(_gvt._SurplusAccountInterestRate, "")
+        
 if __name__ == "__main__":
     unittest.main()
