@@ -451,43 +451,22 @@ class Projections(QRunnable):
             _spouse_ira_total = 0
             _contribution_total = 0
             for _src in self._Assets:
-                _src.calc_balance()
-                if (
-                    _src.ContributionBeginDate.year <= _year
-                    and _src.ContributionEndDate.year >= _year
-                ):
-                    _src.deposit(_src.Contribution)
-                    _pyd.assetContributions[_src.Name] = _src.Contribution
-                    _contribution_total += _src.Contribution
-                else:
-                    _pyd.assetContributions[_src.Name] = 0
+                _balance, _contribution = _src.calc_balance(year=_year)
+                _pyd.assetContributions[_src.Name] = _contribution
+                _contribution_total += _contribution
 
-                _pyd.assetSources[_src.Name] = _src.Balance
+                _pyd.assetSources[_src.Name] = _balance
 
                 if _src.Type == AccountType.TaxDeferred:
                     if _src.Owner == AccountOwnerType.Client:
-                        _client_ira_total += _src.Balance
+                        _client_ira_total += _balance
                     elif _src.Owner == AccountOwnerType.Spouse:
-                        _spouse_ira_total += _src.Balance
+                        _spouse_ira_total += _balance
 
-                _total += _src.Balance
+                _total += _balance
 
             _pyd.assetTotal = _total
             _pyd.assetContributionTotal = _contribution_total
-
-            # _cash_flow = _income_total - _expense_total - _taxes
-
-            # _total = 0
-            _client_ira_total = 0
-            _spouse_ira_total = 0
-            for _src in self._Assets:
-                #    _balance = _src.calc_balance_by_year(_year)
-                #    #_pyd.assetSources[_src.Name] = _balance
-                if _src.Type == AccountType.TaxDeferred:
-                    if _src.Owner == AccountOwnerType.Client:
-                        _client_ira_total += _src.Balance
-                    elif _src.Owner == AccountOwnerType.Spouse:
-                        _spouse_ira_total += _src.Balance
 
             # do RMD calcs
             _rmd_pct = _clientRMD.calc(date(_year, 12, 31))

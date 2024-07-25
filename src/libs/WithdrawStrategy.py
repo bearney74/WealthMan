@@ -66,7 +66,8 @@ class WithdrawStrategy:
         _dict[AccountType.TaxFree] = 0
         _dict[AccountType.Regular] = 0
         for _asset in self._assets:
-            assert _asset.Balance >= 0
+            if _asset.Balance <= 0:
+                continue
             if _asset.Type in (AccountType.TaxDeferred, AccountType.TaxFree):
                 # need to check that owner is old enough to take withdraw
                 match _asset.Owner:

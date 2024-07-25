@@ -14,7 +14,7 @@ class Account:
         Contribution: int = 0,
         ContributionBeginAge: int = None,
         ContributionEndAge: int = None,
-        COLA: float = 0,
+        COLA: float = 0.0,
     ):
         assert isinstance(Name, str)
         self.Name = Name
@@ -26,10 +26,14 @@ class Account:
         self.Owner = Owner
 
         assert isinstance(Balance, int)
-        self.Balance = Balance
+        self._balance = Balance
 
         assert isinstance(COLA, float)
-        self.COLA = COLA
+        if abs(COLA) >= 1:
+            self.COLA = 1.0 + COLA / 100.0
+        else:
+            self.COLA = 1.0 + COLA
+
 
         if Contribution is None:
             Contribution = 0
@@ -39,27 +43,48 @@ class Account:
         if ContributionEndAge is None:
             ContributionEndAge = 99
 
-        self.ContributionBeginDate = date(
-            BirthDate.year + ContributionBeginAge, BirthDate.month, BirthDate.day
-        )
-        self.ContributionEndDate = date(
-            BirthDate.year + ContributionEndAge, BirthDate.month, BirthDate.day
-        )
+        if BirthDate is not None:
+            assert isinstance(BirthDate, date)
+            self.ContributionBeginDate = date(
+                BirthDate.year + ContributionBeginAge, BirthDate.month, BirthDate.day
+            )
+            self.ContributionEndDate = date(
+                BirthDate.year + ContributionEndAge, BirthDate.month, BirthDate.day
+            )
+        else:
+            self.ContributionBeginDate = None
+            self.ContributionEndDate = None
 
-        # self.AllocationPeriods = []
-        # self.AssetClasses = []
+    @property
+    def Balance(self):
+        return self._balance
+
+    @Balance.setter
+    def Balance(self, amount):
+        self._balance = amount
 
     def deposit(self, amount: int):
         assert isinstance(amount, int)
-        self.Balance += amount
+        self._balance += amount
 
     def withdraw(self, amount: int):
         assert isinstance(amount, int)
-        self.Balance -= amount
+        self._balance -= amount
 
-    def calc_balance(self):
-        self.Balance = int(self.Balance * (1.0 + self.COLA / 100.0))
-        return self.Balance
+    def calc_balance(self, year=None):
+        if self._balance > 0:
+            self._balance = int(self._balance * self.COLA)
+
+        if (
+            self.Contribution > 0
+            and year is not None
+            and year >= self.ContributionBeginDate.year
+            and year <= self.ContributionEndDate.year
+        ):
+            self._balance += self.Contribution
+            return self._balance, self.Contribution
+
+        return self._balance, 0
 
 
 ##  maybe implement Allocation Periods sometime in the future??

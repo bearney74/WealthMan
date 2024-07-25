@@ -1,3 +1,4 @@
+from libs.EnumTypes import FederalTaxStatusType
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,7 +15,7 @@ class ProvisionalIncome:
         self._single = {
             "0": {"Begin": 0, "End": 24999 * mult},
             "50": {"Begin": 25000 * mult, "End": 34000 * mult},
-            "85": {"Begin": 34001 * mult, "End": 999_999_999_999},
+            "85": {"Begin": 34001 * mult, "End": None},
         }
 
         self._single = dict(sorted(self._single.items()))
@@ -22,7 +23,7 @@ class ProvisionalIncome:
         self._married_jointly = {
             "0": {"Begin": 0, "End": 31999 * mult},
             "50": {"Begin": 32000 * mult, "End": 44000 * mult},
-            "85": {"Begin": 44001 * mult, "End": 999_999_999_999},
+            "85": {"Begin": 44001 * mult, "End": None},
         }
         self._married_jointly = dict(sorted(self._married_jointly.items()))
 
@@ -31,23 +32,23 @@ class ProvisionalIncome:
 
     def get_rate(self, provisional_income: int, ss_income: int) -> float:
         _income = provisional_income + 0.5 * ss_income
-        if self._filing_status == "Single":
+        if self._filing_status == FederalTaxStatusType.Single:
             for _rate, _dict in self._single.items():
                 _begin = _dict["Begin"]
                 _end = _dict["End"]
 
-                if _income >= _begin and _income <= _end:
+                if _income >= _dict['Begin'] and (_end is None or _income <= _dict['End']):
                     return float(_rate)
         else:
             for _rate, _dict in self._married_jointly.items():
                 _begin = _dict["Begin"]
                 _end = _dict["End"]
 
-                if _income >= _begin and _income <= _end:
+                if _income >= _dict['Begin'] and (_end is None or _income <= _dict['End']):
                     return float(_rate)
 
         logger.error("We shouldn't get here...")
         logger.error(
             "filing_status=%s, provisonal income = %s, ss_income=%s"
-            % (self.filing_status, provisional_income, ss_income)
+            % (self._filing_status, provisional_income, ss_income)
         )
