@@ -35,7 +35,6 @@ import gc
 import logging
 import unittest
 
-# import time
 import functools
 import sys
 import os
@@ -198,6 +197,10 @@ class TestCaseQt(unittest.TestCase):
             )
 
         if len(widgets) > allowedLeakingWidgets:
+            # for _widget in widgets:
+            #    _ref = weakref.ref(_widget)
+            #    _widget = None
+            #    self.qWaitForDestroy(_ref)
             # TODO: fix me...
             # raise RuntimeError("Test ended with widgets alive: %s" % str(widgets))
             # raise RuntimeError("Test ended with widgets alive: %s" % str(widgets))
