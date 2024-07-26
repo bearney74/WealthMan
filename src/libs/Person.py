@@ -25,7 +25,7 @@ class Person:
         self.relationship = relationship
 
     def calc_date_by_age(self, age: int) -> date:
-        return date(self.birthdate.year + age, self.birthdate.month, self.birthdate.day)
+        return date(self.birthDate.year + age, self.birthDate.month, self.birthDate.day)
 
     def calc_age_by_date(self, dt: date) -> int:
         """returns the number of years between two dates"""

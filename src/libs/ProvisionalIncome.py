@@ -34,20 +34,14 @@ class ProvisionalIncome:
         _income = provisional_income + 0.5 * ss_income
         if self._filing_status == FederalTaxStatusType.Single:
             for _rate, _dict in self._single.items():
-                _begin = _dict["Begin"]
-                _end = _dict["End"]
-
                 if _income >= _dict["Begin"] and (
-                    _end is None or _income <= _dict["End"]
+                    _dict['End'] is None or _income <= _dict["End"]
                 ):
                     return float(_rate)
         else:
             for _rate, _dict in self._married_jointly.items():
-                _begin = _dict["Begin"]
-                _end = _dict["End"]
-
                 if _income >= _dict["Begin"] and (
-                    _end is None or _income <= _dict["End"]
+                    _dict['End'] is None or _income <= _dict["End"]
                 ):
                     return float(_rate)
 
