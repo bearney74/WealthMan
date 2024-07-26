@@ -18,5 +18,9 @@ class FederalPovertyLevel:
             logging.error("FPL family size of '%s' is too large" % family_size)
             self._level = _fpl[4]
 
+    @property
+    def FPL_100Percent(self):
+        return self._level
+
     def calc_percent(self, income):
         return float(int(100.0 * income / self._level))
