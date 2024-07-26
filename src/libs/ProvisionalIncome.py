@@ -37,14 +37,18 @@ class ProvisionalIncome:
                 _begin = _dict["Begin"]
                 _end = _dict["End"]
 
-                if _income >= _dict['Begin'] and (_end is None or _income <= _dict['End']):
+                if _income >= _dict["Begin"] and (
+                    _end is None or _income <= _dict["End"]
+                ):
                     return float(_rate)
         else:
             for _rate, _dict in self._married_jointly.items():
                 _begin = _dict["Begin"]
                 _end = _dict["End"]
 
-                if _income >= _dict['Begin'] and (_end is None or _income <= _dict['End']):
+                if _income >= _dict["Begin"] and (
+                    _end is None or _income <= _dict["End"]
+                ):
                     return float(_rate)
 
         logger.error("We shouldn't get here...")

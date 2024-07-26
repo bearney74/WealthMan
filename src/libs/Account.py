@@ -34,7 +34,6 @@ class Account:
         else:
             self.COLA = 1.0 + COLA
 
-
         if Contribution is None:
             Contribution = 0
         self.Contribution = Contribution

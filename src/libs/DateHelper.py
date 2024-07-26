@@ -33,11 +33,11 @@ class DateHelper:
         if self._end_date is None and self._begin_date is None:
             return 100.0
 
-        #leap years have 366 days while other years have 365...
+        # leap years have 366 days while other years have 365...
         if self._begin_date is not None:
-           _year=self._begin_date.year
+            _year = self._begin_date.year
         elif self._end_date is not None:
-            _year=self._end_date.year
-            
+            _year = self._end_date.year
+
         _diff = date(_year, 12, 31) - date(_year, 1, 1)
         return 100.0 * self.days_in_year() / (_diff.days + 1)
