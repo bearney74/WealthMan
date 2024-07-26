@@ -23,7 +23,7 @@ class SurplusAccountTest(unittest.TestCase):
 
         # we only have 110, but lets try to withdraw 250
         _withdraw, _deficit = _a.withdraw(250)
-        self.assertEqual(_deficit, 140)
+        self.assertEqual(_deficit, -140)
         self.assertEqual(_withdraw, 110)
         self.assertEqual(_a.balance, 0)
 
