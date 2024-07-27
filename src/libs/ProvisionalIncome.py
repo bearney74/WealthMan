@@ -35,13 +35,13 @@ class ProvisionalIncome:
         if self._filing_status == FederalTaxStatusType.Single:
             for _rate, _dict in self._single.items():
                 if _income >= _dict["Begin"] and (
-                    _dict['End'] is None or _income <= _dict["End"]
+                    _dict["End"] is None or _income <= _dict["End"]
                 ):
                     return float(_rate)
         else:
             for _rate, _dict in self._married_jointly.items():
                 if _income >= _dict["Begin"] and (
-                    _dict['End'] is None or _income <= _dict["End"]
+                    _dict["End"] is None or _income <= _dict["End"]
                 ):
                     return float(_rate)
 

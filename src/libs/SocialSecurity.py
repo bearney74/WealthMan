@@ -5,7 +5,9 @@ from libs.Person import Person
 # FRA <= means Full Retirement Age
 
 
-class SocialSecurity:
+#trying to merge this SocialSecurity lib with the one in IncomeSources
+
+class SocialSecurity_bak:
     def __init__(
         self, FRAAmount: int, person: Person, start_date: date = None, COLA: float = 0.0
     ):

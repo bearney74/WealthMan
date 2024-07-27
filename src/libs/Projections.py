@@ -155,6 +155,7 @@ class Projections(QRunnable):
         if dv.clientSSAmount is not None:
             _client_ss = SocialSecurity(
                 Name="Client Social Security",
+                Person=self._client,
                 BirthDate=dv.clientBirthDate,
                 FRAAmount=dv.clientSSAmount,
                 Owner=AccountOwnerType.Client,
@@ -168,6 +169,7 @@ class Projections(QRunnable):
             if dv.spouseSSAmount is not None:
                 _spouse_ss = SocialSecurity(
                     Name="Spouse Social Security",
+                    Person=self._spouse,
                     BirthDate=dv.spouseBirthDate,
                     FRAAmount=dv.spouseSSAmount,
                     Owner=AccountOwnerType.Spouse,
