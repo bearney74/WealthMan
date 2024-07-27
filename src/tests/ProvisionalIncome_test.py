@@ -1,5 +1,4 @@
 import unittest
-from datetime import date
 
 from libs.ProvisionalIncome import ProvisionalIncome
 from libs.EnumTypes import FederalTaxStatusType
