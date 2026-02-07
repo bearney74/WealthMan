@@ -84,6 +84,9 @@ class RMD:
                 # TODO
                 logger.error("RMD for spouses 10 years younger not implemented yet")
 
+    #how do we deal with a death of a person?  Does the RMD amount withdrawn change to
+    #the benefituary or does the RMD schedule stay the same even though transfered?
+    # is there a 10 year limit to the withdraws??  Need to investigate..
     def death_event(self, person):
         if person == self.Person1 and self.Person2 is not None:
             self.Person1 = self.Person2

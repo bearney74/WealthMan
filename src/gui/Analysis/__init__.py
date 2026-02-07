@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget
 
-from .DataTable import DataTableTab
+from .DataTable import DataTableTab, IncomeDataTableTab, ExpenseDataTableTab, \
+                       AssetDataTableTab, TaxDataTableTab
 from .Chart import ChartTab
 from .CustomChart import CustomChartTab
 
@@ -17,12 +18,24 @@ class AnalysisTab(QWidget):
         self.tabs = QTabWidget()
         self.tabs.setTabPosition(QTabWidget.TabPosition.South)
 
+        self.IncomeDataTableTab=IncomeDataTableTab(self)
+        self.ExpenseDataTableTab=ExpenseDataTableTab(self)
+        #Assets
+        self.AssetDataTableTab=AssetDataTableTab(self)
+        
+        #Taxes
+        self.TaxDataTableTab=TaxDataTableTab(self)
+        
         self.DataTableTab = DataTableTab(self)
         self.ChartTab = ChartTab(self)
         self.CustomChartTab = CustomChartTab(self)
 
         self.tabs.currentChanged.connect(self.onTabChange)
         # self.tabs.addTab(QWidget(), "Dashboard")
+        self.tabs.addTab(self.IncomeDataTableTab, "Income Details")
+        self.tabs.addTab(self.ExpenseDataTableTab, "Expense Details")
+        self.tabs.addTab(self.AssetDataTableTab, "Asset Details")
+        self.tabs.addTab(self.TaxDataTableTab, "Tax Details")
         self.tabs.addTab(self.DataTableTab, "Details")
         self.tabs.addTab(self.ChartTab, "Charts")
         self.tabs.addTab(self.CustomChartTab, "Custom Charts")
@@ -35,6 +48,10 @@ class AnalysisTab(QWidget):
     def reset(self):
         self.parent.statusbar.showMessage("updating Analysis GUI")
         # print("creating table")
+        self.IncomeDataTableTab.createTable()
+        self.ExpenseDataTableTab.createTable()
+        self.AssetDataTableTab.createTable()
+        self.TaxDataTableTab.createTable()
         self.DataTableTab.createTable()
         # print("setting categories")
         self.ChartTab.setCategories()

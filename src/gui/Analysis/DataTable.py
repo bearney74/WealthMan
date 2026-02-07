@@ -57,9 +57,9 @@ class InitialDelegate(QStyledItemDelegate):
                 option.text = text
 
 
-class DataTableTab(QWidget):
+class DataTableTabBase(QWidget):
     def __init__(self, parent=None):
-        super(DataTableTab, self).__init__(parent)
+        super(DataTableTabBase, self).__init__(parent)
 
         self.parent = parent
 
@@ -77,22 +77,23 @@ class DataTableTab(QWidget):
         self.setLayout(layout)
 
     # Create table
-    def createTable(self):
-        _header, _vheader, _data = self.parent.tableData.get_data_sheet()
+    def createTable(self, header, data):
+        #_header, _vheader, _data = self.parent.tableData.get_data_sheet()
+        #_header, _data = self.parent.tableData.get_data_sheet()
 
         self.table.setUpdatesEnabled(False)
         # self.table.hide()
-        if len(_data) != self.table.columnCount():
+        if len(data) != self.table.columnCount():
             self.table.clear()
         else:
             self.table.clearContents()  # just clear the data not the headers... (setting headers is slow after first time)
 
-        self.table.setRowCount(len(_data))
-        self.table.setColumnCount(len(_data[0]))
+        self.table.setRowCount(len(data))
+        self.table.setColumnCount(len(data[0]))
 
         # print("populating table..")
         _i = 0
-        for _row in _data:
+        for _row in data:
             _j = 0
             for _col in _row:
                 if isinstance(_col, (float, int)):
@@ -114,10 +115,8 @@ class DataTableTab(QWidget):
         if (
             self.table.horizontalHeaderItem(0) is None
         ):  # check to see if headers are already there..
-            self.table.setHorizontalHeaderLabels(
-                _header
-            )  # bottleneck is here when reloading data... :(
-            self.table.setVerticalHeaderLabels(_vheader)
+            self.table.setHorizontalHeaderLabels(header)  # bottleneck is here when reloading data... :(
+            #self.table.setVerticalHeaderLabels(_vheader)
 
         # print("done populating headers..")
         # Table will fit the screen horizontally
@@ -153,3 +152,43 @@ class DataTableTab(QWidget):
                 _csv.writerow(
                     [self.table.item(_row, _column).text() for _column in _columns]
                 )
+
+class DataTableTab(DataTableTabBase):
+    def __init__(self, parent=None):
+        super(DataTableTab, self).__init__(parent)
+     
+    def createTable(self):
+        _header, _data = self.parent.tableData.get_data_sheet()
+        super(DataTableTab, self).createTable(_header, _data)
+
+class IncomeDataTableTab(DataTableTabBase):
+    def __init__(self, parent=None):
+        super(IncomeDataTableTab, self).__init__(parent)
+     
+    def createTable(self):
+        _header, _data = self.parent.tableData._get_income_data_sheet()
+        super(IncomeDataTableTab, self).createTable(_header, _data)
+
+class ExpenseDataTableTab(DataTableTabBase):
+    def __init__(self, parent=None):
+        super(ExpenseDataTableTab, self).__init__(parent)
+     
+    def createTable(self):
+        _header, _data = self.parent.tableData._get_expense_data_sheet()
+        super(ExpenseDataTableTab, self).createTable(_header, _data)
+        
+class AssetDataTableTab(DataTableTabBase):
+    def __init__(self, parent=None):
+        super(AssetDataTableTab, self).__init__(parent)
+     
+    def createTable(self):
+        _header, _data = self.parent.tableData._get_asset_data_sheet()
+        super(AssetDataTableTab, self).createTable(_header, _data)
+        
+class TaxDataTableTab(DataTableTabBase):
+    def __init__(self, parent=None):
+        super(TaxDataTableTab, self).__init__(parent)
+     
+    def createTable(self):
+        _header, _data = self.parent.tableData._get_tax_data_sheet()
+        super(TaxDataTableTab, self).createTable(_header, _data)

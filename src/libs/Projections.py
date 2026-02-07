@@ -118,6 +118,8 @@ class Projections(QRunnable):
         # can set this to see todays dollars
         self.InTodaysDollars = dv.inTodaysDollars
 
+        self.InputVariables=dv   #these are the variables from the input form.
+
         if dv.inTodaysDollars:
             self._inflation = dv.inflation
         else:
@@ -321,20 +323,6 @@ class Projections(QRunnable):
                 )
             )
 
-        if dv.regularBalance is not None:
-            self._Assets.append(
-                Account(
-                    Name="Regular",
-                    Type=AccountType.Regular,
-                    Owner=AccountOwnerType.Both,
-                    BirthDate=dv.clientBirthDate,
-                    Balance=dv.regularBalance,
-                    COLA=dv.regularCola - self._inflation,
-                    Contribution=dv.regularContribution,
-                    ContributionBeginAge=dv.regularContributionBeginAge,
-                    ContributionEndAge=dv.regularContributionEndAge,
-                )
-            )
 
         if dv.spouseIRABalance is not None:
             self._Assets.append(
@@ -365,6 +353,22 @@ class Projections(QRunnable):
                     ContributionEndAge=dv.spouseRothIRAContributionEndAge,
                 )
             )
+
+        if dv.regularBalance is not None:
+            self._Assets.append(
+                Account(
+                    Name="Regular Taxable",
+                    Type=AccountType.Regular,
+                    Owner=AccountOwnerType.Both,
+                    BirthDate=dv.clientBirthDate,
+                    Balance=dv.regularBalance,
+                    COLA=dv.regularCola - self._inflation,
+                    Contribution=dv.regularContribution,
+                    ContributionBeginAge=dv.regularContributionBeginAge,
+                    ContributionEndAge=dv.regularContributionEndAge,
+                )
+            )
+
 
         self._end_year = self._begin_year + dv.forecastYears
         self._federal_tax_status = dv.federalFilingStatus
@@ -408,6 +412,7 @@ class Projections(QRunnable):
                     _spouseRMD.death_event(self._spouse)
 
             # check to see if client (and spouse) are dead...
+            # if both client (and spouse) are dead, we don't need to calcuate things further for this year
             if not _clientIsAlive:
                 if self._client.relationship == "Single":
                     _projection_data.append(_pyd)
@@ -454,8 +459,10 @@ class Projections(QRunnable):
             _contribution_total = 0
             for _src in self._Assets:
                 _balance, _contribution = _src.calc_balance(year=_year)
-                _pyd.assetContributions[_src.Name] = _contribution
-                _contribution_total += _contribution
+                
+                if _src.Contribution is not None and _src.Contribution != 0:
+                   _pyd.assetContributions[_src.Name] = _contribution
+                   _contribution_total += _contribution
 
                 _pyd.assetSources[_src.Name] = _balance
 
@@ -471,12 +478,13 @@ class Projections(QRunnable):
             _pyd.assetContributionTotal = _contribution_total
 
             # do RMD calcs
-            _rmd_pct = _clientRMD.calc(date(_year, 12, 31))
+            _last_day_of_year=date(_year, 12, 31)
+            _rmd_pct = _clientRMD.calc(_last_day_of_year)
             _pyd.clientRMDPercent = _rmd_pct
             _pyd.clientRMD = int(_rmd_pct / 100.0 * _client_ira_total)
 
             if self._spouse is not None:
-                _rmd_pct = _spouseRMD.calc(date(_year, 12, 31))
+                _rmd_pct = _spouseRMD.calc(_last_day_of_year)
                 _pyd.spouseRMDPercent = _rmd_pct
                 _pyd.spouseRMD = int(_rmd_pct / 100.0 * _spouse_ira_total)
 

@@ -117,6 +117,9 @@ class FederalTax(ImportHelper):
         return 100.0 * taxes / total_income
 
     def marginal_tax_rate(self, taxable_income) -> int:
+        if taxable_income <= self.StandardDeduction:
+            return 0.0
+        _taxable = taxable_income - self.StandardDeduction
         for _rate, _dict in self.Brackets.items():
             _begin = _dict["Begin"]
             _end = _dict["End"]
@@ -124,7 +127,7 @@ class FederalTax(ImportHelper):
                 _begin = 0
             if _end is None:
                 _end = 999_999_999_999
-            if taxable_income >= _begin and taxable_income <= _end:
+            if _taxable >= _begin and _taxable <= _end:
                 return float(_rate)
 
         return None  # we shouldn't get here..
