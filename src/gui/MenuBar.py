@@ -81,6 +81,7 @@ class MenuBar:
         self.parent.InputsTab.BasicInfoTab.import_data(dv)
         self.parent.InputsTab.IncomeInfoTab.import_data(dv)
         self.parent.InputsTab.ExpenseInfoTab.import_data(dv)
+        self.parent.InputsTab.TransferInfoTab.import_data(dv)
         self.parent.InputsTab.AssetInfoTab.import_data(dv)
         self.parent.InputsTab.GlobalVariablesTab.import_data(dv)
 
@@ -100,7 +101,7 @@ class MenuBar:
         self.file_save()
 
     def file_save(self):
-        """this will retrieve the xml from the widgets and will save in an xml file somewhere"""
+        """this will retrieve the inputs from the widgets and will save in an pickle file somewhere"""
 
         logger.debug("save file '%s'" % self._filename)
         if self._filename is None:
@@ -110,12 +111,16 @@ class MenuBar:
         if self._filename == "":
             return
 
+        if not self._filename.endswith(".wmd"):
+            self._filename="%s.wmd" % self._filename
+            
         # for every tab in the inputs, we need to retrieve the fields and put in DataVariables (dv).
         dv = DataVariables()
 
         self.parent.InputsTab.BasicInfoTab.export_data(dv)
         self.parent.InputsTab.IncomeInfoTab.export_data(dv)
         self.parent.InputsTab.ExpenseInfoTab.export_data(dv)
+        self.parent.InputsTab.TransferInfoTab.export_data(dv)
         self.parent.InputsTab.AssetInfoTab.export_data(dv)
         self.parent.InputsTab.GlobalVariablesTab.export_data(dv)
 

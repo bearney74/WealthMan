@@ -18,7 +18,7 @@ from .GlobalVariables import GlobalVariablesTab
 from .IncomeInfo import IncomeInfoTab
 from .AssetInfo import AssetInfoTab
 from .ExpenseInfo import ExpenseInfoTab
-
+from .TransferInfo import TransferInfoTab
 
 class InputsTab(QMainWindow):
     def __init__(self, parent=None):
@@ -40,12 +40,14 @@ class InputsTab(QMainWindow):
         self.IncomeInfoTab = IncomeInfoTab(self, self.BasicInfoTab)
         self.AssetInfoTab = AssetInfoTab(self, self.BasicInfoTab)
         self.ExpenseInfoTab = ExpenseInfoTab(self, self.BasicInfoTab)
+        self.TransferInfoTab = TransferInfoTab(self, self.BasicInfoTab)
         self.GlobalVariablesTab = GlobalVariablesTab(self)
 
         self.tabs.addTab(self.BasicInfoTab, "Basic Info")
         self.tabs.addTab(self.IncomeInfoTab, "Income")
         self.tabs.addTab(self.ExpenseInfoTab, "Expenses")
         self.tabs.addTab(self.AssetInfoTab, "Assets")
+        self.tabs.addTab(self.TransferInfoTab, "Transfers")
         self.tabs.addTab(self.GlobalVariablesTab, "Global Variables")
 
         self.setCentralWidget(self.tabs)
@@ -90,7 +92,8 @@ class InputsTab(QMainWindow):
                         _item.widget(), QComboBox
                     ):  # this is probably a person/owner
                         _item.widget().setEnabled(self.BasicInfoTab.client_is_married())
-
+            case "Transfers":
+                pass
             case "Global Variables":
                 self.GlobalVariablesTab._FilingStatusOnceWidowed.setEnabled(
                     self.BasicInfoTab.client_is_married()
@@ -135,6 +138,7 @@ class InputsTab(QMainWindow):
         self.AssetInfoTab.clear_form()
         self.IncomeInfoTab.clear_form()
         self.ExpenseInfoTab.clear_form()
+        self.TransferInfoTab.clear_form()
         self.GlobalVariablesTab.clear_form()
 
     def create_projection(self):
@@ -144,6 +148,7 @@ class InputsTab(QMainWindow):
         self.IncomeInfoTab.export_data(dv)
         self.ExpenseInfoTab.export_data(dv)
         self.AssetInfoTab.export_data(dv)
+        self.TransferInfoTab.export_data(dv)
         self.GlobalVariablesTab.export_data(dv)
 
         self.parent.statusbar.showMessage("Calculating projections")

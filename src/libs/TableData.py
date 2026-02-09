@@ -176,6 +176,10 @@ class TableData:
             _list.append(_record.assetWithdraw)
 
             if _header_flag:
+                _header.append("Transfers Total")
+            _list.append(_record.transfersTotal)
+
+            if _header_flag:
                 _header.append("Client RMD")
             _list.append(_record.clientRMD)
 

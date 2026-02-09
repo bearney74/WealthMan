@@ -19,6 +19,7 @@ from .Person import Person
 from .ProvisionalIncome import ProvisionalIncome
 from .RequiredMinimalDistributions import RMD
 from .SurplusAccount import SurplusAccount
+from .TransferAsset import TransferAssets
 from .WithdrawStrategy import WithdrawStrategy
 
 import logging
@@ -91,6 +92,8 @@ class ProjectionYearData:
         self.assetSources: dict = {}
         self.assetContributions: dict = {}
         self.assetTotal: int = 0
+
+        self.transferTotals: int = 0
 
         # required Minimal distributions
         self.clientRMD: int = 0
@@ -297,7 +300,7 @@ class Projections(QRunnable):
         if dv.clientIRABalance is not None:
             self._Assets.append(
                 Account(
-                    Name="Client IRA",
+                    Name="Client Trad IRA",
                     Type=AccountType.TaxDeferred,
                     Owner=AccountOwnerType.Client,
                     BirthDate=dv.clientBirthDate,
@@ -327,7 +330,7 @@ class Projections(QRunnable):
         if dv.spouseIRABalance is not None:
             self._Assets.append(
                 Account(
-                    Name="Spouse IRA",
+                    Name="Spouse Trad IRA",
                     Type=AccountType.TaxDeferred,
                     Owner=AccountOwnerType.Spouse,
                     Balance=dv.spouseIRABalance,
@@ -355,6 +358,8 @@ class Projections(QRunnable):
             )
 
         if dv.regularBalance is not None:
+            if dv.regularCola is None:
+                dv.regularCola=0
             self._Assets.append(
                 Account(
                     Name="Regular Taxable",
@@ -369,6 +374,71 @@ class Projections(QRunnable):
                 )
             )
 
+
+        #put transfer stuff here.. if an account does not exist, create it and add it to the
+        #self._Assets variable...
+        self._Transfers=[]
+        for _transfer in dv.transfers:
+            #identify the source and target assets.
+            #make sure the source and target assets are in the self._Assets list, if not, create
+            #the asset there with a balance of 0.  #what COLA (interest rate) should we use?
+            _src_acct=None
+            _tgt_acct=None
+            for _asset in self._Assets:
+                if _asset.Name == _transfer.src_acct:
+                    _src_acct=_asset
+                elif _asset.Name == _transfer.tgt_acct:
+                    _tgt_acct=_asset
+            
+            #check to see if source or target have not been found... if no asset exists create it.
+            # and set src_acct or tgt_acct to the newly created asset.
+            for _acct in (_src_acct, _tgt_acct):
+                if  _acct is None:
+                    _owner=None
+                    if _transfer.src_account.contains("Trad IRA"):
+                       _type=AccountType.TradIRA
+                    elif _transfer.src_account.contains("Roth"):
+                       _type=AccountType.RothIRA
+                    else:
+                       _type=AccountType.Regular
+                       _owner=AccountOwnerType.Both
+                    
+                    if _owner is None:
+                       if _transfer.src_account.contains("Client"):
+                          _owner=AccountOwnerType.Client
+                          _birthdt=dv.clientBirthdate
+                       elif _transfer.src_account.contains("Spouse"):
+                          _owner=AccountOwnerType.Spouse
+                          _birthdt=dv.spouseBirthdate
+                        
+                    
+                    _new_acct=Account(Name=_transfer.src_acct,
+                                      Type=_type,
+                                      Owner=_owner,
+                                      BirthDate=_birthdt,
+                                      Balance=0,
+                                      COLA=0    #assume this grows at the rate of inflation
+                    )
+                    
+                    if _src_acct is None:
+                        _src_acct=_new_acct
+                    else:
+                        _tgt_acct=_new_acct
+                        
+                    self._Assets.append(_new_acct)
+            #create a transfer object, which contains the source and target assets as well as
+            #the amount to transfer, Cola, and the begin and end years.
+            #maybe look at adding a variable to see if we should do the transfer at the beginning
+            #of the period or at the end. (I don't know if this really makes a difference).
+
+            if _transfer.person == "Client":
+                _person=self._client
+            elif _tranfer.person == "Spouse":
+                _person=self._spouse
+            self._Transfers.append(TransferAssets(_transfer.descr, _src_acct, _tgt_acct,
+                                                  _transfer.amount, _transfer.COLA,
+                                                  _person,
+                                                  _transfer.beginAge, _transfer.endAge))
 
         self._end_year = self._begin_year + dv.forecastYears
         self._federal_tax_status = dv.federalFilingStatus
@@ -476,6 +546,11 @@ class Projections(QRunnable):
 
             _pyd.assetTotal = _total
             _pyd.assetContributionTotal = _contribution_total
+
+            #do transfers between accounts
+            for _tran in self._Transfers:
+                _tran.do_transfer(_year)
+                _pyd.transfersTotal=_tran.transferred_amount
 
             # do RMD calcs
             _last_day_of_year=date(_year, 12, 31)

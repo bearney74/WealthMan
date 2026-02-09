@@ -91,6 +91,15 @@ class AgeEntry(IntegerEntry):
         self.setValidator(IntRangeValidator(self, min, max))
 
 
+class YearEntry(IntegerEntry):
+    def __init__(self, parent=None, min=1920, max=2099):
+        super(YearEntry, self).__init__(parent=parent)
+
+        self.parent = parent
+        self.setFixedWidth(60)
+        self.setValidator(IntRangeValidator(self, min, max))
+
+
 class MoneyEntry(IntegerEntry):
     # parts copied from https://github.com/yjg30737/pyqt-number-lineedit/blob/main/pyqt_number_lineedit/numberLineEdit.py
     def __init__(self, parent=None):
@@ -186,6 +195,29 @@ class PercentEntry(FloatEntry):
         _dv.setNotation(QDoubleValidator.Notation.StandardNotation)
         self.setValidator(_dv)
 
+
+class PersonTypeEntry(QWidget):
+    def __init__(self, parent):
+        super(PersonTypeEntry, self).__init__(parent)
+
+        _layout = QHBoxLayout()
+        self._widget = QComboBox()
+        self._widget.addItems(["Client", "Spouse"])
+                
+        _layout.addWidget(self._widget)
+        self.setLayout(_layout)
+
+
+    def set(self, person):
+        assert isinstance(person, str)
+        assert person in ("Client", "Spouse")
+        self._widget.setCurrentText("%s" % person)
+
+    def get(self):
+        return self._widget.currentText()
+
+    def clear(self):
+        self._widget.setCurrentText("Client")
 
 class DateEntry(QWidget):
     def __init__(self, parent):

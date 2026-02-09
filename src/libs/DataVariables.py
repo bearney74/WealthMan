@@ -57,6 +57,32 @@ class ExpenseRecord(BaseRecord):
         )
 
 
+class TransferRecord:
+    def __init__(self, descr, src_acct, tgt_acct, amount, COLA, person, beginAge, endAge):
+        assert isinstance(descr, str)
+        self.descr=descr
+        
+        assert isinstance(src_acct, str)
+        self.src_acct=src_acct
+        
+        assert isinstance(tgt_acct, str)
+        self.tgt_acct=tgt_acct
+        
+        assert isinstance(amount, int)
+        self.amount=amount
+
+        assert isinstance(COLA, float)
+        self.COLA=COLA
+        
+        assert isinstance(person, str)
+        self.person=person
+        
+        assert isinstance(beginAge, int)
+        self.beginAge=beginAge
+        
+        assert isinstance(endAge, int)
+        self.endAge=endAge
+        
 class DataVariables:
     def __init__(self):
         self.__version__ = APP_VERSION
@@ -100,6 +126,9 @@ class DataVariables:
 
         # Expense Sources
         self.expenses: [ExpenseRecord] = []
+        
+        # Transfers from one asset to another
+        self.transfers: [TransferRecord] = []
 
         # Assets
         self.clientIRABalance: int = None
