@@ -1,7 +1,6 @@
 import urllib.request
-from bs4 import BeautifulSoup
-import datetime
-import csv
+#from bs4 import BeautifulSoup
+#import datetime
 
 def get_data():
     _url="https://www.slickcharts.com/sp500/returns/history.csv"

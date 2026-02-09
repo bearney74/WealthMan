@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt
 from gui.guihelpers.Entry import MoneyEntry, PercentEntry, AgeEntry, PersonTypeEntry
 
 from libs.DataVariables import DataVariables, TransferRecord
-from libs.EnumTypes import AccountOwnerType
+#from libs.EnumTypes import AccountOwnerType
 
 
 class TransferInfoTab(QWidget):

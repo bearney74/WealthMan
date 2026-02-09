@@ -433,7 +433,7 @@ class Projections(QRunnable):
 
             if _transfer.person == "Client":
                 _person=self._client
-            elif _tranfer.person == "Spouse":
+            elif _transfer.person == "Spouse":
                 _person=self._spouse
             self._Transfers.append(TransferAssets(_transfer.descr, _src_acct, _tgt_acct,
                                                   _transfer.amount, _transfer.COLA,
