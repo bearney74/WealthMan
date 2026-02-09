@@ -1,7 +1,8 @@
 [![codecov](https://codecov.io/github/bearney74/WealthMan/graph/badge.svg?token=HEIDX9MMDN)](https://codecov.io/github/bearney74/WealthMan)
 
 # WealthMan
-This is a desktop application for financial planning.
+This is a desktop application for Wealth Management.  This program generates simulations of future asset growth.
+I am not a Certified Financial Planner (CFP), so take all results from this program with a grain of salt.
 
 ## Description
 Users can enter basic personal information, income sources, expenses, and basic 
