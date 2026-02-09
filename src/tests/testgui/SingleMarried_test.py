@@ -45,7 +45,7 @@ class SingleMarried(TestCaseQt):
         self.assertFalse(self.IncomeInfoTab.pension2OwnerLabel.isEnabled())
         self.assertFalse(self.IncomeInfoTab.pension2Owner.isEnabled())
 
-        self.form.InputsTab.tabs.setCurrentIndex(4)  # select Global tab
+        self.form.InputsTab.tabs.setCurrentIndex(5)  # select Global tab
         self.assertFalse(self.GlobalVariablesTab._FilingStatusOnceWidowed.isEnabled())
 
         # change status to Married...
