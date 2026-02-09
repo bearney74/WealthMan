@@ -66,7 +66,7 @@ class SingleMarried(TestCaseQt):
         self.assertTrue(self.IncomeInfoTab.pension2OwnerLabel.isEnabled())
         self.assertTrue(self.IncomeInfoTab.pension2Owner.isEnabled())
 
-        self.form.InputsTab.tabs.setCurrentIndex(4)  # select Global tab
+        self.form.InputsTab.tabs.setCurrentIndex(5)  # select Global tab
         self.assertTrue(self.GlobalVariablesTab._FilingStatusOnceWidowed.isEnabled())
 
 
