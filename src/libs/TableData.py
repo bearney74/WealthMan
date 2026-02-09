@@ -25,10 +25,10 @@ class TableData:
     def get_data_sheet(self):
         if self.data is None:
             #self.categories, self.vheader, self.data = self._get_data_sheet()
-            self.categories, self.data = self._get_data_sheet()
+            self.categories, self.vheader, self.data = self._get_data_sheet()
             #self.categories = [_x.replace("\n", " ") for _x in self.categories]
 
-        return self.categories, self.data
+        return self.categories, self.vheader, self.data
 
     def _calc_ages(self, rec):
         _ages = ""
@@ -49,6 +49,7 @@ class TableData:
 
     def _get_expense_data_sheet(self):
         _header = ["Year", "Age(s)"]
+        _vheader=[]
         _data = []
 
         for _record in self.projectionData:
@@ -60,6 +61,7 @@ class TableData:
 
             _header_flag = _data == []
             _list = [_record.projectionYear, self._calc_ages(_record)]
+            _vheader.append("%s:%s" % (_record.projectionYear, self._calc_ages(_record)))
             
             for _name, _balance in _record.expenseSources.items():
                 if _header_flag:
@@ -71,10 +73,11 @@ class TableData:
             _list.append(_record.expenseTotal)
 
             _data.append(_list)
-        return _header, _data
+        return _header, _vheader, _data
 
     def _get_income_data_sheet(self):
         _header = ["Year", "Ages(s)"]
+        _vheader=[]
         _data = []
 
         for _record in self.projectionData:
@@ -86,6 +89,7 @@ class TableData:
 
             _header_flag = _data == []
             _list = [_record.projectionYear, self._calc_ages(_record)]
+            _vheader.append("%s:%s" % (_record.projectionYear, self._calc_ages(_record)))
             
             for _name, _balance in _record.incomeSources.items():
                 if _header_flag:
@@ -118,10 +122,11 @@ class TableData:
 
             _data.append(_list)
 
-        return _header, _data
+        return _header, _vheader, _data
 
     def _get_asset_data_sheet(self):
         _header = ["Year", "Age(s)"]
+        _vheader=[]
         _data = []
 
         for _record in self.projectionData:
@@ -133,7 +138,8 @@ class TableData:
 
             _header_flag = _data == []
             _list = [_record.projectionYear, self._calc_ages(_record)]
-
+            _vheader.append("%s:%s" % (_record.projectionYear, self._calc_ages(_record)))
+            
             for _name, _balance in _record.assetSources.items():
                 if _header_flag:
                     _header.append(_name)
@@ -206,10 +212,11 @@ class TableData:
 
             _data.append(_list)
 
-        return _header, _data
+        return _header, _vheader, _data
 
     def _get_tax_data_sheet(self):
         _header = ["Year", "Age(s)"]
+        _vheader=[]
         _data = []
 
         for _record in self.projectionData:
@@ -221,6 +228,7 @@ class TableData:
 
             _header_flag = _data == []
             _list = [_record.projectionYear, self._calc_ages(_record)]
+            _vheader.append("%s:%s" % (_record.projectionYear, self._calc_ages(_record)))
             
             if _header_flag:
                 _header.append("SS Taxable Income")
@@ -273,11 +281,12 @@ class TableData:
 
             _data.append(_list)
 
-        return _header, _data
+        return _header, _vheader, _data
 
         
     def _get_data_sheet(self):
         _header = ["Year", "Age(s)"]
+        _vheader=[]
         _data = []
 
         for _record in self.projectionData:
@@ -289,7 +298,8 @@ class TableData:
 
             _header_flag = _data == []
             _list = [_record.projectionYear, self._calc_ages(_record)]
-
+            _vheader.append("%s:%s" % (_record.projectionYear, self._calc_ages(_record)))
+            
             #for _name, _balance in _record.incomeSources.items():
             #    if _header_flag:
             #        _header.append(_name)
@@ -436,4 +446,4 @@ class TableData:
 
             _data.append(_list)
 
-        return _header, _data
+        return _header, _vheader, _data

@@ -100,7 +100,6 @@ class TransferInfoTab(QWidget):
         assert self.gridLayout.count() == 0
 
     def export_data(self, d: DataVariables):
-        print("TransferInfo.export_data")
         _row = self.gridLayout.count() // 8
         for _i in range(1, _row):
             _item = self.gridLayout.itemAtPosition(_i, 0)
@@ -131,15 +130,12 @@ class TransferInfoTab(QWidget):
                 TransferRecord(_descr, _src_acct, _tgt_acct, _amount, _cola, _person, _beginYear, _endYear)
             )
             
-        print(d.transfers)
-
+        
     def import_data(self, d: DataVariables):
-        print("TransferInfo.import_data", d.transfers)
         for _record in d.transfers:
             self.add_row()
 
             _i = (self.gridLayout.count() // 8 ) - 1
-            print(self.gridLayout.count(), _i)
             _item = self.gridLayout.itemAtPosition(_i, 0)
             _item.widget().setText(_record.descr)
 
