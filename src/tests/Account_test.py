@@ -1,7 +1,7 @@
 import unittest
 from datetime import date
 
-from libs.Account import Account
+from libs.Account import Account, TraditionalIRA, RothIRA, Brokerage
 from libs.EnumTypes import AccountType, AccountOwnerType
 
 
@@ -19,8 +19,10 @@ class AccountTest(unittest.TestCase):
         _a.calc_balance()  # no year set.. no Contribution set, Cola=0 etc..  should return unmodified balance
         self.assertEqual(_a.Balance, 100)
 
-    def test_AccountCOLA(self):
-        _a = Account("Cola", AccountType.Regular, AccountOwnerType.Client, COLA=0.1)
+    def test_AccountInterestRate(self):
+        _a = Account(
+            "Cola", AccountType.Regular, AccountOwnerType.Client, InterestRate=0.1
+        )
         _a.deposit(500)
         self.assertEqual(_a.Balance, 500)
 
@@ -48,7 +50,7 @@ class AccountTest(unittest.TestCase):
             Contribution=1000,
             ContributionBeginAge=20,
             ContributionEndAge=30,
-            COLA=0.1,
+            InterestRate=0.1,
         )
 
         # balance is 0
@@ -64,6 +66,54 @@ class AccountTest(unittest.TestCase):
             _total = int(_total * 1.1)
             _total += 1000
             self.assertEqual(_a.Balance, _total)
+
+
+class TraditionalIRATest(unittest.TestCase):
+    def test_basic(self):
+        _a = TraditionalIRA(
+            "basic",
+            Owner=AccountOwnerType.Client,
+            BirthDate=date(2000, 1, 1),
+            Balance=1000.0,
+        )
+        _a.deposit(500)
+        _a.withdraw(300)
+        self.assertEqual(_a.Balance, 200)
+        self.assertEqual(_a.taxable_income, 300)
+        self.assertEqual(_a.ltcg_income, 0)
+
+
+class RothIRATest(unittest.TestCase):
+    def test_basic(self):
+        _a = RothIRA(
+            "basic",
+            Owner=AccountOwnerType.Client,
+            BirthDate=date(2000, 1, 1),
+            Balance=1000.0,
+        )
+        _a.deposit(500)
+        _a.withdraw(300)
+        self.assertEqual(_a.Balance, 200)
+        self.assertEqual(_a.taxable_income, 0)
+        self.assertEqual(_a.ltcg_income, 0)
+
+
+class BrokerageTest(unittest.TestCase):
+    def test_basic(self):
+        _a = BrokerageIRA(
+            "basic",
+            Owner=AccountOwnerType.Client,
+            BirthDate=date(2000, 1, 1),
+            Balance=1000.0,
+        )
+        _a.deposit(500)
+        _a.withdraw(300)
+        self.assertEqual(_a.Balance, 200)
+        self.assertEqual(_a.taxable_income, 0)
+        self.assertEqual(
+            _a.ltcg_income, 300
+        )  # 300 probably isn't right for LTCG, but will have
+        # to work for now.
 
 
 if __name__ == "__main__":
