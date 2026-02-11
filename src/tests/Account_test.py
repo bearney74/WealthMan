@@ -74,11 +74,11 @@ class TraditionalIRATest(unittest.TestCase):
             "basic",
             Owner=AccountOwnerType.Client,
             BirthDate=date(2000, 1, 1),
-            Balance=1000.0,
+            Balance=1000,
         )
         _a.deposit(500)
         _a.withdraw(300)
-        self.assertEqual(_a.Balance, 200)
+        self.assertEqual(_a.Balance, 1200)
         self.assertEqual(_a.taxable_income, 300)
         self.assertEqual(_a.ltcg_income, 0)
 
@@ -89,11 +89,11 @@ class RothIRATest(unittest.TestCase):
             "basic",
             Owner=AccountOwnerType.Client,
             BirthDate=date(2000, 1, 1),
-            Balance=1000.0,
+            Balance=1000,
         )
         _a.deposit(500)
         _a.withdraw(300)
-        self.assertEqual(_a.Balance, 200)
+        self.assertEqual(_a.Balance, 1200)
         self.assertEqual(_a.taxable_income, 0)
         self.assertEqual(_a.ltcg_income, 0)
 
@@ -104,11 +104,11 @@ class BrokerageTest(unittest.TestCase):
             "basic",
             Owner=AccountOwnerType.Client,
             BirthDate=date(2000, 1, 1),
-            Balance=1000.0,
+            Balance=1000,
         )
         _a.deposit(500)
         _a.withdraw(300)
-        self.assertEqual(_a.Balance, 200)
+        self.assertEqual(_a.Balance, 1200)
         self.assertEqual(_a.taxable_income, 0)
         self.assertEqual(
             _a.ltcg_income, 300
