@@ -112,8 +112,8 @@ class MenuBar:
             return
 
         if not self._filename.endswith(".wmd"):
-            self._filename="%s.wmd" % self._filename
-            
+            self._filename = "%s.wmd" % self._filename
+
         # for every tab in the inputs, we need to retrieve the fields and put in DataVariables (dv).
         dv = DataVariables()
 

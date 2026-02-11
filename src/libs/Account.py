@@ -14,7 +14,7 @@ class Account:
         Contribution: int = 0,
         ContributionBeginAge: int = None,
         ContributionEndAge: int = None,
-        COLA: float = 0.0,
+        InterestRate: float = 0.0,
     ):
         assert isinstance(Name, str)
         self.Name = Name
@@ -25,14 +25,21 @@ class Account:
         assert isinstance(Owner, AccountOwnerType)
         self.Owner = Owner
 
-        assert isinstance(Balance, int)
-        self._balance = Balance
-
-        assert isinstance(COLA, float)
-        if abs(COLA) >= 1:
-            self.COLA = 1.0 + COLA / 100.0
+        assert isinstance(Balance, (int, None))
+        if Balance is None:
+            self._balance = 0
         else:
-            self.COLA = 1.0 + COLA
+            self._balance = Balance
+
+        assert isinstance(InterestRate, float)
+        if abs(InterestRate) >= 1:
+            self.InterestRate = 1.0 + InterestRate / 100.0
+        else:
+            self.InterestRate = 1.0 + InterestRate
+
+        self._taxable_income: int = 0
+        self._ltcg_taxable: int = 0
+        # for now we will treat short term capital gains like taxable income (maybe they r the same?)
 
         if Contribution is None:
             Contribution = 0
@@ -62,17 +69,35 @@ class Account:
     def Balance(self, amount):
         self._balance = amount
 
+    @property
+    def ltcg_income(self):
+        return self._ltcg_income
+
+    @ltcg_income.setter
+    def ltcg_income(self, value):
+        self._ltcg_income = value
+
+    @property
+    def taxable_income(self):
+        return self._taxable_income
+
+    @taxable_income.setter
+    def taxable_income(self, value):
+        self._taxable_income = value
+
     def deposit(self, amount: int):
         assert isinstance(amount, int)
         self._balance += amount
 
     def withdraw(self, amount: int):
         assert isinstance(amount, int)
+        assert self._balance >= amount
+
         self._balance -= amount
 
     def calc_balance(self, year=None):
         if self._balance > 0:
-            self._balance = int(self._balance * self.COLA)
+            self._balance = int(self._balance * self.InterestRate)
 
         if (
             self.Contribution > 0
@@ -86,159 +111,107 @@ class Account:
         return self._balance, 0
 
 
-##  maybe implement Allocation Periods sometime in the future??
-# todo delete stuff below this line
-"""
-    def set_AllocationPeriods(self, periods):
-        assert len(periods) > 0
-        # sort periods by begin and end dates..
-        self.AllocationPeriods = periods
-        _mindate = date(2000, 1, 1)
-        self.AllocationPeriods = sorted(periods, key=lambda x: x.BeginDate or _mindate)
-
-    def set_AssetClasses(self, classes):
-        assert len(classes) > 0
-
-        self.AssetClasses = classes
-
-    def calc_balance_by_year(self, year) -> int:
-        # find the appropriate allocation period...
-        if self.COLA is not None:
-            self.Balance *= 1.0 + self.COLA / 100.0
-            return int(self.Balance)
-
-        _ap = self._get_correct_allocation_period(year)
-        assert isinstance(_ap, AllocationPeriod)
-
-        _ac = self._get_assetclass_period(year)
-        assert isinstance(_ac, AssetClassPeriod)
-
-        _balance_stocks = int(
-            self.Balance
-            * _ap.PercentStocks
-            / 100.0
-            * (1.0 + _ac.StockAssetClass.RateOfReturn / 100.0)
-        )
-        _balance_bonds = int(
-            self.Balance
-            * _ap.PercentBonds
-            / 100.0
-            * (1.0 + _ac.BondAssetClass.RateOfReturn / 100.0)
-        )
-        _balance_money_market = int(
-            self.Balance
-            * _ap.PercentMoneyMarket
-            / 100.0
-            * (1.0 + _ac.MoneyMarketAssetClass.RateOfReturn / 100.0)
-        )
-
-        self.Balance = _balance_stocks + _balance_bonds + _balance_money_market
-        return self.Balance
-        
-    def _get_correct_allocation_period(self, year):
-        for _ap in self.AllocationPeriods:
-            if (
-                _ap.BeginDate is None and _ap.EndDate is None
-            ):  # this period has no begin or end dated (ie, all years are valid)
-                return _ap
-            if _ap.BeginDate is None:  # no begin date (ie, begins at beginning of time)
-                if year <= _ap.EndDate.year:
-                    return _ap
-            if _ap.EndDate is None:  # no end date (ie, ends at the end of time)
-                if _ap.BeginDate.year <= year:
-                    return _ap
-            if _ap.BeginDate is not None and _ap.EndDate is not None:
-                if _ap.BeginDate.year <= year <= _ap.EndDate.year:
-                    return _ap
-
-        assert False, "We don't have a valid allocation period for year %s" % year
-
-    def _get_assetclass_period(self, year):
-        for _ac in self.AssetClasses:
-            if (
-                _ac.BeginDate is None and _ac.EndDate is None
-            ):  # this period has no begin or end dated (ie, all years are valid)
-                return _ac
-            if _ac.BeginDate is None:  # no begin date (ie, begins at beginning of time)
-                if year <= _ac.EndDate.year:
-                    return _ac
-            if _ac.EndDate is None:  # no end date (ie, ends at the end of time)
-                if _ac.BeginDate.year <= year:
-                    return _ac
-            if _ac.BeginDate is not None and _ac.EndDate is not None:
-                if _ac.BeginDate.year <= year <= _ac.EndDate.year:
-                    return _ac
-
-        print("An AssetClass for year '%s' has not been defined" % year)
-
-
-class AllocationPeriod:
+class TraditionalIRA(Account):
     def __init__(
         self,
-        Name: str,
-        BeginDate: date,
-        EndDate: date,
-        PercentStocks: float,
-        PercentBonds: float,
-        PercentMoneyMarket: float,
+        Name,
+        Owner,
+        BirthDate,
+        Balance,
+        InterestRate,
+        Contribution,
+        ContributionBeginAge,
+        ContributionEndAge,
     ):
-        assert isinstance(Name, str)
-        self.Name = Name
-
-        assert BeginDate is None or isinstance(BeginDate, date)
-        self.BeginDate = BeginDate
-
-        assert EndDate is None or isinstance(EndDate, date)
-        self.EndDate = EndDate
-
-        assert isinstance(PercentStocks, (int, float))
-        self.PercentStocks = PercentStocks
-
-        assert isinstance(PercentBonds, (int, float))
-        self.PercentBonds = PercentBonds
-
-        assert isinstance(PercentMoneyMarket, (int, float))
-        self.PercentMoneyMarket = PercentMoneyMarket
-
-        # percent should add up to 100 (or pretty close)
-        assert (
-            99.0
-            < self.PercentStocks + self.PercentBonds + self.PercentMoneyMarket
-            <= 100.0
+        super(TraditionalIRA, self).__init__(
+            Name=Name,
+            Owner=Owner,
+            Type=AccountType.TaxDeferred,
+            BirthDate=BirthDate,
+            Balance=Balance,
+            InterestRate=InterestRate,
+            Contribution=Contribution,
+            ContributionBeginAge=ContributionBeginAge,
+            ContributionEndAge=ContributionEndAge,
         )
+        self.ltcg_income = 0  # assuming this is always 0 for Traditional IRA
+
+    def withdraw(self, amount: int):
+        super().withdraw(amount)
+
+        self._taxable_income = amount
+
+    def calc_balance(self, year=None):
+        self._taxable_income = 0
+
+        return super().calc_balance(year)
 
 
-class AssetClass:
-    def __init__(self, RateOfReturn: float, StandardDeviation: float):
-        assert isinstance(RateOfReturn, float)
-        self.RateOfReturn = RateOfReturn
-
-        assert isinstance(StandardDeviation, float)
-        self.StandardDeviation = StandardDeviation
-
-
-class AssetClassPeriod:
+class RothIRA(Account):
     def __init__(
         self,
-        StockAssetClass,
-        BondAssetClass,
-        MoneyMarketAssetClass,
-        BeginDate=None,
-        EndDate=None,
+        Name,
+        Owner,
+        BirthDate,
+        Balance,
+        InterestRate,
+        Contribution,
+        ContributionBeginAge,
+        ContributionEndAge,
     ):
-        assert isinstance(StockAssetClass, AssetClass)
-        self.StockAssetClass = StockAssetClass
+        super(RothIRA, self).__init__(
+            Name=Name,
+            Owner=Owner,
+            Type=AccountType.TaxFree,
+            BirthDate=BirthDate,
+            Balance=Balance,
+            InterestRate=InterestRate,
+            Contribution=Contribution,
+            ContributionBeginAge=ContributionBeginAge,
+            ContributionEndAge=ContributionEndAge,
+        )
+        self.ltcg_income = 0  # assuming this is always 0
+        self.taxable_income = 0  # assuming this is always 0
 
-        assert isinstance(BondAssetClass, AssetClass)
-        self.BondAssetClass = BondAssetClass
 
-        assert isinstance(MoneyMarketAssetClass, AssetClass)
-        self.MoneyMarketAssetClass = MoneyMarketAssetClass
+# Regular Brokerage Account
+class Brokerage(Account):
+    def __init__(
+        self,
+        Name,
+        Owner,
+        BirthDate,
+        Balance,
+        InterestRate,
+        Contribution,
+        ContributionBeginAge,
+        ContributionEndAge,
+    ):
+        super(Brokerage, self).__init__(
+            Name=Name,
+            Owner=Owner,
+            Type=AccountType.Regular,
+            BirthDate=BirthDate,
+            Balance=Balance,
+            InterestRate=InterestRate,
+            Contribution=Contribution,
+            ContributionBeginAge=ContributionBeginAge,
+            ContributionEndAge=ContributionEndAge,
+        )
+        self.ltcg_income = 0  # will be interest on balance?
+        self.taxable_income = 0  # assuming this is always 0
 
-        assert BeginDate is None or isinstance(BeginDate, date)
-        self.BeginDate = BeginDate
+    def withdraw(self, amount):
+        super().withdraw(amount)
 
-        assert EndDate is None or isinstance(EndDate, date)
-        self.EndDate = EndDate
+        # assume the worst.. assume all withdrawn has to be long term capital gains
+        # maybe find a way to change this so it doesn't have to be the full amount?
+        self.ltcg_income = amount
+        self.taxable_income = 0
 
-"""
+    def calc_balance(self, year=None):
+        # calculate the interest.. (ie, taxable income)
+        self.ltcg_income = 0
+        self.taxable_income = int(self._balance * (self.InterestRate - 1.0))
+
+        return super().calc_balance(year)

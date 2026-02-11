@@ -1,7 +1,12 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget
 
-from .DataTable import DataTableTab, IncomeDataTableTab, ExpenseDataTableTab, \
-                       AssetDataTableTab, TaxDataTableTab
+from .DataTable import (
+    DataTableTab,
+    IncomeDataTableTab,
+    ExpenseDataTableTab,
+    AssetDataTableTab,
+    TaxDataTableTab,
+)
 from .Chart import ChartTab
 from .CustomChart import CustomChartTab
 
@@ -18,14 +23,14 @@ class AnalysisTab(QWidget):
         self.tabs = QTabWidget()
         self.tabs.setTabPosition(QTabWidget.TabPosition.South)
 
-        self.IncomeDataTableTab=IncomeDataTableTab(self)
-        self.ExpenseDataTableTab=ExpenseDataTableTab(self)
-        #Assets
-        self.AssetDataTableTab=AssetDataTableTab(self)
-        
-        #Taxes
-        self.TaxDataTableTab=TaxDataTableTab(self)
-        
+        self.IncomeDataTableTab = IncomeDataTableTab(self)
+        self.ExpenseDataTableTab = ExpenseDataTableTab(self)
+        # Assets
+        self.AssetDataTableTab = AssetDataTableTab(self)
+
+        # Taxes
+        self.TaxDataTableTab = TaxDataTableTab(self)
+
         self.DataTableTab = DataTableTab(self)
         self.ChartTab = ChartTab(self)
         self.CustomChartTab = CustomChartTab(self)

@@ -78,8 +78,8 @@ class DataTableTabBase(QWidget):
 
     # Create table
     def createTable(self, header, vheader, data):
-        #_header, _vheader, _data = self.parent.tableData.get_data_sheet()
-        #_header, _data = self.parent.tableData.get_data_sheet()
+        # _header, _vheader, _data = self.parent.tableData.get_data_sheet()
+        # _header, _data = self.parent.tableData.get_data_sheet()
 
         self.table.setUpdatesEnabled(False)
         # self.table.hide()
@@ -115,7 +115,9 @@ class DataTableTabBase(QWidget):
         if (
             self.table.horizontalHeaderItem(0) is None
         ):  # check to see if headers are already there..
-            self.table.setHorizontalHeaderLabels(header)  # bottleneck is here when reloading data... :(
+            self.table.setHorizontalHeaderLabels(
+                header
+            )  # bottleneck is here when reloading data... :(
             self.table.setVerticalHeaderLabels(vheader)
 
         # print("done populating headers..")
@@ -153,42 +155,47 @@ class DataTableTabBase(QWidget):
                     [self.table.item(_row, _column).text() for _column in _columns]
                 )
 
+
 class DataTableTab(DataTableTabBase):
     def __init__(self, parent=None):
         super(DataTableTab, self).__init__(parent)
-     
+
     def createTable(self):
         _header, _vheader, _data = self.parent.tableData.get_data_sheet()
         super(DataTableTab, self).createTable(_header, _vheader, _data)
 
+
 class IncomeDataTableTab(DataTableTabBase):
     def __init__(self, parent=None):
         super(IncomeDataTableTab, self).__init__(parent)
-     
+
     def createTable(self):
         _header, _vheader, _data = self.parent.tableData._get_income_data_sheet()
         super(IncomeDataTableTab, self).createTable(_header, _vheader, _data)
 
+
 class ExpenseDataTableTab(DataTableTabBase):
     def __init__(self, parent=None):
         super(ExpenseDataTableTab, self).__init__(parent)
-     
+
     def createTable(self):
         _header, _vheader, _data = self.parent.tableData._get_expense_data_sheet()
         super(ExpenseDataTableTab, self).createTable(_header, _vheader, _data)
-        
+
+
 class AssetDataTableTab(DataTableTabBase):
     def __init__(self, parent=None):
         super(AssetDataTableTab, self).__init__(parent)
-     
+
     def createTable(self):
         _header, _vheader, _data = self.parent.tableData._get_asset_data_sheet()
         super(AssetDataTableTab, self).createTable(_header, _vheader, _data)
-        
+
+
 class TaxDataTableTab(DataTableTabBase):
     def __init__(self, parent=None):
         super(TaxDataTableTab, self).__init__(parent)
-     
+
     def createTable(self):
         _header, _vheader, _data = self.parent.tableData._get_tax_data_sheet()
         super(TaxDataTableTab, self).createTable(_header, _vheader, _data)

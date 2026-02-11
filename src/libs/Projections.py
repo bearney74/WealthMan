@@ -2,7 +2,7 @@ from datetime import datetime, date
 
 from PyQt6.QtCore import QRunnable, QObject, pyqtSignal, pyqtSlot
 
-from .Account import Account
+from .Account import TraditionalIRA, RothIRA, Brokerage
 from .DataVariables import DataVariables
 from .EnumTypes import (
     AccountType,
@@ -61,6 +61,7 @@ class ProjectionYearData:
         self.spouseIsAlive: bool = None
 
         self.incomeSources: dict = {}  # key is Name, #value is income
+        self.taxableIncomeTotal: int = 0
         self.incomeTotal: int = 0
         self.FPL: float = 0.0
 
@@ -121,7 +122,7 @@ class Projections(QRunnable):
         # can set this to see todays dollars
         self.InTodaysDollars = dv.inTodaysDollars
 
-        self.InputVariables=dv   #these are the variables from the input form.
+        self.InputVariables = dv  # these are the variables from the input form.
 
         if dv.inTodaysDollars:
             self._inflation = dv.inflation
@@ -297,148 +298,134 @@ class Projections(QRunnable):
                     )
 
         self._Assets = []
-        if dv.clientIRABalance is not None:
-            self._Assets.append(
-                Account(
-                    Name="Client Trad IRA",
-                    Type=AccountType.TaxDeferred,
-                    Owner=AccountOwnerType.Client,
-                    BirthDate=dv.clientBirthDate,
-                    Balance=dv.clientIRABalance,
-                    COLA=dv.clientIRACola - self._inflation,
-                    Contribution=dv.clientIRAContribution,
-                    ContributionBeginAge=dv.clientIRAContributionBeginAge,
-                    ContributionEndAge=dv.clientIRAContributionEndAge,
-                )
+
+        if dv.clientIRACola is None:
+            _interest = -self._inflation
+        else:
+            _interest = dv.clientIRACola - self._inflation
+
+        self._Assets.append(
+            TraditionalIRA(
+                Name="Client Trad IRA",
+                Owner=AccountOwnerType.Client,
+                BirthDate=dv.clientBirthDate,
+                Balance=dv.clientIRABalance,
+                InterestRate=_interest,
+                Contribution=dv.clientIRAContribution,
+                ContributionBeginAge=dv.clientIRAContributionBeginAge,
+                ContributionEndAge=dv.clientIRAContributionEndAge,
             )
-        if dv.clientRothIRABalance is not None:
-            self._Assets.append(
-                Account(
-                    Name="Client Roth IRA",
-                    Type=AccountType.TaxFree,
-                    Owner=AccountOwnerType.Client,
-                    BirthDate=dv.clientBirthDate,
-                    Balance=dv.clientRothIRABalance,
-                    COLA=dv.clientRothIRACola - self._inflation,
-                    Contribution=dv.clientRothIRAContribution,
-                    ContributionBeginAge=dv.clientRothIRAContributionBeginAge,
-                    ContributionEndAge=dv.clientRothIRAContributionEndAge,
-                )
+        )
+
+        if dv.clientRothIRACola is None:
+            _interest = -self._inflation
+        else:
+            _interest = dv.clientRothIRACola - self._inflation
+
+        self._Assets.append(
+            RothIRA(
+                Name="Client Roth IRA",
+                Owner=AccountOwnerType.Client,
+                BirthDate=dv.clientBirthDate,
+                Balance=dv.clientRothIRABalance,
+                InterestRate=_interest,
+                Contribution=dv.clientRothIRAContribution,
+                ContributionBeginAge=dv.clientRothIRAContributionBeginAge,
+                ContributionEndAge=dv.clientRothIRAContributionEndAge,
             )
+        )
 
+        if dv.spouseIRACola is None:
+            _interest = -self._inflation
+        else:
+            _interest = dv.spouseIRACola - self._inflation
 
-        if dv.spouseIRABalance is not None:
-            self._Assets.append(
-                Account(
-                    Name="Spouse Trad IRA",
-                    Type=AccountType.TaxDeferred,
-                    Owner=AccountOwnerType.Spouse,
-                    Balance=dv.spouseIRABalance,
-                    BirthDate=dv.spouseBirthDate,
-                    COLA=dv.spouseIRACola - self._inflation,
-                    Contribution=dv.spouseIRAContribution,
-                    ContributionBeginAge=dv.spouseIRAContributionBeginAge,
-                    ContributionEndAge=dv.spouseIRAContributionEndAge,
-                )
+        self._Assets.append(
+            TraditionalIRA(
+                Name="Spouse Trad IRA",
+                Owner=AccountOwnerType.Spouse,
+                Balance=dv.spouseIRABalance,
+                BirthDate=dv.spouseBirthDate,
+                InterestRate=_interest,
+                Contribution=dv.spouseIRAContribution,
+                ContributionBeginAge=dv.spouseIRAContributionBeginAge,
+                ContributionEndAge=dv.spouseIRAContributionEndAge,
             )
+        )
 
-        if dv.spouseRothIRABalance is not None:
-            self._Assets.append(
-                Account(
-                    Name="Spouse Roth IRA",
-                    Type=AccountType.TaxFree,
-                    Owner=AccountOwnerType.Spouse,
-                    BirthDate=dv.spouseBirthDate,
-                    Balance=dv.spouseRothIRABalance,
-                    COLA=dv.spouseRothIRACola - self._inflation,
-                    Contribution=dv.spouseRothIRAContribution,
-                    ContributionBeginAge=dv.spouseRothIRAContributionBeginAge,
-                    ContributionEndAge=dv.spouseRothIRAContributionEndAge,
-                )
+        if dv.spouseRothIRACola is None:
+            _interest = -self._inflation
+        else:
+            _interest = dv.spouseRothIRACola - self._inflation
+        self._Assets.append(
+            RothIRA(
+                Name="Spouse Roth IRA",
+                Owner=AccountOwnerType.Spouse,
+                BirthDate=dv.spouseBirthDate,
+                Balance=dv.spouseRothIRABalance,
+                InterestRate=_interest,
+                Contribution=dv.spouseRothIRAContribution,
+                ContributionBeginAge=dv.spouseRothIRAContributionBeginAge,
+                ContributionEndAge=dv.spouseRothIRAContributionEndAge,
             )
+        )
 
-        if dv.regularBalance is not None:
-            if dv.regularCola is None:
-                dv.regularCola=0
-            self._Assets.append(
-                Account(
-                    Name="Regular Taxable",
-                    Type=AccountType.Regular,
-                    Owner=AccountOwnerType.Both,
-                    BirthDate=dv.clientBirthDate,
-                    Balance=dv.regularBalance,
-                    COLA=dv.regularCola - self._inflation,
-                    Contribution=dv.regularContribution,
-                    ContributionBeginAge=dv.regularContributionBeginAge,
-                    ContributionEndAge=dv.regularContributionEndAge,
-                )
+        if dv.regularCola is None:
+            _interest = -self._inflation
+        else:
+            _interest = dv.regularCola - self._inflation
+        self._Assets.append(
+            Brokerage(
+                Name="Regular Taxable",
+                Owner=AccountOwnerType.Both,
+                BirthDate=dv.clientBirthDate,
+                Balance=dv.regularBalance,
+                InterestRate=_interest,
+                Contribution=dv.regularContribution,
+                ContributionBeginAge=dv.regularContributionBeginAge,
+                ContributionEndAge=dv.regularContributionEndAge,
             )
+        )
 
-
-        #put transfer stuff here.. if an account does not exist, create it and add it to the
-        #self._Assets variable...
-        self._Transfers=[]
+        # put transfer stuff here.. if an account does not exist, create it and add it to the
+        # self._Assets variable...
+        self._Transfers = []
         for _transfer in dv.transfers:
-            #identify the source and target assets.
-            #make sure the source and target assets are in the self._Assets list, if not, create
-            #the asset there with a balance of 0.  #what COLA (interest rate) should we use?
-            _src_acct=None
-            _tgt_acct=None
+            # identify the source and target assets.
+            # make sure the source and target assets are in the self._Assets list, if not, create
+            # the asset there with a balance of 0.  #what COLA (interest rate) should we use?
+            _src_acct = None
+            _tgt_acct = None
             for _asset in self._Assets:
                 if _asset.Name == _transfer.src_acct:
-                    _src_acct=_asset
+                    _src_acct = _asset
                 elif _asset.Name == _transfer.tgt_acct:
-                    _tgt_acct=_asset
-            
-            #check to see if source or target have not been found... if no asset exists create it.
-            # and set src_acct or tgt_acct to the newly created asset.
-            for _acct in (_src_acct, _tgt_acct):
-                if  _acct is None:
-                    _owner=None
-                    if _transfer.src_account.contains("Trad IRA"):
-                       _type=AccountType.TradIRA
-                    elif _transfer.src_account.contains("Roth"):
-                       _type=AccountType.RothIRA
-                    else:
-                       _type=AccountType.Regular
-                       _owner=AccountOwnerType.Both
-                    
-                    if _owner is None:
-                       if _transfer.src_account.contains("Client"):
-                          _owner=AccountOwnerType.Client
-                          _birthdt=dv.clientBirthdate
-                       elif _transfer.src_account.contains("Spouse"):
-                          _owner=AccountOwnerType.Spouse
-                          _birthdt=dv.spouseBirthdate
-                        
-                    
-                    _new_acct=Account(Name=_transfer.src_acct,
-                                      Type=_type,
-                                      Owner=_owner,
-                                      BirthDate=_birthdt,
-                                      Balance=0,
-                                      COLA=0    #assume this grows at the rate of inflation
-                    )
-                    
-                    if _src_acct is None:
-                        _src_acct=_new_acct
-                    else:
-                        _tgt_acct=_new_acct
-                        
-                    self._Assets.append(_new_acct)
-            #create a transfer object, which contains the source and target assets as well as
-            #the amount to transfer, Cola, and the begin and end years.
-            #maybe look at adding a variable to see if we should do the transfer at the beginning
-            #of the period or at the end. (I don't know if this really makes a difference).
+                    _tgt_acct = _asset
+
+            assert _src_acct is not None
+            assert _tgt_acct is not None
+
+            # create a transfer object, which contains the source and target assets as well as
+            # the amount to transfer, interest, and the begin and end years.
+            # maybe look at adding a variable to see if we should do the transfer at the beginning
+            # of the period or at the end. (I don't know if this really makes a difference).
 
             if _transfer.person == "Client":
-                _person=self._client
+                _person = self._client
             elif _transfer.person == "Spouse":
-                _person=self._spouse
-            self._Transfers.append(TransferAssets(_transfer.descr, _src_acct, _tgt_acct,
-                                                  _transfer.amount, _transfer.COLA,
-                                                  _person,
-                                                  _transfer.beginAge, _transfer.endAge))
+                _person = self._spouse
+            self._Transfers.append(
+                TransferAssets(
+                    _transfer.descr,
+                    _src_acct,
+                    _tgt_acct,
+                    _transfer.amount,
+                    _transfer.COLA,
+                    _person,
+                    _transfer.beginAge,
+                    _transfer.endAge,
+                )
+            )
 
         self._end_year = self._begin_year + dv.forecastYears
         self._federal_tax_status = dv.federalFilingStatus
@@ -498,6 +485,7 @@ class Projections(QRunnable):
             else:
                 _pyd.federalTaxFilingStatus = self._federal_tax_status
 
+            _taxable_income_total = 0
             _income_total = 0
             _ss_income_total = 0
             for _src in self._IncomeSources:
@@ -511,6 +499,7 @@ class Projections(QRunnable):
                 _pyd.incomeSources[_src.Name] = _income
 
                 _income_total += _income  # _src.calc_income_by_year(_year)
+                _taxable_income_total += _income
 
             # _pyd.incomeTotal = _income_total
             _pyd.ssIncomeTotal = _ss_income_total
@@ -529,10 +518,10 @@ class Projections(QRunnable):
             _contribution_total = 0
             for _src in self._Assets:
                 _balance, _contribution = _src.calc_balance(year=_year)
-                
+
                 if _src.Contribution is not None and _src.Contribution != 0:
-                   _pyd.assetContributions[_src.Name] = _contribution
-                   _contribution_total += _contribution
+                    _pyd.assetContributions[_src.Name] = _contribution
+                    _contribution_total += _contribution
 
                 _pyd.assetSources[_src.Name] = _balance
 
@@ -547,13 +536,14 @@ class Projections(QRunnable):
             _pyd.assetTotal = _total
             _pyd.assetContributionTotal = _contribution_total
 
-            #do transfers between accounts
+            # do transfers between accounts
             for _tran in self._Transfers:
                 _tran.do_transfer(_year)
-                _pyd.transfersTotal=_tran.transferred_amount
+                _pyd.transfersTotal = _tran.transferred_amount
+                _taxable_income_total += _tran.taxable_income
 
             # do RMD calcs
-            _last_day_of_year=date(_year, 12, 31)
+            _last_day_of_year = date(_year, 12, 31)
             _rmd_pct = _clientRMD.calc(_last_day_of_year)
             _pyd.clientRMDPercent = _rmd_pct
             _pyd.clientRMD = int(_rmd_pct / 100.0 * _client_ira_total)
@@ -621,6 +611,7 @@ class Projections(QRunnable):
                 }  # no withdraws...
                 # _income_total = 0
 
+            _pyd.taxableIncomeTotal = _taxable_income_total
             _pyd.incomeTotal = _income_total
 
             # _pyd.assetWithdraw=0

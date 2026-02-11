@@ -20,6 +20,7 @@ from .AssetInfo import AssetInfoTab
 from .ExpenseInfo import ExpenseInfoTab
 from .TransferInfo import TransferInfoTab
 
+
 class InputsTab(QMainWindow):
     def __init__(self, parent=None):
         super(InputsTab, self).__init__(parent)

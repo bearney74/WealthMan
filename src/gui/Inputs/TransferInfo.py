@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt
 from gui.guihelpers.Entry import MoneyEntry, PercentEntry, AgeEntry, PersonTypeEntry
 
 from libs.DataVariables import DataVariables, TransferRecord
-#from libs.EnumTypes import AccountOwnerType
+# from libs.EnumTypes import AccountOwnerType
 
 
 class TransferInfoTab(QWidget):
@@ -34,11 +34,10 @@ class TransferInfoTab(QWidget):
 
     def add_row(self):
         if self.gridLayout.count() == 0:
-            
             self.gridLayout.addWidget(QLabel("Transfer Name"), 0, 0)
             self.gridLayout.addWidget(QLabel("Source Account"), 0, 1)
             self.gridLayout.addWidget(QLabel("Target Account"), 0, 2)
-            
+
             self.gridLayout.addWidget(QLabel("Annual Amount"), 0, 3)
             _temp = QLabel("Annual\nPercent\nIncrease", wordWrap=True)
             self.gridLayout.addWidget(_temp, 0, 4)
@@ -52,38 +51,35 @@ class TransferInfoTab(QWidget):
         _descr.setMaximumWidth(300)
         self.gridLayout.addWidget(_descr, _len, 0)
 
-        _accounts=["Client Trad IRA",
-                   "Client Roth IRA"]
+        _accounts = ["Client Trad IRA", "Client Roth IRA"]
         if self.BasicInfoTab.client_is_married():
-           _accounts+=[
-                   "Spouse Trad IRA",
-                   "Spouse Roth IRA"]
-    
-        _accounts+=["Regular Taxable"]
-        
-        #put Select Box here for Source Account
-        _src_acct=QComboBox()
+            _accounts += ["Spouse Trad IRA", "Spouse Roth IRA"]
+
+        _accounts += ["Regular Taxable"]
+
+        # put Select Box here for Source Account
+        _src_acct = QComboBox()
         _src_acct.addItems(_accounts)
         self.gridLayout.addWidget(_src_acct, _len, 1)
-        
-        #put Select Box here for Target Account
-        _tgt_acct=QComboBox()
+
+        # put Select Box here for Target Account
+        _tgt_acct = QComboBox()
         _tgt_acct.addItems(_accounts)
         self.gridLayout.addWidget(_tgt_acct, _len, 2)
-        
-        #Amount
+
+        # Amount
         self.gridLayout.addWidget(MoneyEntry(self.parent), _len, 3)
-        
-        #COLA
+
+        # COLA
         self.gridLayout.addWidget(PercentEntry(self.parent), _len, 4)
 
-        #person (Client, Spouse)
+        # person (Client, Spouse)
         self.gridLayout.addWidget(PersonTypeEntry(self.parent), _len, 5)
-        
-        #beginAge
+
+        # beginAge
         self.gridLayout.addWidget(AgeEntry(self.parent), _len, 6)
 
-        #endAge
+        # endAge
         self.gridLayout.addWidget(AgeEntry(self.parent), _len, 7)
 
     def clear_form(self):
@@ -107,7 +103,7 @@ class TransferInfoTab(QWidget):
 
             _item = self.gridLayout.itemAtPosition(_i, 1)
             _src_acct = _item.widget().currentText()
- 
+
             _item = self.gridLayout.itemAtPosition(_i, 2)
             _tgt_acct = _item.widget().currentText()
 
@@ -119,7 +115,7 @@ class TransferInfoTab(QWidget):
 
             _item = self.gridLayout.itemAtPosition(_i, 5)
             _person = _item.widget().get()
- 
+
             _item = self.gridLayout.itemAtPosition(_i, 6)
             _beginYear = _item.widget().get_int()
 
@@ -127,15 +123,23 @@ class TransferInfoTab(QWidget):
             _endYear = _item.widget().get_int()
 
             d.transfers.append(
-                TransferRecord(_descr, _src_acct, _tgt_acct, _amount, _cola, _person, _beginYear, _endYear)
+                TransferRecord(
+                    _descr,
+                    _src_acct,
+                    _tgt_acct,
+                    _amount,
+                    _cola,
+                    _person,
+                    _beginYear,
+                    _endYear,
+                )
             )
-            
-        
+
     def import_data(self, d: DataVariables):
         for _record in d.transfers:
             self.add_row()
 
-            _i = (self.gridLayout.count() // 8 ) - 1
+            _i = (self.gridLayout.count() // 8) - 1
             _item = self.gridLayout.itemAtPosition(_i, 0)
             _item.widget().setText(_record.descr)
 
@@ -151,7 +155,7 @@ class TransferInfoTab(QWidget):
             _item = self.gridLayout.itemAtPosition(_i, 4)
             _item.widget().setText(_record.COLA)
 
-            #person
+            # person
             _item = self.gridLayout.itemAtPosition(_i, 5)
             _item.widget().set(_record.person)
 

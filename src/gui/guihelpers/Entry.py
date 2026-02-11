@@ -203,10 +203,9 @@ class PersonTypeEntry(QWidget):
         _layout = QHBoxLayout()
         self._widget = QComboBox()
         self._widget.addItems(["Client", "Spouse"])
-                
+
         _layout.addWidget(self._widget)
         self.setLayout(_layout)
-
 
     def set(self, person):
         assert isinstance(person, str)
@@ -218,6 +217,7 @@ class PersonTypeEntry(QWidget):
 
     def clear(self):
         self._widget.setCurrentText("Client")
+
 
 class DateEntry(QWidget):
     def __init__(self, parent):
