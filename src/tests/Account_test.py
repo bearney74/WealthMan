@@ -100,7 +100,7 @@ class RothIRATest(unittest.TestCase):
 
 class BrokerageTest(unittest.TestCase):
     def test_basic(self):
-        _a = BrokerageIRA(
+        _a = Brokerage(
             "basic",
             Owner=AccountOwnerType.Client,
             BirthDate=date(2000, 1, 1),
