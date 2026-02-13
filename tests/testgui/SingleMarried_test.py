@@ -1,6 +1,7 @@
 import unittest
 
 import sys
+
 sys.path.append("src")
 
 from libs.EnumTypes import RelationStatus

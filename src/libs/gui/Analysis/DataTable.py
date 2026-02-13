@@ -16,7 +16,6 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor, QAction, QIcon
 
 from libs.Projections import DataItem
-from libs.EnumTypes import FederalTaxStatusType
 import logging
 
 logger = logging.getLogger(__name__)

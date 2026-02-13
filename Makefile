@@ -1,4 +1,5 @@
 ruff:
+	ruff check
 	ruff format
 
 unittest: unittests
