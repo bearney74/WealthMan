@@ -3,7 +3,12 @@ from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QComboBox
 
 from PyQt6.QtCore import Qt
 
-from gui.guihelpers.Entry import MoneyEntry, PercentEntry, AgeEntry, PersonTypeEntry
+from libs.gui.guihelpers.Entry import (
+    MoneyEntry,
+    PercentEntry,
+    AgeEntry,
+    PersonTypeEntry,
+)
 
 from libs.DataVariables import DataVariables, TransferRecord
 # from libs.EnumTypes import AccountOwnerType

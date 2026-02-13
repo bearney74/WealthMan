@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QComboBox, QCheckBox
 
-from gui.guihelpers.Entry import AgeEntry, PercentEntry
+from libs.gui.guihelpers.Entry import AgeEntry, PercentEntry
 
 from libs.DataVariables import DataVariables
 from libs.EnumTypes import FederalTaxStatusType

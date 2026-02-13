@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor, QAction, QIcon
 
+from libs.Projections import DataItem
 from libs.EnumTypes import FederalTaxStatusType
 import logging
 
@@ -24,7 +25,6 @@ logger = logging.getLogger(__name__)
 class InitialDelegate(QStyledItemDelegate):
     def __init__(self, parent=None):
         super().__init__(parent)
-        # self.nDecimals = decimals
 
     def initStyleOption(self, option, index):
         super().initStyleOption(option, index)
@@ -34,27 +34,39 @@ class InitialDelegate(QStyledItemDelegate):
         text = index.model().data(index, Qt.ItemDataRole.DisplayRole)
         if text is None:
             option.text = ""
-        elif FederalTaxStatusType.has_member(text):
-            option.text = text
-        elif "%" in text:
-            option.text = text
         else:
-            try:
-                if text.strip() == "":
-                    option.text = ""
-                elif "." in text:
-                    number = float(text)
-                    option.text = f"{number:.1f}%"
-                else:
-                    number = int(text)
-                    if number < 0:
-                        option.text = f"(${number:,d})"
-                    else:
-                        option.text = f"${number:,d}"
-            except Exception as e:
-                logger.error(e)
-                print(e)
-                option.text = text
+            option.text = text
+        # if text is None:
+        #    option.text = ""
+        # if isinstance(text, DataItem):
+        #    option.text=str(text)
+        #    print(text)
+        # elif isinstance(text, str):
+        #    option.text=text
+        # elif text is None:
+        #    option.text=""
+        # elif FederalTaxStatusType.has_member(text):
+        #    option.text = text
+        # elif "%" in text:
+        #    option.text = text
+        # else:
+        #    try:
+        #        if text.strip() == "":
+        #            option.text = ""
+        #        elif "." in text:
+        #            number = float(text)
+        #            option.text = f"{number:.1f}%"
+        #        else:
+        #            number = int(text)
+        #            if number < 0:
+        #                option.text = f"(${number:,d})"
+        #            else:
+        #                option.text = f"${number:,d}"
+        #    except Exception as e:
+        #        logger.error(e)
+        #        print("DataTable.py:58: %s" % e)
+        #        print(type(text))
+        #        option.text = text
 
 
 class DataTableTabBase(QWidget):
@@ -96,16 +108,25 @@ class DataTableTabBase(QWidget):
         for _row in data:
             _j = 0
             for _col in _row:
-                if isinstance(_col, (float, int)):
-                    _col = str(_col)
-                    _value = QTableWidgetItem(_col)
-                    if _col.strip().startswith("-"):
+                _value = QTableWidgetItem(str(_col))
+                if isinstance(_col, DataItem):
+                    # _value=QTableWidgetItem(str(_col))
+                    if _col.data < 0:
                         _value.setForeground(QBrush(QColor(255, 0, 0)))
-                    self.table.setItem(_i, _j, _value)
                 elif isinstance(_col, Enum):
-                    self.table.setItem(_i, _j, QTableWidgetItem(_col.name))
-                else:
-                    self.table.setItem(_i, _j, QTableWidgetItem(_col))
+                    _value = QTableWidgetItem(_col.name)
+                self.table.setItem(_i, _j, _value)
+
+                # if isinstance(_col, (float, int)):
+                #    _col = str(_col)
+                #    _value = QTableWidgetItem(_col)
+                #    if _col.strip().startswith("-"):
+                #        _value.setForeground(QBrush(QColor(255, 0, 0)))
+                #    self.table.setItem(_i, _j, _value)
+                # elif isinstance(_col, Enum):
+                #    self.table.setItem(_i, _j, QTableWidgetItem(_col.name))
+                # else:
+                #    self.table.setItem(_i, _j, QTableWidgetItem(_col))
                 _j += 1
             _i += 1
 

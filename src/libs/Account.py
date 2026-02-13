@@ -112,15 +112,17 @@ class Account:
 
 
 class TraditionalIRA(Account):
-    def __init__(self,
-                 Name: str,
-                 Owner: AccountOwnerType,
-                 BirthDate: date = None,
-                 Balance: int = 0,
-                 InterestRate: float = 0.0,
-                 Contribution: int = 0,
-                 ContributionBeginAge: int = None,
-                 ContributionEndAge: int = None):
+    def __init__(
+        self,
+        Name: str,
+        Owner: AccountOwnerType,
+        BirthDate: date = None,
+        Balance: int = 0,
+        InterestRate: float = 0.0,
+        Contribution: int = 0,
+        ContributionBeginAge: int = None,
+        ContributionEndAge: int = None,
+    ):
         super(TraditionalIRA, self).__init__(
             Name=Name,
             Owner=Owner,
@@ -130,7 +132,7 @@ class TraditionalIRA(Account):
             InterestRate=InterestRate,
             Contribution=Contribution,
             ContributionBeginAge=ContributionBeginAge,
-            ContributionEndAge=ContributionEndAge
+            ContributionEndAge=ContributionEndAge,
         )
         self.ltcg_income = 0  # assuming this is always 0 for Traditional IRA
 
@@ -146,16 +148,17 @@ class TraditionalIRA(Account):
 
 
 class RothIRA(Account):
-    def __init__(self,
-                 Name: str,
-                 Owner: AccountOwnerType,
-                 BirthDate: date = None,
-                 Balance: int = 0,
-                 InterestRate: float = 0.0,
-                 Contribution: int = 0,
-                 ContributionBeginAge: int = None,
-                 ContributionEndAge: int = None
-        ):
+    def __init__(
+        self,
+        Name: str,
+        Owner: AccountOwnerType,
+        BirthDate: date = None,
+        Balance: int = 0,
+        InterestRate: float = 0.0,
+        Contribution: int = 0,
+        ContributionBeginAge: int = None,
+        ContributionEndAge: int = None,
+    ):
         super(RothIRA, self).__init__(
             Name=Name,
             Owner=Owner,
@@ -165,7 +168,7 @@ class RothIRA(Account):
             InterestRate=InterestRate,
             Contribution=Contribution,
             ContributionBeginAge=ContributionBeginAge,
-            ContributionEndAge=ContributionEndAge
+            ContributionEndAge=ContributionEndAge,
         )
         self.ltcg_income = 0  # assuming this is always 0
         self.taxable_income = 0  # assuming this is always 0
@@ -176,14 +179,14 @@ class Brokerage(Account):
     def __init__(
         self,
         Name: str,
-                 Owner: AccountOwnerType,
-                 BirthDate: date = None,
-                 Balance: int = 0,
-                 InterestRate: float = 0.0,
-                 Contribution: int = 0,
-                 ContributionBeginAge: int = None,
-                 ContributionEndAge: int = None
-        ):
+        Owner: AccountOwnerType,
+        BirthDate: date = None,
+        Balance: int = 0,
+        InterestRate: float = 0.0,
+        Contribution: int = 0,
+        ContributionBeginAge: int = None,
+        ContributionEndAge: int = None,
+    ):
         super(Brokerage, self).__init__(
             Name=Name,
             Owner=Owner,
@@ -193,7 +196,7 @@ class Brokerage(Account):
             InterestRate=InterestRate,
             Contribution=Contribution,
             ContributionBeginAge=ContributionBeginAge,
-            ContributionEndAge=ContributionEndAge
+            ContributionEndAge=ContributionEndAge,
         )
         self.ltcg_income = 0  # will be interest on balance?
         self.taxable_income = 0  # assuming this is always 0

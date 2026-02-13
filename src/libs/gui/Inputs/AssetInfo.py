@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
 
-from gui.guihelpers.Entry import MoneyEntry, PercentEntry, AgeEntry
+from libs.gui.guihelpers.Entry import MoneyEntry, PercentEntry, AgeEntry
 
 from libs.DataVariables import DataVariables
 

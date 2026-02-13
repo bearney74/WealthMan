@@ -1,4 +1,4 @@
-from libs.EnumTypes import FederalTaxStatusType
+from .EnumTypes import FederalTaxStatusType
 import logging
 
 logger = logging.getLogger(__name__)

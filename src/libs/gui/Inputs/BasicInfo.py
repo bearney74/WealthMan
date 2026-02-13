@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
     QComboBox,
 )
 
-from gui.guihelpers.Entry import AgeEntry, DateEntry
+from libs.gui.guihelpers.Entry import AgeEntry, DateEntry
 from libs.EnumTypes import RelationStatus
 from libs.DataVariables import DataVariables
 

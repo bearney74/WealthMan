@@ -137,11 +137,11 @@ class CustomChartTab(QWidget):
                     _years.append(_record.projectionYear)
 
                 for _name, _value in _record.assetSources.items():
-                    _data[_name].append(_value)
+                    _data[_name].append(_value.data)
 
-                if _record.surplusBalance > 0:
+                if _record.surplusBalance.data > 0:
                     _surplus_flag = True
-                _data["Surplus"].append(_record.surplusBalance)
+                _data["Surplus"].append(_record.surplusBalance.data)
 
         if (
             not _surplus_flag
@@ -165,7 +165,7 @@ class CustomChartTab(QWidget):
                     _years.append(_record.projectionYear)
 
                 for _name, _value in _record.incomeSources.items():
-                    _data[_name].append(_value)
+                    _data[_name].append(_value.data)
 
         self.chart.setTitle("Income Totals")
         if self.parent.tableData.InTodaysDollars:
@@ -186,7 +186,7 @@ class CustomChartTab(QWidget):
                     _years.append(_record.projectionYear)
 
                 for _name, _value in _record.assetContributions.items():
-                    _data[_name].append(_value)
+                    _data[_name].append(_value.data)
 
         self.chart.setTitle("Asset Contribution Totals")
         if self.parent.tableData.InTodaysDollars:

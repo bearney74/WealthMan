@@ -12,21 +12,17 @@ class TableData:
         self.vheader = None
         self.data = None
         self.InTodaysDollars = InTodaysDollars
-        # print(UseSurplusAccount)
         self.UseSurplusAccount = UseSurplusAccount
 
     def getCategories(self):
         if self.categories is None:
             self.categories, self.vheader, self.data = self._get_data_sheet()
-            # self.categories = [_x.replace("\n", " ") for _x in self.categories]
 
         return self.categories
 
     def get_data_sheet(self):
         if self.data is None:
-            # self.categories, self.vheader, self.data = self._get_data_sheet()
             self.categories, self.vheader, self.data = self._get_data_sheet()
-            # self.categories = [_x.replace("\n", " ") for _x in self.categories]
 
         return self.categories, self.vheader, self.data
 
@@ -238,8 +234,10 @@ class TableData:
             )
 
             if _header_flag:
-                _header.append("Taxable Income")
-            _list.append(_record.taxableIncomeTotal)
+                # _header.append("Taxable Income")
+                _header.append(_record.taxableIncomeTotal.header)
+            _list.append(str(_record.taxableIncomeTotal))
+            # _list.append(_record.taxableIncomeTotal)
 
             if _header_flag:
                 _header.append("SS Taxable Income")
@@ -274,9 +272,9 @@ class TableData:
                 _header.append("This Years Federal Taxes")
             _list.append(_record.thisYearsFederalTaxes)
 
-            if _header_flag:
-                _header.append("Taxable Income")
-            _list.append(_record.taxableIncome)
+            # if _header_flag:
+            #    _header.append("Taxable Income")
+            # _list.append(_record.taxableIncome)
 
             if _header_flag:
                 _header.append("Long Term Capital Gains")
@@ -322,8 +320,9 @@ class TableData:
             _list.append(_record.incomeTotal)
 
             if _header_flag:
-                _header.append("FPL")
-            _list.append(_record.FPL)
+                # _header.append("FPL")
+                _header.append(_record.FPL.header)
+            _list.append(str(_record.FPL))
 
             # if _header_flag:
             #    _header.append("SS Income Total")

@@ -9,6 +9,8 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 
+from ...Projections import DataItem
+
 
 class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
@@ -127,7 +129,10 @@ class ChartTab(QWidget):
         _data = []
         _year = datetime.now().year  # should we get this somewhere else?
         for _list in self.parent.tableData.data:
-            _data.append((_year, _list[_ndx]))
+            if isinstance(_list[_ndx], DataItem):
+                _data.append((_year, _list[_ndx].data))
+            else:
+                _data.append((_year, _list[_ndx]))
             _year += 1
 
         _category = self.variables.currentText()
