@@ -1,7 +1,7 @@
 import unittest
 
-from libs.ProvisionalIncome import ProvisionalIncome
-from libs.EnumTypes import FederalTaxStatusType
+from src.libs.ProvisionalIncome import ProvisionalIncome
+from src.libs.EnumTypes import FederalTaxStatusType
 
 
 class ProvisionalIncomeTest(unittest.TestCase):

@@ -1,6 +1,6 @@
 import unittest
 
-from libs.SurplusAccount import SurplusAccount
+from src.libs.SurplusAccount import SurplusAccount
 
 
 class SurplusAccountTest(unittest.TestCase):

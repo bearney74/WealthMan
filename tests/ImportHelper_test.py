@@ -1,7 +1,7 @@
 import unittest
 from datetime import date
 
-from libs.ImportHelper import ImportHelper
+from src.libs.ImportHelper import ImportHelper
 
 
 class ImportHelperTest(unittest.TestCase):

@@ -1,11 +1,8 @@
 import unittest
 from datetime import date
 
-import sys
-
-sys.path.append("../src")
-from libs.Person import Person
-from libs.RequiredMinimalDistributions import RMD
+from src.libs.Person import Person
+from src.libs.RequiredMinimalDistributions import RMD
 
 # FRA means Full Retirement Age
 

@@ -1,8 +1,8 @@
 import unittest
 from datetime import date
 
-from libs.Account import Account, TraditionalIRA, RothIRA, Brokerage
-from libs.EnumTypes import AccountType, AccountOwnerType
+from src.libs.Account import Account, TraditionalIRA, RothIRA, Brokerage
+from src.libs.EnumTypes import AccountType, AccountOwnerType
 
 
 class AccountTest(unittest.TestCase):

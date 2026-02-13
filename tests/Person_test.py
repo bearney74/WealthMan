@@ -1,7 +1,7 @@
 import unittest
 from datetime import date
 
-from libs.Person import Person
+from src.libs.Person import Person
 
 
 class PersonTest(unittest.TestCase):

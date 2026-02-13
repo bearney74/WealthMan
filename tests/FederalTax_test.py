@@ -1,10 +1,7 @@
 import unittest
 
-import sys
-
-sys.path.append("../src")
-from libs.FederalTax import FederalTax
-from libs.EnumTypes import FederalTaxStatusType
+from src.libs.FederalTax import FederalTax
+from src.libs.EnumTypes import FederalTaxStatusType
 
 Year = 2024
 

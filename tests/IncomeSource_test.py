@@ -1,8 +1,8 @@
 import unittest
 from datetime import date
 
-from libs.IncomeSources import IncomeSource
-from libs.EnumTypes import IncomeSourceType, AmountPeriodType, AccountOwnerType
+from src.libs.IncomeSources import IncomeSource
+from src.libs.EnumTypes import IncomeSourceType, AmountPeriodType, AccountOwnerType
 
 
 class IncomeSourceTest(unittest.TestCase):

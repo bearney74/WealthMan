@@ -1,7 +1,7 @@
 import unittest
 from datetime import date
 
-from libs.DateHelper import DateHelper
+from src.libs.DateHelper import DateHelper
 
 
 class DateHelperTest(unittest.TestCase):
