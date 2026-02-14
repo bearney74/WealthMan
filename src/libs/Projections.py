@@ -8,7 +8,6 @@ from .EnumTypes import (
     AccountType,
     AccountOwnerType,
     AmountPeriodType,
-    FederalTaxStatusType,
     IncomeSourceType,
 )
 from .Expense import Expense
@@ -75,7 +74,7 @@ class ProjectionYearData:
     def __init__(self, year: int):
         """This is a single years projection data"""
         assert isinstance(year, int)
-        self.projectionYear: int = year
+        self.projectionYear: DataItem = DataItem("Year", "{}", year)
 
         self.clientAge: int = None
         self.clientIsAlive: bool = None
@@ -101,7 +100,10 @@ class ProjectionYearData:
             "Surplus Deficit"
         )  # int = 0  # cashFlow - assetWithdraws
 
-        self.federalTaxFilingStatus: FederalTaxStatusType = None
+        self.federalTaxFilingStatus: DataItem = DataItem(
+            "Federal Tax Filing Status", "{.name}", None
+        )
+        # FederalTaxStatusType = None
         self.thisYearsFederalTaxes: DataItem = DataItem(
             "This Years Federal Taxes"
         )  # int = 0
@@ -536,9 +538,9 @@ class Projections(QRunnable):
             # at least one person is still alive...  do the projection for that year...
 
             if not _clientIsAlive or not _spouseIsAlive:
-                _pyd.federalTaxFilingStatus = self._federal_tax_status_once_widowed
+                _pyd.federalTaxFilingStatus.data = self._federal_tax_status_once_widowed
             else:
-                _pyd.federalTaxFilingStatus = self._federal_tax_status
+                _pyd.federalTaxFilingStatus.data = self._federal_tax_status
 
             _taxable_income_total = 0
             _income_total = 0
@@ -562,7 +564,7 @@ class Projections(QRunnable):
             _expense_total = 0
             for _src in self._Expenses:
                 _expense = _src.calc_balance_by_year(_year)
-                _pyd.expenseSources[_src.Name] = DataItem(_src.Name, "${:,}", _expense)
+                _pyd.expenseSources[_src.Name] = _expense
 
                 _expense_total += _expense
             _pyd.expenseTotal.data = _expense_total
@@ -725,7 +727,7 @@ class Projections(QRunnable):
                     _cpi = pow(1 - self._inflation / 100.0, _year - self._begin_year)
                 else:
                     _cpi = 1
-                _pi = ProvisionalIncome(_pyd.federalTaxFilingStatus, _cpi)
+                _pi = ProvisionalIncome(_pyd.federalTaxFilingStatus.data, _cpi)
                 _pyd.ssTaxRate.data = _pi.get_rate(
                     _income_total - _ss_income_total,
                     _ss_income_total,
@@ -793,7 +795,7 @@ class Projections(QRunnable):
             )  # + _pyd.assetTaxDeferredWithdraw)
 
             # federal taxes
-            _ft = FederalTax(_pyd.federalTaxFilingStatus, 2024)
+            _ft = FederalTax(_pyd.federalTaxFilingStatus.data, 2024)
             # _taxable_income = (
             #    _income_total - _ss_income_total + _pyd.ssTaxableIncome
             # )  # + _surplusWithdraw

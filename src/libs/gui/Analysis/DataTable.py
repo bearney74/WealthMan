@@ -110,7 +110,7 @@ class DataTableTabBase(QWidget):
                 _value = QTableWidgetItem(str(_col))
                 if isinstance(_col, DataItem):
                     # _value=QTableWidgetItem(str(_col))
-                    if _col.data < 0:
+                    if isinstance(_col.data, (float, int)) < 0:
                         _value.setForeground(QBrush(QColor(255, 0, 0)))
                 elif isinstance(_col, Enum):
                     _value = QTableWidgetItem(_col.name)
