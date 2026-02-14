@@ -64,3 +64,7 @@ class TransferAssets:
     @property
     def taxable_income(self):
         return self.sourceAccount.taxable_income
+    
+    @property
+    def ltcg_income(self):
+        return self.sourceAccount.ltcg_income
