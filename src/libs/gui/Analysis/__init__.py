@@ -39,7 +39,7 @@ class AnalysisTab(QWidget):
         self.tabs.addTab(self.TaxDataTableTab, "Tax Details")
         self.tabs.addTab(self.DataTableTab, "Details")
         self.tabs.addTab(self.ChartTab, "Charts")
-        
+
         layout = QVBoxLayout()
         layout.addWidget(self.tabs)
 
@@ -47,12 +47,12 @@ class AnalysisTab(QWidget):
 
     def reset(self):
         self.parent.statusbar.showMessage("updating Analysis GUI")
-        
+
         self.IncomeDataTableTab.createTable()
         self.ExpenseDataTableTab.createTable()
         self.AssetDataTableTab.createTable()
         self.TaxDataTableTab.createTable()
         self.DataTableTab.createTable()
         self.ChartTab.setCategories()
-        
+
         self.parent.statusbar.showMessage("Done updating Analysis GUI", 2000)

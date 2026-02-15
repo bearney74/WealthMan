@@ -185,7 +185,7 @@ class TableData:
         return _header, _vheader, _data
 
     def get_chart_data(self):
-        _data=[]
+        _data = []
         for _record in self.projectionData:
             _data.append(_record.__dict__)
 

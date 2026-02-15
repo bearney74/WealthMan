@@ -1,4 +1,3 @@
-from datetime import datetime
 import matplotlib
 
 matplotlib.use("QtAgg")
@@ -119,31 +118,36 @@ class ChartTab(QWidget):
 
     def setCategories(self):
         self.variables.clear()
-        _data=self.parent.tableData.get_chart_data()
-        _categories=[]
+        _data = self.parent.tableData.get_chart_data()
+        _categories = []
         for _key in _data[0].keys():
-            if isinstance(_data[0][_key], DataItem) and _key != 'federalTaxFilingStatus':
-               _categories.append(_data[0][_key].header)
-        
+            if (
+                isinstance(_data[0][_key], DataItem)
+                and _key != "federalTaxFilingStatus"
+            ):
+                _categories.append(_data[0][_key].header)
+
         self.variables.addItems(_categories)
         self.variables.setCurrentText(_categories[1])
 
     def _selectionchange(self, i):
         _ndx = self.variables.currentIndex()
-        _category=self.variables.currentText()
-        _data=self.parent.tableData.get_chart_data()
+        _category = self.variables.currentText()
+        _data = self.parent.tableData.get_chart_data()
 
-        #figure out the variable name from the "user friendly" category variable..
-        _variable_name=None
+        # figure out the variable name from the "user friendly" category variable..
+        _variable_name = None
         for _key in _data[0].keys():
             if isinstance(_data[0][_key], DataItem):
                 if _category == _data[0][_key].header:
-                    _variable_name=_key
-        
-        _chart_data=[]
+                    _variable_name = _key
+
+        _chart_data = []
         for _record in _data:
-            _chart_data.append((_record['projectionYear'].data, _record[_variable_name].data))
-        
+            _chart_data.append(
+                (_record["projectionYear"].data, _record[_variable_name].data)
+            )
+
         self.chart.setTitle(_category)
         self.chart.setLabels(_category)
         if self.parent.tableData.InTodaysDollars:
