@@ -8,17 +8,10 @@ class TableData:
         assert Data is not None
         self.projectionData = Data
 
-        self.categories = None
         self.vheader = None
         self.data = None
         self.InTodaysDollars = InTodaysDollars
         self.UseSurplusAccount = UseSurplusAccount
-
-    def getCategories(self):
-        if self.categories is None:
-            self.categories, self.vheader, self.data = self._get_data_sheet()
-
-        return self.categories
 
     def get_data_sheet(self):
         if self.data is None:
@@ -190,6 +183,13 @@ class TableData:
 
         _header = [var.header for var in _data[0]]
         return _header, _vheader, _data
+
+    def get_chart_data(self):
+        _data=[]
+        for _record in self.projectionData:
+            _data.append(_record.__dict__)
+
+        return _data
 
     def _get_data_sheet(self):
         _vheader = []

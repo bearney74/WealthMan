@@ -8,7 +8,6 @@ from .DataTable import (
     TaxDataTableTab,
 )
 from .Chart import ChartTab
-from .CustomChart import CustomChartTab
 
 
 class AnalysisTab(QWidget):
@@ -33,18 +32,14 @@ class AnalysisTab(QWidget):
 
         self.DataTableTab = DataTableTab(self)
         self.ChartTab = ChartTab(self)
-        self.CustomChartTab = CustomChartTab(self)
 
-        self.tabs.currentChanged.connect(self.onTabChange)
-        # self.tabs.addTab(QWidget(), "Dashboard")
         self.tabs.addTab(self.IncomeDataTableTab, "Income Details")
         self.tabs.addTab(self.ExpenseDataTableTab, "Expense Details")
         self.tabs.addTab(self.AssetDataTableTab, "Asset Details")
         self.tabs.addTab(self.TaxDataTableTab, "Tax Details")
         self.tabs.addTab(self.DataTableTab, "Details")
         self.tabs.addTab(self.ChartTab, "Charts")
-        self.tabs.addTab(self.CustomChartTab, "Custom Charts")
-
+        
         layout = QVBoxLayout()
         layout.addWidget(self.tabs)
 
@@ -52,19 +47,12 @@ class AnalysisTab(QWidget):
 
     def reset(self):
         self.parent.statusbar.showMessage("updating Analysis GUI")
-        # print("creating table")
+        
         self.IncomeDataTableTab.createTable()
         self.ExpenseDataTableTab.createTable()
         self.AssetDataTableTab.createTable()
         self.TaxDataTableTab.createTable()
         self.DataTableTab.createTable()
-        # print("setting categories")
         self.ChartTab.setCategories()
-        # self.CustomChartTab.AssetTotals()
+        
         self.parent.statusbar.showMessage("Done updating Analysis GUI", 2000)
-
-    def onTabChange(self, i):
-        _tabName = self.tabs.tabText(i)
-        match _tabName:
-            case "Custom Charts":
-                self.CustomChartTab.AssetTotals()

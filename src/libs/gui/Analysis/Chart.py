@@ -119,27 +119,35 @@ class ChartTab(QWidget):
 
     def setCategories(self):
         self.variables.clear()
-        _categories = self.parent.tableData.getCategories()
+        _data=self.parent.tableData.get_chart_data()
+        _categories=[]
+        for _key in _data[0].keys():
+            if isinstance(_data[0][_key], DataItem) and _key != 'federalTaxFilingStatus':
+               _categories.append(_data[0][_key].header)
+        
         self.variables.addItems(_categories)
-        self.variables.setCurrentText("Asset Total")
+        self.variables.setCurrentText(_categories[1])
 
     def _selectionchange(self, i):
         _ndx = self.variables.currentIndex()
+        _category=self.variables.currentText()
+        _data=self.parent.tableData.get_chart_data()
 
-        _data = []
-        _year = datetime.now().year  # should we get this somewhere else?
-        for _list in self.parent.tableData.data:
-            if isinstance(_list[_ndx], DataItem):
-                _data.append((_year, _list[_ndx].data))
-            else:
-                _data.append((_year, _list[_ndx]))
-            _year += 1
-
-        _category = self.variables.currentText()
+        #figure out the variable name from the "user friendly" category variable..
+        _variable_name=None
+        for _key in _data[0].keys():
+            if isinstance(_data[0][_key], DataItem):
+                if _category == _data[0][_key].header:
+                    _variable_name=_key
+        
+        _chart_data=[]
+        for _record in _data:
+            _chart_data.append((_record['projectionYear'].data, _record[_variable_name].data))
+        
         self.chart.setTitle(_category)
         self.chart.setLabels(_category)
         if self.parent.tableData.InTodaysDollars:
             self.chart.setSubTitle("In Today's Dollars")
 
-        self.chart.plot(_data)
+        self.chart.plot(_chart_data)
         self.chart.show(True)
