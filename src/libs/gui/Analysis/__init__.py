@@ -8,7 +8,7 @@ from .DataTable import (
     TaxDataTableTab,
 )
 from .Chart import ChartTab
-
+from .CustomChart import CustomChartTab
 
 class AnalysisTab(QWidget):
     def __init__(self, parent):
@@ -32,6 +32,9 @@ class AnalysisTab(QWidget):
 
         self.DataTableTab = DataTableTab(self)
         self.ChartTab = ChartTab(self)
+        self.CustomChartTab=CustomChartTab(self)
+
+        self.tabs.currentChanged.connect(self.onTabChange)
 
         self.tabs.addTab(self.IncomeDataTableTab, "Income Details")
         self.tabs.addTab(self.ExpenseDataTableTab, "Expense Details")
@@ -39,6 +42,7 @@ class AnalysisTab(QWidget):
         self.tabs.addTab(self.TaxDataTableTab, "Tax Details")
         self.tabs.addTab(self.DataTableTab, "Details")
         self.tabs.addTab(self.ChartTab, "Charts")
+        self.tabs.addTab(self.CustomChartTab, "Custom Charts")
 
         layout = QVBoxLayout()
         layout.addWidget(self.tabs)
@@ -56,3 +60,10 @@ class AnalysisTab(QWidget):
         self.ChartTab.setCategories()
 
         self.parent.statusbar.showMessage("Done updating Analysis GUI", 2000)
+
+    def onTabChange(self, i):
+        _tabName = self.tabs.tabText(i)
+
+        match _tabName:
+            case "Custom Charts":
+                 self.CustomChartTab.AssetTotals()
