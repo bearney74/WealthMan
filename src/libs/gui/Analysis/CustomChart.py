@@ -193,19 +193,17 @@ class CustomChartTab(QWidget):
                 for _name, _value in _record.assetContributions.items():
                     _data[_name].append(_value.data)
 
-
-        #self.chart.show(False)
+        # self.chart.show(False)
         self.chart.setTitle("Asset Contribution Totals")
         if self.parent.tableData.InTodaysDollars:
-           self.chart.setSubTitle("In Today's Dollars")
+            self.chart.setSubTitle("In Today's Dollars")
         else:
-           self.chart.setSubTitle("")
-        
-        print(_data.values())
+            self.chart.setSubTitle("")
+
         if len(_data.values()) > 0:
-           self.chart.plot(
-               _years, _data.values(), _data.keys(), legend_location="upper right"
-           )
+            self.chart.plot(
+                _years, _data.values(), _data.keys(), legend_location="upper right"
+            )
         else:
-            self.chart.plot([],[],[])
+            self.chart.plot([], [], [])
         self.chart.show(True)

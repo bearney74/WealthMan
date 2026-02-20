@@ -722,7 +722,11 @@ class Projections(QRunnable):
             # _pyd.surplusDeficit -= _contribution_total
 
             if _pyd.ssIncomeTotal.data > 0:
-                _sst=SocialSecurityTaxes(_pyd.taxableIncomeTotal.data, _pyd.ssIncomeTotal.data, _pyd.federalTaxFilingStatus.data)
+                _sst = SocialSecurityTaxes(
+                    _pyd.taxableIncomeTotal.data,
+                    _pyd.ssIncomeTotal.data,
+                    _pyd.federalTaxFilingStatus.data,
+                )
                 _pyd.ssTaxRate.data = _sst.percent_taxable()
                 _pyd.ssTaxableIncome.data = _sst.taxable()
             else:

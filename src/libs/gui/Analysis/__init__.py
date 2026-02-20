@@ -10,6 +10,7 @@ from .DataTable import (
 from .Chart import ChartTab
 from .CustomChart import CustomChartTab
 
+
 class AnalysisTab(QWidget):
     def __init__(self, parent):
         super(AnalysisTab, self).__init__(parent)
@@ -32,7 +33,7 @@ class AnalysisTab(QWidget):
 
         self.DataTableTab = DataTableTab(self)
         self.ChartTab = ChartTab(self)
-        self.CustomChartTab=CustomChartTab(self)
+        self.CustomChartTab = CustomChartTab(self)
 
         self.tabs.currentChanged.connect(self.onTabChange)
 
@@ -66,4 +67,4 @@ class AnalysisTab(QWidget):
 
         match _tabName:
             case "Custom Charts":
-                 self.CustomChartTab.AssetTotals()
+                self.CustomChartTab.AssetTotals()
