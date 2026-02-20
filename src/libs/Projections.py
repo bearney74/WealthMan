@@ -15,7 +15,7 @@ from .FederalPovertyLevel import FederalPovertyLevel
 from .FederalTax import FederalTax
 from .IncomeSources import IncomeSource, SocialSecurity
 from .Person import Person
-from .ProvisionalIncome import ProvisionalIncome
+from .ProvisionalIncome import SocialSecurityTaxes
 from .RequiredMinimalDistributions import RMD
 from .SurplusAccount import SurplusAccount
 from .TransferAsset import TransferAssets
@@ -722,22 +722,9 @@ class Projections(QRunnable):
             # _pyd.surplusDeficit -= _contribution_total
 
             if _pyd.ssIncomeTotal.data > 0:
-                # if we are calculating in todays dollars, we need to deflate the value of provisional income amounts for rates
-                if self.InTodaysDollars:
-                    _cpi = pow(1 - self._inflation / 100.0, _year - self._begin_year)
-                else:
-                    _cpi = 1
-                _pi = ProvisionalIncome(_pyd.federalTaxFilingStatus.data, _cpi)
-                _pyd.ssTaxRate.data = _pi.get_rate(
-                    _income_total - _ss_income_total,
-                    _ss_income_total,
-                )
-                _pyd.ssTaxableIncome.data = _pi.calc_ss_taxable(
-                    _income_total
-                    - _ss_income_total,  # + _pyd.assetWithdraw, to we need to add in Regular Brockerage withdraws?
-                    _ss_income_total,
-                )
-                # print(_year, _cpi, _income_total - _ss_income_total, _pyd.ssTaxRate, _pyd.ssTaxableIncome)
+                _sst=SocialSecurityTaxes(_pyd.taxableIncomeTotal.data, _pyd.ssIncomeTotal.data, _pyd.federalTaxFilingStatus.data)
+                _pyd.ssTaxRate.data = _sst.percent_taxable()
+                _pyd.ssTaxableIncome.data = _sst.taxable()
             else:
                 _pyd.ssTaxableIncome.data = 0
                 _pyd.ssTaxRate.data = 0.0
