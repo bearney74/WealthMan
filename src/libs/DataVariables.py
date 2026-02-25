@@ -92,7 +92,7 @@ class DataVariables:
         self._app_version = APP_VERSION
         self._creation_date = datetime.now()
         self._modified_date = None
-        
+
         # BasicInfo
         self.clientName: str = ""
         self.clientBirthDate: date = None

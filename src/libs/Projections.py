@@ -198,7 +198,9 @@ class Projections(QRunnable):
 
         _is_married = dv.relationStatus == "Married"
 
-        self._begin_year = dv.start_year if dv.start_year is not None else datetime.now().year
+        self._begin_year = (
+            dv.start_year if dv.start_year is not None else datetime.now().year
+        )
 
         self._withdrawOrder = dv.withdrawOrder
 

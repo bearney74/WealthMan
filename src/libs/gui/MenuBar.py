@@ -81,8 +81,8 @@ class MenuBar:
         # see if
         if dv.__version__ != FILE_VERSION:
             dv = self.convert_file(dv)
-            
-        #if not hasattr(dv, "start_year"):
+
+        # if not hasattr(dv, "start_year"):
         #    dv.start_year=None
         self.parent.InputsTab.clear_forms()
         self.parent.InputsTab.BasicInfoTab.import_data(dv)
@@ -102,7 +102,7 @@ class MenuBar:
         # TODO:  create a class to handle these types of conversions in the future
         if dv.__version__ == "0.2 alpha":
             dv.ssCola = dv.clientSSCola
-            
+
         return dv
 
     def file_new(self):
