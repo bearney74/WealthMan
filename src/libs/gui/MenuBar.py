@@ -79,9 +79,9 @@ class MenuBar:
 
         logger.info("__version__ = '%s'" % dv.__version__)
         print("file version = %s" % dv.__version__)
-        #see if 
+        # see if
         if dv.__version__ != FILE_VERSION:
-           dv=self.convert_file(dv)
+            dv = self.convert_file(dv)
         self.parent.InputsTab.clear_forms()
         self.parent.InputsTab.BasicInfoTab.import_data(dv)
         self.parent.InputsTab.IncomeInfoTab.import_data(dv)
@@ -97,10 +97,10 @@ class MenuBar:
         self._filename = _fname
 
     def convert_file(self, dv):
-        #TODO:  create a class to handle these types of conversions in the future
+        # TODO:  create a class to handle these types of conversions in the future
         if dv.__version__ == "0.2 alpha":
-            dv.ssCola=dv.clientSSCola
-            
+            dv.ssCola = dv.clientSSCola
+
         return dv
 
     def file_new(self):

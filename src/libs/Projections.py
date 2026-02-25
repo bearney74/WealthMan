@@ -27,10 +27,11 @@ logger = logging.getLogger(__name__)
 
 
 def todays_amount(amount, inflation, years):
-    """ calculate the $ amount to purchase something x years in the future if it
-        is valued at amount dollars today, use negative inflation to see
-        values in the past"""
-    return round(amount * pow(1.0 + inflation/100.0, years))
+    """calculate the $ amount to purchase something x years in the future if it
+    is valued at amount dollars today, use negative inflation to see
+    values in the past"""
+    return round(amount * pow(1.0 + inflation / 100.0, years))
+
 
 class WorkerSignals(QObject):
     """
@@ -730,19 +731,19 @@ class Projections(QRunnable):
             if _pyd.ssIncomeTotal.data > 0:
                 if self.InTodaysDollars:
                     _num = _pyd.projectionYear.data - _year
-                    _inflation=self.InputVariables.ssCola
+                    _inflation = self.InputVariables.ssCola
                 else:
-                    #we don't need to adjust the values since they are already
-                    #in the dollars amounts for the given year.
+                    # we don't need to adjust the values since they are already
+                    # in the dollars amounts for the given year.
                     _num = 0
-                    _inflation=0
-                #just a note, the taxableIncomeTotal value is usually a combination
-                #of income from different sources, a job, social security,
+                    _inflation = 0
+                # just a note, the taxableIncomeTotal value is usually a combination
+                # of income from different sources, a job, social security,
                 # account interest, etc..  Should we use the same inflation
-                #value for all these different income sources??  The solution
-                #for this maybe to create a variable with this years real dollar
-                #amount that takes the different sources of income inflation
-                #into consideration.. For now, just use the SS cola for this.
+                # value for all these different income sources??  The solution
+                # for this maybe to create a variable with this years real dollar
+                # amount that takes the different sources of income inflation
+                # into consideration.. For now, just use the SS cola for this.
                 # SS Cola and inflation should be about the same.
                 _sst = SocialSecurityTaxes(
                     todays_amount(_pyd.taxableIncomeTotal.data, _inflation, _num),
@@ -750,7 +751,9 @@ class Projections(QRunnable):
                     _pyd.federalTaxFilingStatus.data,
                 )
                 _pyd.ssTaxRate.data = _sst.percent_taxable()
-                _pyd.ssTaxableIncome.data = todays_amount(_sst.taxable(), -_inflation, _num)
+                _pyd.ssTaxableIncome.data = todays_amount(
+                    _sst.taxable(), -_inflation, _num
+                )
             else:
                 _pyd.ssTaxableIncome.data = 0
                 _pyd.ssTaxRate.data = 0.0

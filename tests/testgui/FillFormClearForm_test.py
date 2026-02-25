@@ -97,9 +97,6 @@ class FillFormClearForm(TestCaseQt):
             self._testMoney(_widget.Amount, "1234")
             self._testMoney(_widget.Amount, "")
 
-            self._testPercent(_widget.Cola, "6.9")
-            self._testPercent(_widget.Cola, "")
-
             self._testAge(_widget.BeginAge, "69")
             self._testAge(_widget.BeginAge, "")
 
@@ -150,6 +147,9 @@ class FillFormClearForm(TestCaseQt):
 
         self._testPercent(_gvt._Inflation, "33")
         self._testPercent(_gvt._Inflation, "")
+
+        self._testPercent(_gvt._ssCola, "33")
+        self._testPercent(_gvt._ssCola, "")
 
         self._testCheckBox(_gvt._InTodaysDollars, True)
         self._testCheckBox(_gvt._InTodaysDollars, False)

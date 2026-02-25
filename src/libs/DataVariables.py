@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from .EnumTypes import RelationStatus, AccountOwnerType, FederalTaxStatusType
 from .Version import APP_VERSION, FILE_VERSION
@@ -89,6 +89,9 @@ class TransferRecord:
 class DataVariables:
     def __init__(self):
         self.__version__ = FILE_VERSION
+        self._app_version = APP_VERSION
+        self._creation_date = datetime.now()
+        self._modified_date = None
         # BasicInfo
 
         self.clientName: str = ""
