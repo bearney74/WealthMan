@@ -92,8 +92,8 @@ class DataVariables:
         self._app_version = APP_VERSION
         self._creation_date = datetime.now()
         self._modified_date = None
+        
         # BasicInfo
-
         self.clientName: str = ""
         self.clientBirthDate: date = None
         self.clientLifeSpanAge: int = None  # age
@@ -166,6 +166,7 @@ class DataVariables:
         self.regularContributionEndAge: int = None
 
         # Global Variables
+        self.start_year: int = None
         self.inflation: float = None
         self.ssCola: float = None
         self.withdrawOrder: str = None
