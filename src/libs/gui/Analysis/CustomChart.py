@@ -20,9 +20,9 @@ class MplCanvas(FigureCanvasQTAgg):
         super(MplCanvas, self).__init__(self.fig)
 
 
-class StackChart(QWidget):
+class MyChart(QWidget):
     def __init__(self, parent=None, width=5, height=45, dpi=100):
-        super(StackChart, self).__init__(parent)
+        super(MyChart, self).__init__(parent)
         self.title = ""
 
         _layout = QVBoxLayout()
@@ -46,7 +46,7 @@ class StackChart(QWidget):
         else:
             self.canvas.hide()
 
-    def plot(self, years, values, labels, legend_location="upper left"):
+    def stackplot(self, years, values, labels, legend_location="upper left"):
         self.canvas.axes.clear()
 
         try:
@@ -77,14 +77,37 @@ class StackChart(QWidget):
         self.canvas.axes.legend(loc=legend_location)
 
         def format_string(x, pos):
-            _str = ""
-            x = int(x)
-            return f"${x:,d}"
+            return "${:,d}".format(int(x))
 
         self.canvas.axes.yaxis.set_major_formatter(FuncFormatter(format_string))
         for _line in _output:
             if _line.figure is not None:
                 _line.figure.canvas.draw()
+
+    def plotlines(self, years, data, labels, legend_location="upper left"):
+        self.canvas.axes.clear()
+
+        self.canvas.fig.suptitle(self.title)
+        if self.subtitle != "":
+            self.canvas.fig.text(0.5, 0.9, self.subtitle, horizontalalignment="center")
+
+        def format_string(x, pos):
+            return "${:,d}".format(int(x))
+
+        self.canvas.axes.yaxis.set_major_formatter(FuncFormatter(format_string))
+
+        # _num=len(labels)
+        for _label in labels:
+            _out = self.canvas.axes.plot(years, data[_label], label=_label)
+            for _line in _out:
+                if _line.figure is not None:
+                    _line.figure.canvas.draw()
+
+        self.canvas.axes.legend(loc=legend_location)
+        # for some reason the legend does not get update unless we call the draw below...
+        self.canvas.fig.draw(self.canvas.fig.canvas.renderer)
+
+        # self.show(True)
 
 
 class CustomChartTab(QWidget):
@@ -94,10 +117,15 @@ class CustomChartTab(QWidget):
 
         self.variables = QComboBox(self.parent)
         self.variables.addItems(
-            ["Asset Totals", "Asset Contribution Totals", "Income Totals"]
+            [
+                "Asset Totals",
+                "Asset Contribution Totals",
+                "Income Totals",
+                "Income VS Expense",
+            ]
         )
 
-        self.chart = StackChart(self, width=5, height=45, dpi=100)
+        self.chart = MyChart(self, width=5, height=45, dpi=100)
 
         layout = QVBoxLayout()
         hlayout = QHBoxLayout()
@@ -120,6 +148,8 @@ class CustomChartTab(QWidget):
                 self.AssetContributionTotals()
             case "Income Totals":
                 self.IncomeTotals()
+            case "Income VS Expense":
+                self.IncomeVsExpenses()
             case _:
                 logger.error(
                     "invalid custom chart '%s' " % self.variables.currentText()
@@ -154,7 +184,7 @@ class CustomChartTab(QWidget):
         else:
             self.chart.setSubTitle("")
 
-        self.chart.plot(_years, _data.values(), _data.keys())
+        self.chart.stackplot(_years, _data.values(), _data.keys())
         self.chart.show(True)
 
     def IncomeTotals(self):
@@ -175,13 +205,12 @@ class CustomChartTab(QWidget):
         else:
             self.chart.setSubTitle("")
 
-        self.chart.plot(
+        self.chart.stackplot(
             _years, _data.values(), _data.keys(), legend_location="upper right"
         )
         self.chart.show(True)
 
     def AssetContributionTotals(self):
-        print("Asset Contribution Totals")
         _years = []
 
         _data = collections.defaultdict(list)
@@ -201,9 +230,39 @@ class CustomChartTab(QWidget):
             self.chart.setSubTitle("")
 
         if len(_data.values()) > 0:
-            self.chart.plot(
+            self.chart.stackplot(
                 _years, _data.values(), _data.keys(), legend_location="upper right"
             )
         else:
-            self.chart.plot([], [], [])
+            self.chart.stackplot([], [], [])
+        self.chart.show(True)
+
+    def IncomeVsExpenses(self):
+        _years = []
+
+        _data = collections.defaultdict(list)
+        for _record in self.parent.projectionData:
+            if _record.clientIsAlive or _record.spouseIsAlive:
+                if _record.projectionYear.data not in _years:
+                    _years.append(_record.projectionYear.data)
+
+                _data["Income"].append(_record.incomeTotal.data)
+                _data["Expense"].append(_record.expenseTotal.data)
+
+                # for _name, _value in _record.assetContributions.items():
+                #    _data[_name].append(_value.data)
+
+        # self.chart.show(False)
+        self.chart.setTitle("Income Vs Expenses")
+        if self.parent.tableData.InTodaysDollars:
+            self.chart.setSubTitle("In Today's Dollars")
+        else:
+            self.chart.setSubTitle("")
+
+        if len(_data.values()) > 0:
+            self.chart.plotlines(
+                _years, _data, _data.keys(), legend_location="upper right"
+            )
+        else:
+            self.chart.plotlines([], [], [])
         self.chart.show(True)
