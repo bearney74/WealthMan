@@ -3,13 +3,18 @@
 # WealthMan
 This is a desktop application for Wealth Management.  This program generates simulations of future asset growth.
 I am not a Certified Financial Planner (CFP), so take all results from this program with a grain of salt.
+I am looking for individuals to test the output to see if the results are accurate.  Feel free to submit 
+issues.
+
+This applications should be able to run on Windows, Linux, and MacOS (just about anywhere where Python 3 
+and PyQt can run)
 
 ## Description
 Users can enter basic personal information, income sources, expenses, and basic 
 asset information. Certain assumptions such as inflation rate, and asset rate of 
-return can be entered by the user.
+return per account can be entered by the user.
 
-From that information, projections (forecasts) can be made for several years in 
+From the inputted valies, projections (forecasts) can be made for several years in 
 the future showing how income, assets, and expenses affect a person's net worth.
 
 Currently, users can output the projection data in csv format, that can be imported 
@@ -35,8 +40,8 @@ I would also like to create an interface for "what if" scenarios, which will inc
 cost savings if roth conversions are done, etc.
 
 
-FYI.   This project is still under HEAVY development and is not ready for use by end users.  
-Developers and early adopters can use the program, but should be suspicious of any generated output.
+FYI.   This project is still under HEAVY development and is not ready for production.  All generated
+output should be checked and double checked for accuracy.
 I am interested in feedback.  Please submit any issues/bugs, feature requests to the issues tab above.
 
 ## Screenshots

@@ -142,16 +142,17 @@ class ChartTab(QWidget):
                 if _category == _data[0][_key].header:
                     _variable_name = _key
 
-        _chart_data = []
-        for _record in _data:
-            _chart_data.append(
-                (_record["projectionYear"].data, _record[_variable_name].data)
-            )
+        if _variable_name is not None:
+           _chart_data = []
+           for _record in _data:
+               _chart_data.append(
+                   (_record["projectionYear"].data, _record[_variable_name].data)
+               )
 
-        self.chart.setTitle(_category)
-        self.chart.setLabels(_category)
-        if self.parent.tableData.InTodaysDollars:
-            self.chart.setSubTitle("In Today's Dollars")
+           self.chart.setTitle(_category)
+           self.chart.setLabels(_category)
+           if self.parent.tableData.InTodaysDollars:
+              self.chart.setSubTitle("In Today's Dollars")
 
-        self.chart.plot(_chart_data)
-        self.chart.show(True)
+           self.chart.plot(_chart_data)
+           self.chart.show(True)

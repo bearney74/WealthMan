@@ -5,6 +5,7 @@ import os
 import pickle
 
 from libs.DataVariables import DataVariables
+from libs.Version import FILE_VERSION
 
 import logging
 
@@ -77,6 +78,10 @@ class MenuBar:
             dv = pickle.load(_fp)
 
         logger.info("__version__ = '%s'" % dv.__version__)
+        print("file version = %s" % dv.__version__)
+        #see if 
+        if dv.__version__ != FILE_VERSION:
+           dv=self.convert_file(dv)
         self.parent.InputsTab.clear_forms()
         self.parent.InputsTab.BasicInfoTab.import_data(dv)
         self.parent.InputsTab.IncomeInfoTab.import_data(dv)
@@ -90,6 +95,13 @@ class MenuBar:
         )
         # _import.get_gui_data(self.parent)
         self._filename = _fname
+
+    def convert_file(self, dv):
+        #TODO:  create a class to handle these types of conversions in the future
+        if dv.__version__ == "0.2 alpha":
+            dv.ssCola=dv.clientSSCola
+            
+        return dv
 
     def file_new(self):
         logger.debug("new file")

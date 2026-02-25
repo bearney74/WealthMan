@@ -18,6 +18,9 @@ class GlobalVariablesTab(QWidget):
         self._Inflation = PercentEntry(min=-10.0, max=10.0, num_decimal_places=1)
         formlayout.addRow(QLabel("Inflation:"), self._Inflation)
 
+        self._ssCola = PercentEntry(min=-10.0, max=10.0, num_decimal_places=1)
+        formlayout.addRow(QLabel("SS Cola:"), self._ssCola)
+
         self._WithdrawOrder = QComboBox()
         self._WithdrawOrder.setFixedWidth(200)
         self._WithdrawOrder.addItems(
@@ -80,12 +83,14 @@ class GlobalVariablesTab(QWidget):
         self._WithdrawOrder.setCurrentIndex(0)
         self._forecast_years.setText("")
         self._Inflation.setText("")
+        self._ssCola.setText("")
         self._InTodaysDollars.setChecked(False)
         self._SurplusAccount.setChecked(False)
         self._SurplusAccountInterestRate.setText("")
 
     def export_data(self, d: DataVariables):
         d.inflation = self._Inflation.get_float(Default=3.0)
+        d.ssCola = self._ssCola.get_float(Default=3.0)
         d.withdrawOrder = self._WithdrawOrder.currentText()
         d.forecastYears = self._forecast_years.get_int(Default=30)
         d.inTodaysDollars = self._InTodaysDollars.isChecked()
@@ -104,6 +109,7 @@ class GlobalVariablesTab(QWidget):
     def import_data(self, d: DataVariables):
         """imports variables to the Global Variables tab"""
         self._Inflation.setText(d.inflation)
+        self._ssCola.setText(d.ssCola)
         self._WithdrawOrder.setCurrentText(d.withdrawOrder)
         self._forecast_years.setText(d.forecastYears)
         # use hasattr to "upgrade" a saved file to use a new version of

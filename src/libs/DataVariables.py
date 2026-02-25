@@ -1,7 +1,7 @@
 from datetime import date
 
 from .EnumTypes import RelationStatus, AccountOwnerType, FederalTaxStatusType
-from .Version import APP_VERSION
+from .Version import APP_VERSION, FILE_VERSION
 
 
 class BaseRecord:
@@ -88,7 +88,7 @@ class TransferRecord:
 
 class DataVariables:
     def __init__(self):
-        self.__version__ = APP_VERSION
+        self.__version__ = FILE_VERSION
         # BasicInfo
 
         self.clientName: str = ""
@@ -104,11 +104,9 @@ class DataVariables:
 
         # Income Sources
         self.clientSSAmount: int = None
-        self.clientSSCola: float = None
         self.clientSSBeginAge: int = None
 
         self.spouseSSAmount: int = None
-        self.spouseSSCola: float = None
         self.spouseSSBeginAge: int = None
 
         self.pension1Name: str = None
@@ -166,6 +164,7 @@ class DataVariables:
 
         # Global Variables
         self.inflation: float = None
+        self.ssCola: float = None
         self.withdrawOrder: str = None
         self.forecastYears: int = None
         self.inTodaysDollars: bool = False

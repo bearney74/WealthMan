@@ -8,7 +8,9 @@ class ProvisionalIncomeTest(unittest.TestCase):
     """tests to verify that basic calcs from Federal Tax Brackets are correct..."""
 
     def test_single_status(self):
-        pass
+        sst = SocialSecurityTaxes(0, 48000, FederalTaxStatusType.Single)
+        assert sst.taxable() == 0
+        assert sst.percent_taxable() == 0
 
     def test_married_status(self):
         # examples taken from https://www.youtube.com/watch?v=-ifv6Y6migk&list=PL63mgCrh_1ym4wKoUgFbNazFwmOHVjl6V

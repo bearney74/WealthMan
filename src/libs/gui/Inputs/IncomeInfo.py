@@ -30,11 +30,6 @@ class SocialSecurityWidget(QWidget):
         _label.setToolTip("Full Retirement Age Amount")
         _flayout.addRow(_label, self.Amount)
 
-        self.Cola = PercentEntry(self.parent)
-        _label = QLabel("COLA:")
-        _label.setToolTip("Cost of Living Adjustment")
-        _flayout.addRow(_label, self.Cola)
-
         self.BeginAge = AgeEntry(min=62, max=70)
         _label = QLabel("Begin Age:")
         _label.setToolTip("Age between 62 and 70")
@@ -45,7 +40,6 @@ class SocialSecurityWidget(QWidget):
 
     def clear_form(self):
         self.Amount.setText("")
-        self.Cola.setText("")
         self.BeginAge.setText("")
 
 
@@ -206,11 +200,9 @@ class IncomeInfoTab(QWidget):
 
     def export_data(self, dv: DataVariables):
         dv.clientSSAmount = self.clientSS.Amount.get_int()
-        dv.clientSSCola = self.clientSS.Cola.get_float()
         dv.clientSSBeginAge = self.clientSS.BeginAge.get_int()
 
         dv.spouseSSAmount = self.spouseSS.Amount.get_int()
-        dv.spouseSSCola = self.spouseSS.Cola.get_float()
         dv.spouseSSBeginAge = self.spouseSS.BeginAge.get_int()
 
         dv.pension1Name = self.pension1Name.text()
@@ -268,11 +260,9 @@ class IncomeInfoTab(QWidget):
 
     def import_data(self, dv: DataVariables):
         self.clientSS.Amount.setText(dv.clientSSAmount)
-        self.clientSS.Cola.setText(dv.clientSSCola)
         self.clientSS.BeginAge.setText(dv.clientSSBeginAge)
 
         self.spouseSS.Amount.setText(dv.spouseSSAmount)
-        self.spouseSS.Cola.setText(dv.spouseSSCola)
         self.spouseSS.BeginAge.setText(dv.spouseSSBeginAge)
 
         self.pension1Name.setText(dv.pension1Name)
