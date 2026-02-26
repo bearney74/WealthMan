@@ -33,7 +33,9 @@ class AccountType(Enum):
     Regular = 1  # Savings, Checking, Money Market, etc
     TaxDeferred = 2  # 401k, IRA, etc
     TaxFree = 3  # Roth IRA, Life Insurance Payout, etc
-    Brokerage = 4  # for long term capital gains taxes...
+
+
+#   Brokerage = 4  # for long term capital gains taxes...
 
 
 class IncomeSourceType(Enum):
@@ -51,3 +53,12 @@ class FederalTaxStatusType(Enum):
     @classmethod
     def has_member(cls, s):
         return s in cls.__members__
+
+
+class WithdrawOrderType(Enum):
+    TaxDeferred_Regular_TaxFree = 1
+    TaxDeferred_TaxFree_Regular = 2
+    Regular_TaxFree_TaxDeferred = 3
+    Regular_TaxDeferred_TaxFree = 4
+    TaxFree_TaxDeferred_Regular = 5
+    TaxFree_Regular_TaxDeferred = 6

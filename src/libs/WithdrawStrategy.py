@@ -1,35 +1,56 @@
 from .Account import Account
-from .EnumTypes import AccountType, AccountOwnerType
+from .EnumTypes import AccountType, AccountOwnerType, WithdrawOrderType
 
 import logging
 
 logger = logging.getLogger(__name__)
 
 
+def WithdrawOrderType2List(withdrawOrder: WithdrawOrderType):
+    """turns a WithdrawOrderType into a list of AccountTypes"""
+    match withdrawOrder:
+        case WithdrawOrderType.TaxDeferred_Regular_TaxFree:
+            return [AccountType.TaxDeferred, AccountType.Regular, AccountType.TaxFree]
+        case WithdrawOrderType.TaxDeferred_TaxFree_Regular:
+            return [AccountType.TaxDeferred, AccountType.TaxFree, AccountType.Regular]
+        case WithdrawOrderType.Regular_TaxFree_TaxDeferred:
+            return [AccountType.Regular, AccountType.TaxFree, AccountType.TaxDeferred]
+        case WithdrawOrderType.Regular_TaxDeferred_TaxFree:
+            return [AccountType.Regular, AccountType.TaxDeferred, AccountType.TaxFree]
+        case WithdrawOrderType.TaxFree_TaxDeferred_Regular:
+            return [AccountType.TaxFree, AccountType.TaxDeferred, AccountType.Regular]
+        case WithdrawOrderType.TaxFree_Regular_TaxDeferred:
+            return [AccountType.TaxFree, AccountType.Regular, AccountType.TaxDeferred]
+        case _:
+            logger.error("Invalid Withdraw Order Type '%s'" % withdrawOrder)
+
+
 class WithdrawStrategy:
     def __init__(
         self,
-        withdrawOrder,
+        withdrawOrder: WithdrawOrderType,
         clientAge: int,
         clientIsAlive: bool,
         spouseAge: int,
         spouseIsAlive: bool,
         assets: [Account],
     ):
-        assert withdrawOrder in [
-            "TaxDeferred,Regular,TaxFree",
-            "TaxDeferred,TaxFree,Regular",
-            "Regular,TaxFree,TaxDeferred",
-            "Regular,TaxDeferred,TaxFree",
-            "TaxFree, TaxDeferred,Regular",
-            "TaxFree,Regular,TaxDeferred",
-        ]
 
+        assert isinstance(withdrawOrder, WithdrawOrderType)
         self.withdrawOrder = withdrawOrder
+
+        assert isinstance(clientAge, int)
         self.clientAge = clientAge
+
+        assert isinstance(clientIsAlive, bool)
         self.clientIsAlive = clientIsAlive
+
+        assert isinstance(spouseAge, int)
         self.spouseAge = spouseAge
+
+        assert isinstance(spouseIsAlive, bool)
         self.spouseIsAlive = spouseIsAlive
+
         self._assets = []
 
         _regular = []
@@ -47,18 +68,15 @@ class WithdrawStrategy:
                 case _:
                     logger.error("invalid asset type '%s'" % _asset.type)
 
-        # now set assets variable based on withdrawOrder
-        _list = self.withdrawOrder.split(",")
-        for _type in self.withdrawOrder.split(","):
+        # now puts accounts into asset list based on withdrawOrder
+        for _type in WithdrawOrderType2List(self.withdrawOrder):
             match _type:
-                case "TaxDeferred":
+                case AccountType.TaxDeferred:
                     self._assets += _taxdeferred
-                case "Regular":
+                case AccountType.Regular:
                     self._assets += _regular
-                case "TaxFree":
+                case AccountType.TaxFree:
                     self._assets += _taxfree
-                case _:
-                    logger.error("invalid asset type '%s'" % _type)
 
     def reconcile_required_withdraw(self, deficit: int):
         _dict = {}
@@ -70,6 +88,7 @@ class WithdrawStrategy:
                 continue
             if _asset.Type in (AccountType.TaxDeferred, AccountType.TaxFree):
                 # need to check that owner is old enough to take withdraw
+                # for now we assume that we cannot access these accounts if owner < 59 years of age
                 match _asset.Owner:
                     case AccountOwnerType.Client:
                         if self.clientAge < 59:
@@ -77,7 +96,11 @@ class WithdrawStrategy:
                     case AccountOwnerType.Spouse:
                         if self.spouseAge < 59:
                             continue
+
             # if we get here, we can take some money from the account..
+            # need to look into how I can use the new account variables for Taxable income, etc
+            # for these since I am taking money out of the accounts.
+            # this may simplify the logic below somewhat..
             if deficit <= _asset.Balance:
                 _dict[_asset.Type] += deficit
                 _asset.Balance -= deficit
