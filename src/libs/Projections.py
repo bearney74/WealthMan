@@ -26,7 +26,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def todays_amount(amount, inflation, years):
+def todays_amount(amount: int, inflation: int, years: int) -> int:
     """calculate the $ amount to purchase something x years in the future if it
     is valued at amount dollars today, use negative inflation to see
     values in the past"""

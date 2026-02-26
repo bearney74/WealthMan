@@ -89,13 +89,21 @@ class WithdrawOrderTest(unittest.TestCase):
             InterestRate=1.0,
         )
 
+        _roth = RothIRA(
+            Name="Roth IRA",
+            Owner=AccountOwnerType.Spouse,
+            BirthDate=date(1990, 1, 1),
+            Balance=0,
+            InterestRate=2.0,
+        )
+
         _ws = WithdrawStrategy(
             WithdrawOrderType.TaxDeferred_Regular_TaxFree,
             60,
             True,
             60,
             False,
-            [_trad],
+            [_trad, _roth],
         )
 
         _deficit, _dict = _ws.reconcile_required_withdraw(5_000)
@@ -105,6 +113,7 @@ class WithdrawOrderTest(unittest.TestCase):
         self.assertEqual(_dict[AccountType.TaxFree], 0)
         self.assertEqual(_dict[AccountType.Regular], 0)
         self.assertEqual(_trad.Balance, 0)
+        self.assertEqual(_roth.Balance, 0)
 
 
 if __name__ == "__main__":
