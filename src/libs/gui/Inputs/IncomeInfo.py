@@ -4,26 +4,32 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QFormLayout,
     QGridLayout,
-    QComboBox,
 )
 
 from PyQt6.QtCore import Qt
 
-from libs.gui.guihelpers.Entry import MoneyEntry, PercentEntry, AgeEntry
+from libs.gui.guihelpers.Entry import (
+    AgeEntry,
+    MoneyEntry,
+    PercentEntry,
+    AccountOwnerTypeEntry,
+)
 
 from libs.DataVariables import DataVariables, IncomeRecord
-from libs.EnumTypes import AccountOwnerType
+from libs.EnumTypes import AccountOwnerType, PersonType, RelationStatusType
 
 
 class SocialSecurityWidget(QWidget):
     def __init__(self, parent, person_type):
         super(SocialSecurityWidget, self).__init__(parent)
         self.parent = parent
+
+        assert isinstance(person_type, PersonType)
         self.person_type = person_type
 
         _layout = QVBoxLayout()
         _flayout = QFormLayout()
-        _layout.addWidget(QLabel("%s Social Security" % self.person_type))
+        _layout.addWidget(QLabel("%s Social Security" % self.person_type.name))
 
         self.Amount = MoneyEntry()
         _label = QLabel("FRA Amount:")
@@ -55,10 +61,10 @@ class IncomeInfoTab(QWidget):
         _layout.addWidget(QLabel("<b><u>Social Security</u></b>"))
 
         _hlayout = QHBoxLayout()
-        self.clientSS = SocialSecurityWidget(self.parent, "Client")
+        self.clientSS = SocialSecurityWidget(self.parent, PersonType.Client)
         _hlayout.addWidget(self.clientSS)
 
-        self.spouseSS = SocialSecurityWidget(self.parent, "Spouse")
+        self.spouseSS = SocialSecurityWidget(self.parent, PersonType.Spouse)
         _hlayout.addWidget(self.spouseSS)
         self.spouseSS.setEnabled(self.BasicInfoTab.client_is_married())
 
@@ -74,8 +80,9 @@ class IncomeInfoTab(QWidget):
         _flayout1.addRow(QLabel("Description"), self.pension1Name)
 
         self.pension1OwnerLabel = QLabel("Owner:")
-        self.pension1Owner = QComboBox()
-        self.pension1Owner.addItems(["Client", "Spouse"])
+        self.pension1Owner = AccountOwnerTypeEntry()
+        # self.pension1Owner = QComboBox()
+        # self.pension1Owner.addItems(["Client", "Spouse"])
         _flayout1.addRow(self.pension1OwnerLabel, self.pension1Owner)
 
         self.pension1Amount = MoneyEntry()
@@ -101,8 +108,9 @@ class IncomeInfoTab(QWidget):
         _flayout2.addRow(QLabel("Description"), self.pension2Name)
 
         self.pension2OwnerLabel = QLabel("Owner:")
-        self.pension2Owner = QComboBox()
-        self.pension2Owner.addItems(["Client", "Spouse"])
+        self.pension2Owner = AccountOwnerTypeEntry()
+        # self.pension2Owner = QComboBox()
+        # self.pension2Owner.addItems(["Client", "Spouse"])
         _flayout2.addRow(self.pension2OwnerLabel, self.pension2Owner)
 
         self.pension2Amount = MoneyEntry()
@@ -171,10 +179,11 @@ class IncomeInfoTab(QWidget):
         _percent = PercentEntry(self.parent)
         self.gridLayout.addWidget(_percent, _row, 2)
 
-        _person = QComboBox()
-        _person.addItems(["Client", "Spouse"])
-        self.gridLayout.addWidget(_person, _row, 3)
-        _person.setEnabled(self.BasicInfoTab.client_is_married())
+        _owner = AccountOwnerTypeEntry()
+        # _person = QComboBox()
+        # _person.addItems(["Client", "Spouse"])
+        self.gridLayout.addWidget(_owner, _row, 3)
+        _owner.setEnabled(self.BasicInfoTab.client_is_married())
 
         _begin_age = AgeEntry(self.parent)
         self.gridLayout.addWidget(_begin_age, _row, 4)
@@ -209,7 +218,8 @@ class IncomeInfoTab(QWidget):
         if not self.BasicInfoTab.client_is_married():
             dv.pension1Owner = AccountOwnerType.Client
         else:
-            dv.pension1Owner = AccountOwnerType[self.pension1Owner.currentText()]
+            # dv.pension1Owner = AccountOwnerType[self.pension1Owner.currentText()]
+            dv.pension1Owner = self.pension1Owner.get()
 
         dv.pension1Amount = self.pension1Amount.get_int()
         dv.pension1Cola = self.pension1Cola.get_float()
@@ -221,7 +231,8 @@ class IncomeInfoTab(QWidget):
         if not self.BasicInfoTab.client_is_married():
             dv.pension2Owner = AccountOwnerType.Client
         else:
-            dv.pension2Owner = AccountOwnerType[self.pension2Owner.currentText()]
+            # dv.pension2Owner = AccountOwnerType[self.pension2Owner.currentText()]
+            dv.pension2Owner = self.pension2Owner.get()
 
         dv.pension2Amount = self.pension2Amount.get_int()
         dv.pension2Cola = self.pension2Cola.get_float()
@@ -241,7 +252,7 @@ class IncomeInfoTab(QWidget):
             _cola = _item.widget().get_float()
 
             _item = self.gridLayout.itemAtPosition(_row, 3)
-            _person = _item.widget().currentText()
+            _owner = _item.widget().get()  # .currentText()
 
             _item = self.gridLayout.itemAtPosition(_row, 4)
             _begin_age = _item.widget().get_int()
@@ -249,10 +260,10 @@ class IncomeInfoTab(QWidget):
             _item = self.gridLayout.itemAtPosition(_row, 5)
             _end_age = _item.widget().get_int()
 
-            _owner = AccountOwnerType.Client
-            if self.BasicInfoTab.client_is_married():
-                if _person == "Spouse":
-                    _owner = AccountOwnerType.Spouse
+            # _owner = AccountOwnerType.Client
+            # if self.BasicInfoTab.client_is_married():
+            #    if _person == PersonType.Spouse:
+            #        _owner = AccountOwnerType.Spouse
 
             dv.otherIncomes.append(
                 IncomeRecord(_descr, _amount, _cola, _owner, _begin_age, _end_age)
@@ -294,16 +305,8 @@ class IncomeInfoTab(QWidget):
             _item.widget().setText(_record.COLA)
 
             _item = self.gridLayout.itemAtPosition(_row, 3)
-            if self.BasicInfoTab.client_is_married():
-                if _record.owner == AccountOwnerType.Spouse:
-                    _owner = "Spouse"
-                else:
-                    _owner = "Client"
-            else:
-                _owner = "Client"
-                _item.widget().setEnabled(False)
-
-            _item.widget().setCurrentText(_owner)
+            _item.widget().setEnabled(dv.relationStatus == RelationStatusType.Married)
+            _item.widget().set(_record.owner)
 
             _item = self.gridLayout.itemAtPosition(_row, 4)
             _item.widget().setText(_record.begin_age)

@@ -4,7 +4,7 @@ import sys
 
 sys.path.append("src")
 
-from libs.EnumTypes import RelationStatus
+from libs.EnumTypes import RelationStatusType
 from main import Main
 
 from tests.TestCaseQt import TestCaseQt
@@ -33,7 +33,7 @@ class SingleMarried(TestCaseQt):
     def test_main(self):
         _status = self.BasicInfoTab._clientinfo._status
 
-        self.assertEqual(RelationStatus[_status.currentText()], RelationStatus.Single)
+        self.assertEqual(_status.get(), RelationStatusType.Single)
 
         # make sure that spouse widgets are disabled since We choose single
         self.form.InputsTab.tabs.setCurrentIndex(0)  # select Basic Tab
@@ -53,8 +53,9 @@ class SingleMarried(TestCaseQt):
         self.assertFalse(self.GlobalVariablesTab._FilingStatusOnceWidowed.isEnabled())
 
         # change status to Married...
-        _status.setCurrentText(RelationStatus.Married.name)
-        self.assertEqual(RelationStatus[_status.currentText()], RelationStatus.Married)
+        # _status.setCurrentText(RelationStatusType.Married.name)
+        _status.set(RelationStatusType.Married)
+        self.assertEqual(_status.get(), RelationStatusType.Married)
 
         # make sure that spouse widgets are enabled since We choose married
         self.form.InputsTab.tabs.setCurrentIndex(0)  # select Basic Tab

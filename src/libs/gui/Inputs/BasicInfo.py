@@ -5,11 +5,10 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QFormLayout,
     QLineEdit,
-    QComboBox,
 )
 
-from libs.gui.guihelpers.Entry import AgeEntry, DateEntry
-from libs.EnumTypes import RelationStatus
+from libs.gui.guihelpers.Entry import AgeEntry, DateEntry, RelationStatusTypeEntry
+from libs.EnumTypes import RelationStatusType, PersonType
 from libs.DataVariables import DataVariables
 
 
@@ -19,8 +18,8 @@ class BasicInfoTab(QWidget):
         self.parent = parent
         hlayout = QHBoxLayout()
 
-        self._clientinfo = PersonBasicInfo("Client", self)
-        self._spouseinfo = PersonBasicInfo("Spouse", self)
+        self._clientinfo = PersonBasicInfo(PersonType.Client, self)
+        self._spouseinfo = PersonBasicInfo(PersonType.Spouse, self)
         self._spouseinfo.setEnabled(False)
 
         hlayout.addWidget(self._clientinfo)
@@ -40,10 +39,7 @@ class BasicInfoTab(QWidget):
         return self._clientinfo.is_valid() and self._spouse_info.is_valid()
 
     def client_is_married(self) -> bool:
-        return (
-            RelationStatus[self._clientinfo._status.currentText()]
-            == RelationStatus.Married
-        )
+        return self._clientinfo._status.get() == RelationStatusType.Married
 
     def clear_form(self):
         self._clientinfo.clear_form()
@@ -55,7 +51,7 @@ class BasicInfoTab(QWidget):
         d.clientBirthDate = self._clientinfo._birthDate.get_date()
         d.clientLifeSpanAge = self._clientinfo._lifespan_age.get_int()
         d.clientRetirementAge = self._clientinfo._retirement_age.get_int()
-        d.relationStatus = self._clientinfo._status.currentText()
+        d.relationStatus = self._clientinfo._status.get()  # currentText()
 
         if self.client_is_married():
             d.spouseName = self._spouseinfo._name.text()
@@ -73,7 +69,9 @@ class BasicInfoTab(QWidget):
         self._clientinfo._birthDate.set_date(d.clientBirthDate)
         self._clientinfo._lifespan_age.setText(d.clientLifeSpanAge)
         self._clientinfo._retirement_age.setText(d.clientRetirementAge)
-        self._clientinfo._status.setCurrentText(d.relationStatus)
+        self._clientinfo._status.set(
+            d.relationStatus
+        )  # setCurrentText(d.relationStatus)
 
         if self.client_is_married():
             self._spouseinfo._name.setText(d.spouseName)
@@ -86,8 +84,9 @@ class PersonBasicInfo(QWidget):
     def __init__(self, person_type: str, parent):
         super(PersonBasicInfo, self).__init__(parent)
         self.parent = parent
+
+        assert isinstance(person_type, PersonType)
         self._person_type = person_type
-        assert self._person_type in ("Client", "Spouse")
 
         vlayout = QVBoxLayout()
         vlayout.addWidget(QLabel("<b><u>%s Information</u></b>" % self._person_type))
@@ -111,11 +110,12 @@ class PersonBasicInfo(QWidget):
             QLabel("%s Lifespan Age:" % self._person_type), self._lifespan_age
         )
 
-        if self._person_type == "Client":
-            self._status = QComboBox()
-            self._status.addItems(
-                [RelationStatus.Single.name, RelationStatus.Married.name]
-            )  # "Single", "Married"])
+        if self._person_type == PersonType.Client:
+            self._status = RelationStatusTypeEntry()
+            # self._status = QComboBox()
+            # self._status.addItems(
+            #    [RelationStatus.Single.name, RelationStatus.Married.name]
+            # )  # "Single", "Married"])
             self._status.currentIndexChanged.connect(self.selectionchange)
             formlayout.addRow(QLabel("Married Status:"), self._status)
 
@@ -125,7 +125,7 @@ class PersonBasicInfo(QWidget):
 
     def selectionchange(self, i):
         self.parent._spouseinfo.setEnabled(
-            RelationStatus[self._status.currentText()] == RelationStatus.Married
+            self._status.enumValue() == RelationStatusType.Married
         )
 
     def validate_form(self) -> bool:
@@ -172,5 +172,6 @@ class PersonBasicInfo(QWidget):
         self._retirement_age.setText("")
         self._lifespan_age.setText("")
 
-        if self._person_type == "Client":
-            self._status.setCurrentText("Single")
+        if self._person_type == PersonType.Client:
+            # self._status.setCurrentText(RelationStatusType.Single)
+            self._status.set(RelationStatusType.Single)

@@ -1,6 +1,11 @@
 from datetime import date, datetime
 
-from .EnumTypes import RelationStatus, AccountOwnerType, FederalTaxStatusType
+from .EnumTypes import (
+    RelationStatusType,
+    AccountOwnerType,
+    FederalTaxStatusType,
+    PersonType,
+)
 from .Version import APP_VERSION, FILE_VERSION
 
 
@@ -21,7 +26,7 @@ class BaseRecord:
         self.amount = amount
         assert isinstance(COLA, float)
         self.COLA = COLA
-        assert isinstance(owner, AccountOwnerType)
+        assert isinstance(owner, (AccountOwnerType, PersonType))
         self.owner = owner
         assert isinstance(begin_age, int) or begin_age is None
         self.begin_age = begin_age
@@ -51,22 +56,32 @@ class IncomeRecord(BaseRecord):
 
 
 class ExpenseRecord(BaseRecord):
-    def __init__(self, descr, amount, COLA, owner, begin_age, end_age):
+    def __init__(self, descr, amount, COLA, person, begin_age, end_age):
         super(ExpenseRecord, self).__init__(
-            descr, amount, COLA, owner, begin_age, end_age
+            descr, amount, COLA, person, begin_age, end_age
         )
 
 
 class TransferRecord:
     def __init__(
-        self, descr, src_acct, tgt_acct, amount, COLA, person, beginAge, endAge
+        self,
+        descr: str,
+        src_acct: str,
+        tgt_acct: str,
+        amount: int,
+        COLA: float,
+        person: PersonType,
+        beginAge: int,
+        endAge: int,
     ):
         assert isinstance(descr, str)
         self.descr = descr
 
+        # should this be of class Account instead of str?
         assert isinstance(src_acct, str)
         self.src_acct = src_acct
 
+        # should this be of class Account instead of str?
         assert isinstance(tgt_acct, str)
         self.tgt_acct = tgt_acct
 
@@ -76,7 +91,7 @@ class TransferRecord:
         assert isinstance(COLA, float)
         self.COLA = COLA
 
-        assert isinstance(person, str)
+        assert isinstance(person, PersonType)
         self.person = person
 
         assert isinstance(beginAge, int)
@@ -98,7 +113,7 @@ class DataVariables:
         self.clientBirthDate: date = None
         self.clientLifeSpanAge: int = None  # age
         self.clientRetirementAge: int = None
-        self.relationStatus: RelationStatus = RelationStatus.Single
+        self.relationStatus: RelationStatusType = RelationStatusType.Single
 
         self.spouseName: str = ""
         self.spouseBirthDate: date = None

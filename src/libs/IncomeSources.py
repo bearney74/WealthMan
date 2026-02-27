@@ -84,7 +84,7 @@ class SocialSecurity(IncomeSource):
 
         super(SocialSecurity, self).__init__(
             Name=Name,
-            IncomeType=IncomeSourceType.SocialSecurity,
+            IncomeType=IncomeSourceType.Social_Security,
             Amount=FRAAmount,
             AmountPeriod=AmountPeriodType.Annual,
             Owner=Owner,

@@ -1,14 +1,9 @@
 from enum import Enum
 
-# def list_members(enum_type: Enum):
-#    return [member.name.replace('_', ' ') for member in enum_type]
 
-# def string2member(enum_type:Enum, name:str):
-#    try:
-#        return enum_type[name.replace(' ', '_')]
-#    except KeyError:
-#        #log this error..
-#        pass
+class MyEnum(Enum):
+    def members(self):
+        return [member.name for member in self]
 
 
 class AmountPeriodType(Enum):
@@ -18,12 +13,12 @@ class AmountPeriodType(Enum):
     Weekly = 4
 
 
-class RelationStatusType(Enum):
+class RelationStatus(Enum):
     Single = 1
     Married = 2
 
 
-class PersonType(Enum):
+class PersonType(MyEnum):
     Client = 0
     Spouse = 1
 
@@ -34,9 +29,9 @@ class AccountOwnerType(Enum):
     Both = 2
 
 
-# class Relationship(Enum):
-#    Spouse = 1
-#    Child = 2
+class Relationship(Enum):
+    Spouse = 1
+    Child = 2
 
 
 class AccountType(Enum):
@@ -51,14 +46,14 @@ class AccountType(Enum):
 class IncomeSourceType(Enum):
     Employment = 1
     Pension = 2
-    Social_Security = 3
+    SocialSecurity = 3
 
 
 class FederalTaxStatusType(Enum):
     Single = 1
-    Married_Filing_Jointly = 2
-    Married_Filing_Separately = 3
-    Head_Of_Household = 4
+    MarriedFilingJointly = 2
+    MarriedFilingSeparately = 3
+    HeadOfHousehold = 4
 
     @classmethod
     def has_member(cls, s):

@@ -4,7 +4,7 @@ import sys
 
 sys.path.append("src")
 
-from libs.EnumTypes import RelationStatus
+from libs.EnumTypes import RelationStatusType
 from main import Main
 from tests.TestCaseQt import TestCaseQt
 
@@ -73,10 +73,12 @@ class FillFormClearForm(TestCaseQt):
         self._testAge(_client._lifespan_age, "69")
         self._testAge(_client._lifespan_age, "")
 
-        self.assertEqual(RelationStatus[_status.currentText()], RelationStatus.Single)
+        self.assertEqual(_status.get(), RelationStatusType.Single)
 
-        _status.setCurrentText(RelationStatus.Married.name)
-        self.assertEqual(RelationStatus[_status.currentText()], RelationStatus.Married)
+        _status.set(
+            RelationStatusType.Married
+        )  # setCurrentText(RelationStatus.Married.name)
+        self.assertEqual(_status.get(), RelationStatusType.Married)
 
     def test_BasicInfoTab_spouse(self):
         _spouse = self.BasicInfoTab._spouseinfo

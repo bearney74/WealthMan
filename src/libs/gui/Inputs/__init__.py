@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import (
     QTabWidget,
     QToolBar,
     QMainWindow,
-    QComboBox,
+    # QComboBox,
     QStyle,
     QProgressDialog,
 )
@@ -19,6 +19,8 @@ from .IncomeInfo import IncomeInfoTab
 from .AssetInfo import AssetInfoTab
 from .ExpenseInfo import ExpenseInfoTab
 from .TransferInfo import TransferInfoTab
+
+from ..guihelpers.Entry import EnumEntry
 
 
 class InputsTab(QMainWindow):
@@ -56,49 +58,38 @@ class InputsTab(QMainWindow):
         self.threadpool = QThreadPool()
 
     def onTabChange(self, i):
-        _tabName = self.tabs.tabText(i)
-        match _tabName:
+        _is_married = self.BasicInfoTab.client_is_married()
+
+        # _tabName = self.tabs.tabText(i)
+        match self.tabs.tabText(i):
             case "Assets":
-                self.AssetInfoTab._spouseinfo.setEnabled(
-                    self.BasicInfoTab.client_is_married()
-                )
+                self.AssetInfoTab._spouseinfo.setEnabled(_is_married)
+
             case "Income":
-                self.IncomeInfoTab.spouseSS.setEnabled(
-                    self.BasicInfoTab.client_is_married()
-                )
-                self.IncomeInfoTab.pension1OwnerLabel.setEnabled(
-                    self.BasicInfoTab.client_is_married()
-                )
-                self.IncomeInfoTab.pension1Owner.setEnabled(
-                    self.BasicInfoTab.client_is_married()
-                )
-                self.IncomeInfoTab.pension2OwnerLabel.setEnabled(
-                    self.BasicInfoTab.client_is_married()
-                )
-                self.IncomeInfoTab.pension2Owner.setEnabled(
-                    self.BasicInfoTab.client_is_married()
-                )
+                self.IncomeInfoTab.spouseSS.setEnabled(_is_married)
+                self.IncomeInfoTab.pension1OwnerLabel.setEnabled(_is_married)
+                self.IncomeInfoTab.pension1Owner.setEnabled(_is_married)
+                self.IncomeInfoTab.pension2OwnerLabel.setEnabled(_is_married)
+                self.IncomeInfoTab.pension2Owner.setEnabled(_is_married)
 
                 for _i in range(1, self.IncomeInfoTab.gridLayout.count() // 6):
                     _item = self.IncomeInfoTab.gridLayout.itemAtPosition(_i, 3)
                     if isinstance(
-                        _item.widget(), QComboBox
+                        _item.widget(), EnumEntry
                     ):  # this is probably a person/owner
-                        _item.widget().setEnabled(self.BasicInfoTab.client_is_married())
+                        _item.widget().setEnabled(_is_married)
 
             case "Expenses":
                 for _i in range(1, self.ExpenseInfoTab.gridLayout.count() // 6):
                     _item = self.ExpenseInfoTab.gridLayout.itemAtPosition(_i, 3)
                     if isinstance(
-                        _item.widget(), QComboBox
+                        _item.widget(), EnumEntry
                     ):  # this is probably a person/owner
-                        _item.widget().setEnabled(self.BasicInfoTab.client_is_married())
+                        _item.widget().setEnabled(_is_married)
             case "Transfers":
                 pass
             case "Global Variables":
-                self.GlobalVariablesTab._FilingStatusOnceWidowed.setEnabled(
-                    self.BasicInfoTab.client_is_married()
-                )
+                self.GlobalVariablesTab._FilingStatusOnceWidowed.setEnabled(_is_married)
         # self._previous_tab_name = _tabName
 
     def clear_forms_action(self):

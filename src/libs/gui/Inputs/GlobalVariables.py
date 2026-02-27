@@ -1,9 +1,15 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QComboBox, QCheckBox
+from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QCheckBox
 
-from libs.gui.guihelpers.Entry import AgeEntry, PercentEntry, YearEntry
+from libs.gui.guihelpers.Entry import (
+    AgeEntry,
+    PercentEntry,
+    YearEntry,
+    WithdrawOrderEntry,
+    FederalTaxStatusEntry,
+)
 
 from libs.DataVariables import DataVariables
-from libs.EnumTypes import FederalTaxStatusType
+# from libs.EnumTypes import FederalTaxStatusType
 
 
 class GlobalVariablesTab(QWidget):
@@ -24,35 +30,39 @@ class GlobalVariablesTab(QWidget):
         self._ssCola = PercentEntry(min=-10.0, max=10.0, num_decimal_places=1)
         formlayout.addRow(QLabel("SS Cola:"), self._ssCola)
 
-        self._WithdrawOrder = QComboBox()
-        self._WithdrawOrder.setFixedWidth(200)
-        self._WithdrawOrder.addItems(
-            [
-                "TaxDeferred,Regular,TaxFree",
-                "TaxDeferred,TaxFree,Regular",
-                "Regular,TaxFree,TaxDeferred",
-                "Regular,TaxDeferred,TaxFree",
-                "TaxFree, TaxDeferred,Regular",
-                "TaxFree,Regular,TaxDeferred",
-            ]
-        )
+        self._WithdrawOrder = WithdrawOrderEntry(limit_size=250)
+        # self._WithdrawOrder = QComboBox()
+        # self._WithdrawOrder.setFixedWidth(200)
+        # self._WithdrawOrder.addItems(list_members(WithdrawOrderType))
+        #    [
+        #        "TaxDeferred,Regular,TaxFree",
+        #        "TaxDeferred,TaxFree,Regular",
+        #        "Regular,TaxFree,TaxDeferred",
+        #        "Regular,TaxDeferred,TaxFree",
+        #        "TaxFree, TaxDeferred,Regular",
+        #        "TaxFree,Regular,TaxDeferred",
+        #    ]
+        # )
         formlayout.addRow(QLabel("Withdrawal Order"), self._WithdrawOrder)
 
-        _filing = [
-            "Single",
-            "MarriedFilingJointly",
-            "MarriedFilingSeparately",
-            "HeadOfHousehold",
-        ]
+        # _filing = [
+        #    "Single",
+        #    "MarriedFilingJointly",
+        #    "MarriedFilingSeparately",
+        #    "HeadOfHousehold",
+        # ]
+        # _filing=list_members(FederalTaxStatusType)
 
-        self._FilingStatus = QComboBox()
-        self._FilingStatus.setFixedWidth(200)
-        self._FilingStatus.addItems(_filing)
+        self._FilingStatus = FederalTaxStatusEntry(limit_size=200)
+        # self._FilingStatus = QComboBox()
+        # self._FilingStatus.setFixedWidth(200)
+        # self._FilingStatus.addItems(_filing)
         formlayout.addRow(QLabel("Federal Filing Status:"), self._FilingStatus)
 
-        self._FilingStatusOnceWidowed = QComboBox()
-        self._FilingStatusOnceWidowed.setFixedWidth(200)
-        self._FilingStatusOnceWidowed.addItems(_filing)
+        self._FilingStatusOnceWidowed = FederalTaxStatusEntry(limit_size=200)
+        # self._FilingStatusOnceWidowed = QComboBox()
+        # self._FilingStatusOnceWidowed.setFixedWidth(200)
+        # self._FilingStatusOnceWidowed.addItems(_filing)
         formlayout.addRow(
             QLabel("Federal Filing Status once Widowed"), self._FilingStatusOnceWidowed
         )
@@ -96,13 +106,16 @@ class GlobalVariablesTab(QWidget):
         d.start_year = self._start_year.get_int(Default=None)
         d.inflation = self._Inflation.get_float(Default=3.0)
         d.ssCola = self._ssCola.get_float(Default=3.0)
-        d.withdrawOrder = self._WithdrawOrder.currentText()
+        d.withdrawOrder = self._WithdrawOrder.enumValue()  # currentText()
         d.forecastYears = self._forecast_years.get_int(Default=30)
         d.inTodaysDollars = self._InTodaysDollars.isChecked()
-        d.federalFilingStatus = FederalTaxStatusType[self._FilingStatus.currentText()]
-        d.federalFilingStatusOnceWidowed = FederalTaxStatusType[
-            self._FilingStatusOnceWidowed.currentText()
-        ]
+        d.federalFilingStatus = (
+            self._FilingStatus.enumValue()
+        )  # FederalTaxStatusType[self._FilingStatus.currentText()]
+        d.federalFilingStatusOnceWidowed = self._FilingStatusOnceWidowed.enumValue()
+        # FederalTaxStatusType[
+        #    self._FilingStatusOnceWidowed.currentText()
+        # ]
         d.SurplusAccount = self._SurplusAccount.isChecked()
         if self._SurplusAccount.isChecked():
             d.SurplusAccountInterestRate = self._SurplusAccountInterestRate.get_float(
@@ -116,6 +129,8 @@ class GlobalVariablesTab(QWidget):
         self._start_year.setText(d.start_year)
         self._Inflation.setText(d.inflation)
         self._ssCola.setText(d.ssCola)
+        # self._WithdrawOrder.setCurrentText(d.withdrawOrder)
+        print(d.withdrawOrder)
         self._WithdrawOrder.setCurrentText(d.withdrawOrder)
         self._forecast_years.setText(d.forecastYears)
         # use hasattr to "upgrade" a saved file to use a new version of
@@ -126,17 +141,20 @@ class GlobalVariablesTab(QWidget):
         if hasattr(d, "inTodaysDollars"):
             self._InTodaysDollars.setChecked(d.inTodaysDollars)
 
-        if hasattr(d, "federalFilingStatus") and d.federalFilingStatus is not None:
-            self._FilingStatus.setCurrentText(d.federalFilingStatus.name)
-        if (
-            hasattr(d, "federalFilingStatusOnceWidowed")
-            and d.federalFilingStatusOnceWidowed is not None
-        ):
-            self._FilingStatusOnceWidowed.setCurrentText(
-                d.federalFilingStatusOnceWidowed.name
-            )
+        self._FilingStatus.set(d.federalFilingStatus)
+        # if hasattr(d, "federalFilingStatus") and d.federalFilingStatus is not None:
+        #    self._FilingStatus.setCurrentText(d.federalFilingStatus.name)
 
-        if hasattr(d, "SurplusAccount"):
-            self._SurplusAccount.setChecked(d.SurplusAccount)
-            self._SurplusAccountInterestRate.setText(d.SurplusAccountInterestRate)
-            self._SurplusAccountInterestRate.setEnabled(d.SurplusAccount)
+        self._FilingStatusOnceWidowed.set(d.federalFilingStatusOnceWidowed)
+        # if (
+        #    hasattr(d, "federalFilingStatusOnceWidowed")
+        #    and d.federalFilingStatusOnceWidowed is not None
+        # ):
+        #    self._FilingStatusOnceWidowed.setCurrentText(
+        #        d.federalFilingStatusOnceWidowed.name
+        #    )
+
+        # if hasattr(d, "SurplusAccount"):
+        self._SurplusAccount.setChecked(d.SurplusAccount)
+        self._SurplusAccountInterestRate.setText(d.SurplusAccountInterestRate)
+        self._SurplusAccountInterestRate.setEnabled(d.SurplusAccount)

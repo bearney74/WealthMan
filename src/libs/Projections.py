@@ -9,6 +9,8 @@ from .EnumTypes import (
     AccountOwnerType,
     AmountPeriodType,
     IncomeSourceType,
+    PersonType,
+    RelationStatusType,
 )
 from .Expense import Expense
 from .FederalPovertyLevel import FederalPovertyLevel
@@ -56,7 +58,9 @@ class WorkerSignals(QObject):
 
 
 class DataItem:
-    def __init__(self, header, format="${:,}", default_data=0):
+    def __init__(
+        self, header: str, format: str = "${:,}", default_data: [float, int] = 0
+    ):
         self._header = header
         self._format = format
         self._data = default_data
@@ -196,7 +200,7 @@ class Projections(QRunnable):
         # print(self.UseSurplusAccount)
         self.SurplusAccountInterestRate = dv.SurplusAccountInterestRate
 
-        _is_married = dv.relationStatus == "Married"
+        _is_married = dv.relationStatus == RelationStatusType.Married
 
         self._begin_year = (
             dv.start_year if dv.start_year is not None else datetime.now().year
@@ -334,7 +338,7 @@ class Projections(QRunnable):
         self._Expenses = []
         for _record in dv.expenses:
             _birthdate = dv.clientBirthDate
-            if _record.owner == AccountOwnerType.Spouse:
+            if _record.owner == PersonType.Spouse:
                 _birthdate = dv.spouseBirthDate
 
             if _record.amount is not None:
@@ -475,9 +479,9 @@ class Projections(QRunnable):
             # maybe look at adding a variable to see if we should do the transfer at the beginning
             # of the period or at the end. (I don't know if this really makes a difference).
 
-            if _transfer.person == "Client":
+            if _transfer.person == PersonType.Client:
                 _person = self._client
-            elif _transfer.person == "Spouse":
+            elif _transfer.person == PersonType.Spouse:
                 _person = self._spouse
 
             self._Transfers.append(
@@ -537,7 +541,7 @@ class Projections(QRunnable):
             # check to see if client (and spouse) are dead...
             # if both client (and spouse) are dead, we don't need to calcuate things further for this year
             if not _clientIsAlive:
-                if self._client.relationship == "Single":
+                if self._client.relationship == RelationStatusType.Single:
                     _projection_data.append(_pyd)
                     continue
                 elif not _spouseIsAlive:
@@ -556,7 +560,7 @@ class Projections(QRunnable):
             _ss_income_total = 0
             for _src in self._IncomeSources:
                 # _income = _src.calc_balance_by_year(_year)
-                if _src.IncomeType == IncomeSourceType.SocialSecurity:
+                if _src.IncomeType == IncomeSourceType.Social_Security:
                     _income = _src.calc_balance_by_year(_year)
                     _ss_income_total += _income
                 else:

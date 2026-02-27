@@ -1,12 +1,17 @@
 from PyQt6.QtWidgets import QWidget, QPushButton, QLabel, QLineEdit
-from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QComboBox
+from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout
 
 from PyQt6.QtCore import Qt
 
-from libs.gui.guihelpers.Entry import MoneyEntry, PercentEntry, AgeEntry
+from libs.gui.guihelpers.Entry import (
+    AgeEntry,
+    MoneyEntry,
+    PercentEntry,
+    PersonTypeEntry,
+)
 
 from libs.DataVariables import DataVariables, ExpenseRecord
-from libs.EnumTypes import AccountOwnerType
+from libs.EnumTypes import RelationStatusType
 
 
 class ExpenseInfoTab(QWidget):
@@ -55,8 +60,9 @@ class ExpenseInfoTab(QWidget):
         _COLA = PercentEntry(self.parent)
         self.gridLayout.addWidget(_COLA, _len, 2)
 
-        _person = QComboBox()
-        _person.addItems(["Client", "Spouse"])
+        _person = PersonTypeEntry()
+        # _person = QComboBox()
+        # _person.addItems(["Client", "Spouse"])
         _person.setEnabled(self.BasicInfoTab.client_is_married())
         self.gridLayout.addWidget(_person, _len, 3)
 
@@ -92,7 +98,7 @@ class ExpenseInfoTab(QWidget):
             _cola = _item.widget().get_float()
 
             _item = self.gridLayout.itemAtPosition(_i, 3)
-            _person = _item.widget().currentText()
+            _person = _item.widget().get()  # currentText()
 
             _item = self.gridLayout.itemAtPosition(_i, 4)
             _begin_age = _item.widget().get_int()
@@ -100,13 +106,13 @@ class ExpenseInfoTab(QWidget):
             _item = self.gridLayout.itemAtPosition(_i, 5)
             _end_age = _item.widget().get_int()
 
-            _owner = AccountOwnerType.Client
-            if self.BasicInfoTab.client_is_married():
-                if _person == "Spouse":
-                    _owner = AccountOwnerType.Spouse
+            # _owner = AccountOwnerType.Client
+            # if self.BasicInfoTab.client_is_married():
+            #    if _person == "Spouse":
+            #        _owner = AccountOwnerType.Spouse
 
             d.expenses.append(
-                ExpenseRecord(_descr, _amount, _cola, _owner, _begin_age, _end_age)
+                ExpenseRecord(_descr, _amount, _cola, _person, _begin_age, _end_age)
             )
 
     def import_data(self, d: DataVariables):
@@ -124,12 +130,13 @@ class ExpenseInfoTab(QWidget):
             _item = self.gridLayout.itemAtPosition(_i, 2)
             _item.widget().setText(_record.COLA)
 
-            if _record.owner == AccountOwnerType.Spouse:
-                _owner = "Spouse"
-            else:
-                _owner = "Client"
+            # if _record.owner == AccountOwnerType.Spouse:
+            #    _owner = PersonType.Spouse
+            # else:
+            #    _owner = PersonType.Client
             _item = self.gridLayout.itemAtPosition(_i, 3)
-            _item.widget().setCurrentText(_owner)
+            _item.widget().set(_record.owner)  # setCurrentText(_owner)
+            _item.widget().setEnabled(d.relationStatus == RelationStatusType.Married)
 
             _item = self.gridLayout.itemAtPosition(_i, 4)
             _item.widget().setText(_record.begin_age)

@@ -1,6 +1,16 @@
 from datetime import datetime, date
+from enum import Enum
+
 from PyQt6.QtWidgets import QLineEdit, QWidget, QComboBox, QHBoxLayout, QLabel
 from PyQt6.QtGui import QIntValidator, QDoubleValidator, QValidator
+
+from ...EnumTypes import (
+    AccountOwnerType,
+    PersonType,
+    RelationStatusType,
+    WithdrawOrderType,
+    FederalTaxStatusType,
+)
 
 
 class MinWidthLabel(QLabel):
@@ -196,27 +206,129 @@ class PercentEntry(FloatEntry):
         self.setValidator(_dv)
 
 
-class PersonTypeEntry(QWidget):
-    def __init__(self, parent):
-        super(PersonTypeEntry, self).__init__(parent)
+class EnumEntry(QWidget):
+    def __init__(self, enum_type: Enum, parent=None, limit_size: int = None):
+        # def __init__(self, parent, enum_type: Enum):
+        super(EnumEntry, self).__init__(parent)
+
+        if limit_size is not None:
+            self.setFixedWidth(limit_size)
 
         _layout = QHBoxLayout()
         self._widget = QComboBox()
-        self._widget.addItems(["Client", "Spouse"])
+        self._enum = enum_type
+        self._widget.addItems(self._list_members(self._enum))
 
         _layout.addWidget(self._widget)
         self.setLayout(_layout)
 
-    def set(self, person):
-        assert isinstance(person, str)
-        assert person in ("Client", "Spouse")
-        self._widget.setCurrentText("%s" % person)
+    @property
+    def currentIndexChanged(self):
+        return self._widget.currentIndexChanged
 
-    def get(self):
+    def currentText(self) -> str:
         return self._widget.currentText()
 
+    def setEnabled(self, flag: bool) -> None:
+        self._widget.setEnabled(flag)
+
+    def isEnabled(self) -> bool:
+        return self._widget.isEnabled()
+
+    def enumValue(self):
+        """return the enum member value"""
+        return self._string2member(self.currentText())
+
+    def setCurrentIndex(self, index: int) -> None:
+        self._widget.setCurrentIndex(index)
+
+    def setCurrentText(self, member: Enum) -> None:
+        if isinstance(member, str):
+            self._widget.setCurrentText(member)
+        else:
+            self._widget.setCurrentText(member.name)
+
+    def _list_members(self, enum: Enum) -> [str]:
+        return [member.name.replace("_", " ") for member in enum]
+
+    def _member2string(self, member) -> str:
+        _name = member.name.replace("_", " ")
+        return _name
+
+    def _string2member(self, value: str) -> Enum:
+        value = value.replace(" ", "_")  # .upper()
+        return self._enum[value]
+
+    def set(self, value: Enum) -> None:
+        if isinstance(value, str):
+            self._widget.setCurrentText(value)
+        else:
+            # assert isinstance(value, Enum)
+            self._widget.setCurrentText(self._member2string(value))
+
+    def get(self) -> Enum:
+        _value = self._widget.currentText()
+        return self._string2member(_value)
+        # return self._widget.currentText()
+
     def clear(self):
-        self._widget.setCurrentText("Client")
+        self._widget.setCurrentIndex(0)
+
+
+class RelationStatusTypeEntry(EnumEntry):
+    def __init__(self, parent=None, limit_size: int = None):
+        super(RelationStatusTypeEntry, self).__init__(
+            RelationStatusType,
+            parent=parent,
+            limit_size=100 if limit_size is None else limit_size,
+        )
+
+
+class AccountOwnerTypeEntry(EnumEntry):
+    def __init__(self, parent=None, limit_size: int = None):
+        super(AccountOwnerTypeEntry, self).__init__(
+            AccountOwnerType,
+            parent=parent,
+            limit_size=100 if limit_size is None else limit_size,
+        )
+
+
+class PersonTypeEntry(EnumEntry):
+    def __init__(self, parent=None, limit_size: int = None):
+        super(PersonTypeEntry, self).__init__(
+            PersonType,
+            parent=parent,
+            limit_size=100 if limit_size is None else limit_size,
+        )
+
+
+class WithdrawOrderEntry(EnumEntry):
+    def __init__(self, parent=None, limit_size: int = None):
+        super(WithdrawOrderEntry, self).__init__(
+            WithdrawOrderType,
+            parent=parent,
+            limit_size=250 if limit_size is None else limit_size,
+        )
+
+    def _list_members(self, enum: Enum):
+        return [member.name.replace("_", ", ") for member in enum]
+
+    def _member2string(self, member):
+        _name = member.name.replace("_", ", ")
+        return _name
+
+    def _string2member(self, value: str):
+        value = value.replace(", ", "_")  # .upper()
+        return self._enum[value]
+
+
+class FederalTaxStatusEntry(EnumEntry):
+    def __init__(self, parent=None, limit_size: int = None):
+        super(FederalTaxStatusEntry, self).__init__(
+            FederalTaxStatusType,
+            parent=parent,
+            limit_size=200 if limit_size is None else limit_size,
+        )
 
 
 class DateEntry(QWidget):
