@@ -2,7 +2,7 @@ import unittest
 from datetime import date
 
 from src.libs.IncomeSources import IncomeSource
-from src.libs.EnumTypes import IncomeSourceType, AmountPeriodType, PersonType
+from src.libs.EnumTypes import IncomeSourceType, PersonType
 
 
 class IncomeSourceTest(unittest.TestCase):
@@ -11,7 +11,6 @@ class IncomeSourceTest(unittest.TestCase):
             "test",
             IncomeType=IncomeSourceType.EMPLOYMENT,
             Amount=100_000,
-            AmountPeriod=AmountPeriodType.ANNUAL,
             Owner=PersonType.CLIENT,
             BirthDate=date(2000, 1, 1),
             COLA=1.0,
@@ -28,7 +27,6 @@ class IncomeSourceTest(unittest.TestCase):
             "test",
             IncomeType=IncomeSourceType.PENSION,
             Amount=50_000,
-            AmountPeriod=AmountPeriodType.ANNUAL,
             Owner=PersonType.CLIENT,
             BirthDate=date(2000, 1, 1),
             SurvivorPercent=100.0,
@@ -39,14 +37,12 @@ class IncomeSourceTest(unittest.TestCase):
         for _year in range(2020, 2030):
             _balance = _is.calc_balance_by_year(_year)
             self.assertEqual(_balance, 50_000)
-            # _balance=int(_balance * 1.01)
 
     def test_SurvivorBenefit50(self):
         _is = IncomeSource(
             "test",
             IncomeType=IncomeSourceType.PENSION,
             Amount=50_000,
-            AmountPeriod=AmountPeriodType.ANNUAL,
             Owner=PersonType.CLIENT,
             BirthDate=date(2000, 1, 1),
             LifeSpanAge=20,
@@ -57,14 +53,12 @@ class IncomeSourceTest(unittest.TestCase):
         for _year in range(2025, 2030):
             _balance = _is.calc_balance_by_year(_year)
             self.assertEqual(_balance, 25_000)
-            # _balance=int(_balance * 1.01)
 
     def test_SurvivorBenefit0(self):
         _is = IncomeSource(
             "test",
             IncomeType=IncomeSourceType.PENSION,
             Amount=50_000,
-            AmountPeriod=AmountPeriodType.ANNUAL,
             Owner=PersonType.CLIENT,
             BirthDate=date(2000, 1, 1),
             LifeSpanAge=20,
@@ -75,7 +69,6 @@ class IncomeSourceTest(unittest.TestCase):
         for _year in range(2025, 2030):
             _balance = _is.calc_balance_by_year(_year)
             self.assertEqual(_balance, 0)
-            # _balance=int(_balance * 1.01)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 from datetime import date
 
-from .EnumTypes import AmountPeriodType
 from .DateHelper import DateHelper
 
 import logging
@@ -13,7 +12,6 @@ class IncomeExpenseBase:
         self,
         Name: str,
         Amount: int,
-        AmountPeriod: AmountPeriodType,
         BirthDate: date = None,
         BeginAge: int = None,
         EndAge: int = None,
@@ -28,9 +26,6 @@ class IncomeExpenseBase:
 
         assert isinstance(Amount, int)
         self.Amount = Amount
-
-        assert isinstance(AmountPeriod, AmountPeriodType)
-        self.AmountPeriod = AmountPeriod
 
         if BeginAge is None:
             BeginAge = 0
@@ -74,7 +69,7 @@ class IncomeExpenseBase:
             else:  # Endyear also equal to year
                 _dh = DateHelper(self.BeginDate, self.EndDate)
                 return int(_dh.percent_of_year() / 100.0 * self._calc_balance())
-                # return self._annual_income
+
         if self.EndDate.year == year:
             if self.BeginDate.year < year:
                 _dh = DateHelper(date(year, 1, 1), self.EndDate)
@@ -92,9 +87,6 @@ class IncomeExpenseBase:
         assert False
 
     def _calc_annual_balance(self) -> int:
-        assert (
-            self.AmountPeriod == AmountPeriodType.ANNUAL
-        )  # todo: do we need this variable?
         return self.Amount
 
     def _calc_balance(self) -> int:

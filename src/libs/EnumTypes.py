@@ -1,12 +1,4 @@
-from enum import Enum, StrEnum
-
-
-# we can probably remove this Enum in the future..
-class AmountPeriodType(Enum):
-    ANNUAL = 1
-    # MONLYTH = 2
-    # BiWeekly = 3
-    # Weekly = 4
+from enum import Enum, StrEnum  # StrEnum requires python > 3.10
 
 
 class RelationStatusType(StrEnum):

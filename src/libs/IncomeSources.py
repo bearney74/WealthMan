@@ -2,9 +2,8 @@ from datetime import date
 
 from .EnumTypes import (
     IncomeSourceType,
-    AmountPeriodType,
     PersonType,
-)  # AccountOwnerType
+)
 from .IncomeExpenseBase import IncomeExpenseBase
 from .Person import Person
 
@@ -15,7 +14,6 @@ class IncomeSource(IncomeExpenseBase):
         Name: str,
         IncomeType: IncomeSourceType,
         Amount: int,
-        AmountPeriod: AmountPeriodType,
         Owner: PersonType,
         BirthDate: date,
         BeginAge: int = None,
@@ -28,7 +26,6 @@ class IncomeSource(IncomeExpenseBase):
         super(IncomeSource, self).__init__(
             Name=Name,
             Amount=Amount,
-            AmountPeriod=AmountPeriod,
             BirthDate=BirthDate,
             BeginAge=BeginAge,
             EndAge=EndAge,
@@ -90,7 +87,6 @@ class SocialSecurity(IncomeSource):
             Name=Name,
             IncomeType=IncomeSourceType.SOCIAL_SECURITY,
             Amount=FRAAmount,
-            AmountPeriod=AmountPeriodType.ANNUAL,
             Owner=Owner,
             BirthDate=BirthDate,
             BeginAge=BeginAge,

@@ -82,8 +82,6 @@ class IncomeInfoTab(QWidget):
 
         self.pension1OwnerLabel = QLabel("Owner:")
         self.pension1Owner = PersonTypeEntry()
-        # self.pension1Owner = QComboBox()
-        # self.pension1Owner.addItems(["Client", "Spouse"])
         _flayout1.addRow(self.pension1OwnerLabel, self.pension1Owner)
 
         self.pension1Amount = MoneyEntry()
@@ -110,8 +108,6 @@ class IncomeInfoTab(QWidget):
 
         self.pension2OwnerLabel = QLabel("Owner:")
         self.pension2Owner = PersonTypeEntry()
-        # self.pension2Owner = QComboBox()
-        # self.pension2Owner.addItems(["Client", "Spouse"])
         _flayout2.addRow(self.pension2OwnerLabel, self.pension2Owner)
 
         self.pension2Amount = MoneyEntry()
@@ -181,8 +177,6 @@ class IncomeInfoTab(QWidget):
         self.gridLayout.addWidget(_percent, _row, 2)
 
         _owner = PersonTypeEntry()
-        # _person = QComboBox()
-        # _person.addItems(["Client", "Spouse"])
         self.gridLayout.addWidget(_owner, _row, 3)
         _owner.setEnabled(self.BasicInfoTab.client_is_married())
 
@@ -219,7 +213,6 @@ class IncomeInfoTab(QWidget):
         if not self.BasicInfoTab.client_is_married():
             dv.pension1Owner = PersonType.CLIENT
         else:
-            # dv.pension1Owner = AccountOwnerType[self.pension1Owner.currentText()]
             dv.pension1Owner = self.pension1Owner.get()
 
         dv.pension1Amount = self.pension1Amount.get_int()
@@ -232,7 +225,6 @@ class IncomeInfoTab(QWidget):
         if not self.BasicInfoTab.client_is_married():
             dv.pension2Owner = PersonType.CLIENT
         else:
-            # dv.pension2Owner = AccountOwnerType[self.pension2Owner.currentText()]
             dv.pension2Owner = self.pension2Owner.get()
 
         dv.pension2Amount = self.pension2Amount.get_int()
@@ -260,11 +252,6 @@ class IncomeInfoTab(QWidget):
 
             _item = self.gridLayout.itemAtPosition(_row, 5)
             _end_age = _item.widget().get_int()
-
-            # _owner = AccountOwnerType.Client
-            # if self.BasicInfoTab.client_is_married():
-            #    if _person == PersonType.Spouse:
-            #        _owner = AccountOwnerType.Spouse
 
             dv.otherIncomes.append(
                 IncomeRecord(_descr, _amount, _cola, _owner, _begin_age, _end_age)

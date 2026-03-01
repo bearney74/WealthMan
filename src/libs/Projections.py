@@ -7,7 +7,6 @@ from .DataVariables import DataVariables
 from .EnumTypes import (
     AccountType,
     AccountOwnerType,
-    AmountPeriodType,
     IncomeSourceType,
     PersonType,
     RelationStatusType,
@@ -275,7 +274,6 @@ class Projections(QRunnable):
                 IncomeType=IncomeSourceType.PENSION,
                 Owner=dv.pension1Owner,
                 Amount=dv.pension1Amount,
-                AmountPeriod=AmountPeriodType.ANNUAL,  # is this needed? should we always assume ANNUAL
                 BirthDate=_birthdate,
                 BeginAge=dv.pension1BeginAge,
                 LifeSpanAge=_lifespan,
@@ -296,7 +294,6 @@ class Projections(QRunnable):
                 IncomeType=IncomeSourceType.PENSION,
                 Owner=dv.pension2Owner,
                 Amount=dv.pension2Amount,
-                AmountPeriod=AmountPeriodType.ANNUAL,
                 BirthDate=_birthdate,
                 BeginAge=dv.pension2BeginAge,
                 SurvivorPercent=dv.pension2SurvivorBenefits,
@@ -320,7 +317,6 @@ class Projections(QRunnable):
                     _record.descr,
                     IncomeSourceType.EMPLOYMENT,
                     _record.amount,
-                    AmountPeriodType.ANNUAL,
                     _record.owner,
                     BirthDate=_birthdate,
                     BeginAge=_record.begin_age,
@@ -354,7 +350,6 @@ class Projections(QRunnable):
                 _e = Expense(
                     _record.descr,
                     _record.amount,
-                    AmountPeriodType.ANNUAL,
                     BirthDate=_birthdate,
                     BeginAge=_record.begin_age,
                     EndAge=_record.end_age,

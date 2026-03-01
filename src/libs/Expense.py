@@ -1,7 +1,6 @@
 from datetime import date
 
 from .IncomeExpenseBase import IncomeExpenseBase
-from .EnumTypes import AmountPeriodType
 
 
 class Expense(IncomeExpenseBase):
@@ -9,7 +8,6 @@ class Expense(IncomeExpenseBase):
         self,
         Name: str,
         Amount: int,
-        AmountPeriod: AmountPeriodType,
         BirthDate: date = None,
         BeginAge: int = None,
         EndAge: int = None,
@@ -19,7 +17,6 @@ class Expense(IncomeExpenseBase):
             self,
             Name=Name,
             Amount=Amount,
-            AmountPeriod=AmountPeriod,
             BirthDate=BirthDate,
             BeginAge=BeginAge,
             EndAge=EndAge,
