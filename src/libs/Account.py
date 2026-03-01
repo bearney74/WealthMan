@@ -126,7 +126,7 @@ class TraditionalIRA(Account):
         super(TraditionalIRA, self).__init__(
             Name=Name,
             Owner=Owner,
-            Type=AccountType.TaxDeferred,
+            Type=AccountType.TAXDEFERRED,
             BirthDate=BirthDate,
             Balance=Balance,
             InterestRate=InterestRate,
@@ -162,7 +162,7 @@ class RothIRA(Account):
         super(RothIRA, self).__init__(
             Name=Name,
             Owner=Owner,
-            Type=AccountType.TaxFree,
+            Type=AccountType.TAXFREE,
             BirthDate=BirthDate,
             Balance=Balance,
             InterestRate=InterestRate,
@@ -190,7 +190,7 @@ class Brokerage(Account):
         super(Brokerage, self).__init__(
             Name=Name,
             Owner=Owner,
-            Type=AccountType.Regular,
+            Type=AccountType.REGULAR,
             BirthDate=BirthDate,
             Balance=Balance,
             InterestRate=InterestRate,

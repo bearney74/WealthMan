@@ -2,17 +2,17 @@ import unittest
 from datetime import date
 
 from src.libs.IncomeSources import IncomeSource
-from src.libs.EnumTypes import IncomeSourceType, AmountPeriodType, AccountOwnerType
+from src.libs.EnumTypes import IncomeSourceType, AmountPeriodType, PersonType
 
 
 class IncomeSourceTest(unittest.TestCase):
     def test_Employment(self):
         _is = IncomeSource(
             "test",
-            IncomeType=IncomeSourceType.Employment,
+            IncomeType=IncomeSourceType.EMPLOYMENT,
             Amount=100_000,
-            AmountPeriod=AmountPeriodType.Annual,
-            Owner=AccountOwnerType.Client,
+            AmountPeriod=AmountPeriodType.ANNUAL,
+            Owner=PersonType.CLIENT,
             BirthDate=date(2000, 1, 1),
             COLA=1.0,
         )
@@ -26,10 +26,10 @@ class IncomeSourceTest(unittest.TestCase):
     def test_SurvivorBenefit100(self):
         _is = IncomeSource(
             "test",
-            IncomeType=IncomeSourceType.Pension,
+            IncomeType=IncomeSourceType.PENSION,
             Amount=50_000,
-            AmountPeriod=AmountPeriodType.Annual,
-            Owner=AccountOwnerType.Client,
+            AmountPeriod=AmountPeriodType.ANNUAL,
+            Owner=PersonType.CLIENT,
             BirthDate=date(2000, 1, 1),
             SurvivorPercent=100.0,
             COLA=0.0,
@@ -44,10 +44,10 @@ class IncomeSourceTest(unittest.TestCase):
     def test_SurvivorBenefit50(self):
         _is = IncomeSource(
             "test",
-            IncomeType=IncomeSourceType.Pension,
+            IncomeType=IncomeSourceType.PENSION,
             Amount=50_000,
-            AmountPeriod=AmountPeriodType.Annual,
-            Owner=AccountOwnerType.Client,
+            AmountPeriod=AmountPeriodType.ANNUAL,
+            Owner=PersonType.CLIENT,
             BirthDate=date(2000, 1, 1),
             LifeSpanAge=20,
             SurvivorPercent=50.0,
@@ -62,10 +62,10 @@ class IncomeSourceTest(unittest.TestCase):
     def test_SurvivorBenefit0(self):
         _is = IncomeSource(
             "test",
-            IncomeType=IncomeSourceType.Pension,
+            IncomeType=IncomeSourceType.PENSION,
             Amount=50_000,
-            AmountPeriod=AmountPeriodType.Annual,
-            Owner=AccountOwnerType.Client,
+            AmountPeriod=AmountPeriodType.ANNUAL,
+            Owner=PersonType.CLIENT,
             BirthDate=date(2000, 1, 1),
             LifeSpanAge=20,
             SurvivorPercent=0.0,

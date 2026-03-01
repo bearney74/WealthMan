@@ -9,7 +9,7 @@ class AccountTest(unittest.TestCase):
     """tests to verify that basic calcs from Federal Tax Brackets are correct..."""
 
     def test_basicAccount(self):
-        _a = Account("basic", AccountType.Regular, AccountOwnerType.Client)
+        _a = Account("basic", AccountType.REGULAR, AccountOwnerType.CLIENT)
         _a.deposit(500)
         self.assertEqual(_a.Balance, 500)
 
@@ -21,7 +21,7 @@ class AccountTest(unittest.TestCase):
 
     def test_AccountInterestRate(self):
         _a = Account(
-            "Cola", AccountType.Regular, AccountOwnerType.Client, InterestRate=0.1
+            "Cola", AccountType.REGULAR, AccountOwnerType.CLIENT, InterestRate=0.1
         )
         _a.deposit(500)
         self.assertEqual(_a.Balance, 500)
@@ -32,8 +32,8 @@ class AccountTest(unittest.TestCase):
     def test_AccountContribution(self):
         _a = Account(
             "Contribution",
-            AccountType.Regular,
-            AccountOwnerType.Client,
+            AccountType.REGULAR,
+            AccountOwnerType.CLIENT,
             BirthDate=date(2000, 1, 1),
             Contribution=1000,
         )
@@ -44,8 +44,8 @@ class AccountTest(unittest.TestCase):
     def test_AccountContribution1(self):
         _a = Account(
             "Contribution",
-            AccountType.Regular,
-            AccountOwnerType.Client,
+            AccountType.REGULAR,
+            AccountOwnerType.CLIENT,
             BirthDate=date(2000, 1, 1),
             Contribution=1000,
             ContributionBeginAge=20,
@@ -72,7 +72,7 @@ class TraditionalIRATest(unittest.TestCase):
     def test_basic(self):
         _a = TraditionalIRA(
             "basic",
-            Owner=AccountOwnerType.Client,
+            Owner=AccountOwnerType.CLIENT,
             BirthDate=date(2000, 1, 1),
             Balance=1000,
         )
@@ -87,7 +87,7 @@ class RothIRATest(unittest.TestCase):
     def test_basic(self):
         _a = RothIRA(
             "basic",
-            Owner=AccountOwnerType.Client,
+            Owner=AccountOwnerType.CLIENT,
             BirthDate=date(2000, 1, 1),
             Balance=1000,
         )
@@ -102,7 +102,7 @@ class BrokerageTest(unittest.TestCase):
     def test_basic(self):
         _a = Brokerage(
             "basic",
-            Owner=AccountOwnerType.Client,
+            Owner=AccountOwnerType.CLIENT,
             BirthDate=date(2000, 1, 1),
             Balance=1000,
         )

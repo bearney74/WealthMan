@@ -10,7 +10,7 @@ class SocialSecurityTaxes:
         self._income = AGI + int(SS_Amount / 2)
         self._taxable = None
 
-        if filing_status == FederalTaxStatusType.Married_Filing_Jointly:
+        if filing_status == FederalTaxStatusType.MARRIED_FILING_JOINTLY:
             self._threshold1 = 32000
             self._threshold2 = 44000
         else:

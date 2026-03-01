@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from enum import Enum
+from enum import Enum, StrEnum
 
 from PyQt6.QtWidgets import QLineEdit, QWidget, QComboBox, QHBoxLayout, QLabel
 from PyQt6.QtGui import QIntValidator, QDoubleValidator, QValidator
@@ -197,17 +197,14 @@ class PercentEntry(FloatEntry):
     def __init__(self, parent=None, min=0.0, max=9.9, num_decimal_places: int = 1):
         super(PercentEntry, self).__init__(parent, min, max, num_decimal_places)
 
-        # self.setMaxLength(4)
         self.setFixedWidth(30)
-        # self.setValidator(QDoubleValidator(min, max, num_decimal_places))
-        # _dv=QDoubleValidator(0.0, 9.9, 1)
         _dv = QDoubleValidator(min, max, num_decimal_places)
         _dv.setNotation(QDoubleValidator.Notation.StandardNotation)
         self.setValidator(_dv)
 
 
 class EnumEntry(QWidget):
-    def __init__(self, enum_type: Enum, parent=None, limit_size: int = None):
+    def __init__(self, enum_type: StrEnum, parent=None, limit_size: int = None):
         # def __init__(self, parent, enum_type: Enum):
         super(EnumEntry, self).__init__(parent)
 
@@ -216,6 +213,9 @@ class EnumEntry(QWidget):
 
         _layout = QHBoxLayout()
         self._widget = QComboBox()
+
+        # print(enum_type)
+        # assert isinstance(enum_type, StrEnum)
         self._enum = enum_type
         self._widget.addItems(self._list_members(self._enum))
 
@@ -237,39 +237,30 @@ class EnumEntry(QWidget):
 
     def enumValue(self):
         """return the enum member value"""
-        return self._string2member(self.currentText())
+        return self._enum(self._widget.currentText())
 
     def setCurrentIndex(self, index: int) -> None:
         self._widget.setCurrentIndex(index)
 
-    def setCurrentText(self, member: Enum) -> None:
+    def setCurrentText(self, member: StrEnum) -> None:
         if isinstance(member, str):
             self._widget.setCurrentText(member)
         else:
             self._widget.setCurrentText(member.name)
 
     def _list_members(self, enum: Enum) -> [str]:
-        return [member.name.replace("_", " ") for member in enum]
+        return [member.value for member in enum]
 
-    def _member2string(self, member) -> str:
-        _name = member.name.replace("_", " ")
-        return _name
-
-    def _string2member(self, value: str) -> Enum:
-        value = value.replace(" ", "_")  # .upper()
-        return self._enum[value]
-
-    def set(self, value: Enum) -> None:
-        if isinstance(value, str):
-            self._widget.setCurrentText(value)
+    def set(self, item: Enum) -> None:
+        if isinstance(item, StrEnum):
+            self._widget.setCurrentText(item.value)
+        if isinstance(item, str):
+            self._widget.setCurrentText(item)
         else:
-            # assert isinstance(value, Enum)
-            self._widget.setCurrentText(self._member2string(value))
+            print("Error, invalid item for set function")
 
-    def get(self) -> Enum:
-        _value = self._widget.currentText()
-        return self._string2member(_value)
-        # return self._widget.currentText()
+    def get(self) -> StrEnum:
+        return self._enum(self._widget.currentText())
 
     def clear(self):
         self._widget.setCurrentIndex(0)
@@ -309,17 +300,6 @@ class WithdrawOrderEntry(EnumEntry):
             parent=parent,
             limit_size=250 if limit_size is None else limit_size,
         )
-
-    def _list_members(self, enum: Enum):
-        return [member.name.replace("_", ", ") for member in enum]
-
-    def _member2string(self, member):
-        _name = member.name.replace("_", ", ")
-        return _name
-
-    def _string2member(self, value: str):
-        value = value.replace(", ", "_")  # .upper()
-        return self._enum[value]
 
 
 class FederalTaxStatusEntry(EnumEntry):

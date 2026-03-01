@@ -33,7 +33,7 @@ class SingleMarried(TestCaseQt):
     def test_main(self):
         _status = self.BasicInfoTab._clientinfo._status
 
-        self.assertEqual(_status.get(), RelationStatusType.Single)
+        self.assertEqual(_status.get(), RelationStatusType.SINGLE)
 
         # make sure that spouse widgets are disabled since We choose single
         self.form.InputsTab.tabs.setCurrentIndex(0)  # select Basic Tab
@@ -54,8 +54,8 @@ class SingleMarried(TestCaseQt):
 
         # change status to Married...
         # _status.setCurrentText(RelationStatusType.Married.name)
-        _status.set(RelationStatusType.Married)
-        self.assertEqual(_status.get(), RelationStatusType.Married)
+        _status.set(RelationStatusType.MARRIED)
+        self.assertEqual(_status.get(), RelationStatusType.MARRIED)
 
         # make sure that spouse widgets are enabled since We choose married
         self.form.InputsTab.tabs.setCurrentIndex(0)  # select Basic Tab

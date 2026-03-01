@@ -12,6 +12,7 @@ from .EnumTypes import (
     PersonType,
     RelationStatusType,
 )
+
 from .Expense import Expense
 from .FederalPovertyLevel import FederalPovertyLevel
 from .FederalTax import FederalTax
@@ -111,8 +112,9 @@ class ProjectionYearData:
             "Surplus Deficit"
         )  # int = 0  # cashFlow - assetWithdraws
 
+        # todo format of output for this needs to be fixed. (see Tax Table output)
         self.federalTaxFilingStatus: DataItem = DataItem(
-            "Federal Tax Filing Status", "{.name}", None
+            "Federal Tax Filing Status", "{.value}", None
         )
         # FederalTaxStatusType = None
         self.thisYearsFederalTaxes: DataItem = DataItem(
@@ -200,7 +202,7 @@ class Projections(QRunnable):
         # print(self.UseSurplusAccount)
         self.SurplusAccountInterestRate = dv.SurplusAccountInterestRate
 
-        _is_married = dv.relationStatus == RelationStatusType.Married
+        _is_married = dv.relationStatus == RelationStatusType.MARRIED
 
         self._begin_year = (
             dv.start_year if dv.start_year is not None else datetime.now().year
@@ -233,7 +235,7 @@ class Projections(QRunnable):
                 Person=self._client,
                 BirthDate=dv.clientBirthDate,
                 FRAAmount=dv.clientSSAmount,
-                Owner=AccountOwnerType.Client,
+                Owner=PersonType.CLIENT,
                 BeginAge=dv.clientSSBeginAge,
                 LifeSpanAge=dv.clientLifeSpanAge,
                 COLA=dv.ssCola - self._inflation,
@@ -247,7 +249,7 @@ class Projections(QRunnable):
                     Person=self._spouse,
                     BirthDate=dv.spouseBirthDate,
                     FRAAmount=dv.spouseSSAmount,
-                    Owner=AccountOwnerType.Spouse,
+                    Owner=PersonType.SPOUSE,
                     BeginAge=dv.spouseSSBeginAge,
                     LifeSpanAge=dv.spouseLifeSpanAge,
                     COLA=dv.ssCola - self._inflation,
@@ -264,16 +266,16 @@ class Projections(QRunnable):
         if dv.pension1Name is not None and dv.pension1Name.strip() != "":
             _birthdate = dv.clientBirthDate
             _lifespan = dv.clientLifeSpanAge
-            if dv.pension1Owner == AccountOwnerType.Spouse:
+            if dv.pension1Owner == PersonType.SPOUSE:
                 _birthdate = dv.spouseBirthDate
                 _lifespan = dv.spouseLifeSpanAge
 
             _is = IncomeSource(
                 Name=dv.pension1Name,
-                IncomeType=IncomeSourceType.Pension,
+                IncomeType=IncomeSourceType.PENSION,
                 Owner=dv.pension1Owner,
                 Amount=dv.pension1Amount,
-                AmountPeriod=AmountPeriodType.Annual,
+                AmountPeriod=AmountPeriodType.ANNUAL,  # is this needed? should we always assume ANNUAL
                 BirthDate=_birthdate,
                 BeginAge=dv.pension1BeginAge,
                 LifeSpanAge=_lifespan,
@@ -285,16 +287,16 @@ class Projections(QRunnable):
         if dv.pension2Name is not None and dv.pension2Name.strip() != "":
             _birthdate = dv.clientBirthDate
             _lifespan = dv.clientLifeSpanAge
-            if dv.pension2Owner == AccountOwnerType.Spouse:
+            if dv.pension2Owner == PersonType.SPOUSE:
                 _birthdate = dv.spouseBirthDate
                 _lifespan = dv.spouseLifeSpanAge
 
             _is = IncomeSource(
                 Name=dv.pension2Name,
-                IncomeType=IncomeSourceType.Pension,
+                IncomeType=IncomeSourceType.PENSION,
                 Owner=dv.pension2Owner,
                 Amount=dv.pension2Amount,
-                AmountPeriod=AmountPeriodType.Annual,
+                AmountPeriod=AmountPeriodType.ANNUAL,
                 BirthDate=_birthdate,
                 BeginAge=dv.pension2BeginAge,
                 SurvivorPercent=dv.pension2SurvivorBenefits,
@@ -304,7 +306,7 @@ class Projections(QRunnable):
 
         for _record in dv.otherIncomes:
             _birthdate = dv.clientBirthDate
-            if _record.owner == AccountOwnerType.Spouse:
+            if _record.owner == PersonType.SPOUSE:
                 _birthdate = dv.spouseBirthDate
 
             if _record.amount is not None:
@@ -316,9 +318,9 @@ class Projections(QRunnable):
                     _record.COLA = 0.0
                 _is = IncomeSource(
                     _record.descr,
-                    IncomeSourceType.Employment,
+                    IncomeSourceType.EMPLOYMENT,
                     _record.amount,
-                    AmountPeriodType.Annual,
+                    AmountPeriodType.ANNUAL,
                     _record.owner,
                     BirthDate=_birthdate,
                     BeginAge=_record.begin_age,
@@ -338,7 +340,7 @@ class Projections(QRunnable):
         self._Expenses = []
         for _record in dv.expenses:
             _birthdate = dv.clientBirthDate
-            if _record.owner == PersonType.Spouse:
+            if _record.owner == PersonType.SPOUSE:
                 _birthdate = dv.spouseBirthDate
 
             if _record.amount is not None:
@@ -352,7 +354,7 @@ class Projections(QRunnable):
                 _e = Expense(
                     _record.descr,
                     _record.amount,
-                    AmountPeriodType.Annual,
+                    AmountPeriodType.ANNUAL,
                     BirthDate=_birthdate,
                     BeginAge=_record.begin_age,
                     EndAge=_record.end_age,
@@ -376,7 +378,7 @@ class Projections(QRunnable):
         self._Assets.append(
             TraditionalIRA(
                 Name="Client Trad IRA",
-                Owner=AccountOwnerType.Client,
+                Owner=AccountOwnerType.CLIENT,
                 BirthDate=dv.clientBirthDate,
                 Balance=dv.clientIRABalance,
                 InterestRate=_interest,
@@ -394,13 +396,13 @@ class Projections(QRunnable):
         self._Assets.append(
             RothIRA(
                 Name="Client Roth IRA",
-                Owner=AccountOwnerType.Client,
+                Owner=AccountOwnerType.CLIENT,
                 BirthDate=dv.clientBirthDate,
                 Balance=dv.clientRothIRABalance,
                 InterestRate=_interest,
-                Contribution=dv.clientRothIRAContribution,
-                ContributionBeginAge=dv.clientRothIRAContributionBeginAge,
-                ContributionEndAge=dv.clientRothIRAContributionEndAge,
+                Contribution=dv.clientRothContribution,
+                ContributionBeginAge=dv.clientRothContributionBeginAge,
+                ContributionEndAge=dv.clientRothContributionEndAge,
             )
         )
 
@@ -412,7 +414,7 @@ class Projections(QRunnable):
         self._Assets.append(
             TraditionalIRA(
                 Name="Spouse Trad IRA",
-                Owner=AccountOwnerType.Spouse,
+                Owner=AccountOwnerType.SPOUSE,
                 Balance=dv.spouseIRABalance,
                 BirthDate=dv.spouseBirthDate,
                 InterestRate=_interest,
@@ -429,13 +431,13 @@ class Projections(QRunnable):
         self._Assets.append(
             RothIRA(
                 Name="Spouse Roth IRA",
-                Owner=AccountOwnerType.Spouse,
+                Owner=AccountOwnerType.SPOUSE,
                 BirthDate=dv.spouseBirthDate,
                 Balance=dv.spouseRothIRABalance,
                 InterestRate=_interest,
-                Contribution=dv.spouseRothIRAContribution,
-                ContributionBeginAge=dv.spouseRothIRAContributionBeginAge,
-                ContributionEndAge=dv.spouseRothIRAContributionEndAge,
+                Contribution=dv.spouseRothContribution,
+                ContributionBeginAge=dv.spouseRothContributionBeginAge,
+                ContributionEndAge=dv.spouseRothContributionEndAge,
             )
         )
 
@@ -446,7 +448,7 @@ class Projections(QRunnable):
         self._Assets.append(
             Brokerage(
                 Name="Regular Taxable",
-                Owner=AccountOwnerType.Both,
+                Owner=AccountOwnerType.BOTH,
                 BirthDate=dv.clientBirthDate,
                 Balance=dv.regularBalance,
                 InterestRate=_interest,
@@ -479,9 +481,9 @@ class Projections(QRunnable):
             # maybe look at adding a variable to see if we should do the transfer at the beginning
             # of the period or at the end. (I don't know if this really makes a difference).
 
-            if _transfer.person == PersonType.Client:
+            if _transfer.person == PersonType.CLIENT:
                 _person = self._client
-            elif _transfer.person == PersonType.Spouse:
+            elif _transfer.person == PersonType.SPOUSE:
                 _person = self._spouse
 
             self._Transfers.append(
@@ -528,7 +530,7 @@ class Projections(QRunnable):
                 _clientRMD.death_event(self._client)
 
             _spouseage = None
-            _spouseIsAlive = None
+            _spouseIsAlive = False
             if self._spouse is not None:
                 _spouseage = self._spouse.calc_age_by_year(_year)
                 _spouseIsAlive = _spouseage <= self._spouse.lifeSpanAge
@@ -541,7 +543,7 @@ class Projections(QRunnable):
             # check to see if client (and spouse) are dead...
             # if both client (and spouse) are dead, we don't need to calcuate things further for this year
             if not _clientIsAlive:
-                if self._client.relationship == RelationStatusType.Single:
+                if self._client.relationship == RelationStatusType.SINGLE:
                     _projection_data.append(_pyd)
                     continue
                 elif not _spouseIsAlive:
@@ -560,7 +562,7 @@ class Projections(QRunnable):
             _ss_income_total = 0
             for _src in self._IncomeSources:
                 # _income = _src.calc_balance_by_year(_year)
-                if _src.IncomeType == IncomeSourceType.Social_Security:
+                if _src.IncomeType == IncomeSourceType.SOCIAL_SECURITY:
                     _income = _src.calc_balance_by_year(_year)
                     _ss_income_total += _income
                 else:
@@ -595,10 +597,10 @@ class Projections(QRunnable):
 
                 _pyd.assetSources[_src.Name] = DataItem(_src.Name, "${:,}", _balance)
 
-                if _src.Type == AccountType.TaxDeferred:
-                    if _src.Owner == AccountOwnerType.Client:
+                if _src.Type == AccountType.TAXDEFERRED:
+                    if _src.Owner == AccountOwnerType.CLIENT:
                         _client_ira_total += _balance
-                    elif _src.Owner == AccountOwnerType.Spouse:
+                    elif _src.Owner == AccountOwnerType.SPOUSE:
                         _spouse_ira_total += _balance
 
                 _total += _balance
@@ -655,15 +657,15 @@ class Projections(QRunnable):
 
                 _pyd.assetWithdraw.data = 0
                 _pyd.assetTaxDeferredWithdraw.data = _withdraw_dict[
-                    AccountType.TaxDeferred
+                    AccountType.TAXDEFERRED
                 ]
-                _pyd.assetRegularWithdraw.data = _withdraw_dict[AccountType.Regular]
-                _pyd.assetTaxFreeWithdraw.data = _withdraw_dict[AccountType.TaxFree]
+                _pyd.assetRegularWithdraw.data = _withdraw_dict[AccountType.REGULAR]
+                _pyd.assetTaxFreeWithdraw.data = _withdraw_dict[AccountType.TAXFREE]
 
                 for _asset_type, _amount in _withdraw_dict.items():
                     _pyd.assetWithdraw.data += _amount
                     if (
-                        _asset_type == AccountType.TaxDeferred
+                        _asset_type == AccountType.TAXDEFERRED
                     ):  # these withdraws are seen as regular income
                         _income_total += _amount
                         _taxable_income_total += _amount
@@ -679,8 +681,8 @@ class Projections(QRunnable):
                 _deficit = 0
                 # _pyd.surplusDeficit = _pyd.cashFlow
                 _withdraw_dict = {
-                    AccountType.Regular: 0,
-                    AccountType.TaxDeferred: 0,
+                    AccountType.REGULAR: 0,
+                    AccountType.TAXDEFERRED: 0,
                 }  # no withdraws...
                 # _income_total = 0
 
@@ -830,7 +832,7 @@ class Projections(QRunnable):
                 max(_pyd.taxableIncomeTotal.data - _ft.StandardDeduction, 0)
             )
             _pyd.longTermCapitalGainsTaxes.data = _ft.calc_ltcg_taxes(
-                _withdraw_dict[AccountType.Regular] + _pyd.surplusWithdraw.data
+                _withdraw_dict[AccountType.REGULAR] + _pyd.surplusWithdraw.data
             )
             _pyd.thisYearsFederalTaxes.data = (
                 _pyd.thisYearsFederalTaxes.data + _pyd.longTermCapitalGainsTaxes.data

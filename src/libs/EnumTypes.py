@@ -1,74 +1,56 @@
-from enum import Enum
-
-# def list_members(enum_type: Enum):
-#    return [member.name.replace('_', ' ') for member in enum_type]
-
-# def string2member(enum_type:Enum, name:str):
-#    try:
-#        return enum_type[name.replace(' ', '_')]
-#    except KeyError:
-#        #log this error..
-#        pass
+from enum import Enum, StrEnum
 
 
+# we can probably remove this Enum in the future..
 class AmountPeriodType(Enum):
-    Annual = 1
-    Monthly = 2
-    BiWeekly = 3
-    Weekly = 4
+    ANNUAL = 1
+    # MONLYTH = 2
+    # BiWeekly = 3
+    # Weekly = 4
 
 
-class RelationStatusType(Enum):
-    Single = 1
-    Married = 2
+class RelationStatusType(StrEnum):
+    SINGLE = "Single"
+    MARRIED = "Married"
 
 
-class PersonType(Enum):
-    Client = 0
-    Spouse = 1
+class PersonType(StrEnum):
+    CLIENT = "Client"
+    SPOUSE = "Spouse"
 
 
 class AccountOwnerType(Enum):
-    Client = 0
-    Spouse = 1
-    Both = 2
-
-
-# class Relationship(Enum):
-#    Spouse = 1
-#    Child = 2
+    CLIENT = 0
+    SPOUSE = 1
+    BOTH = 2
 
 
 class AccountType(Enum):
-    Regular = 1  # Savings, Checking, Money Market, etc
-    TaxDeferred = 2  # 401k, IRA, etc
-    TaxFree = 3  # Roth IRA, Life Insurance Payout, etc
+    REGULAR = 1  # Savings, Checking, Money Market, etc
+    TAXDEFERRED = 2  # 401k, IRA, etc
+    TAXFREE = 3  # Roth IRA, Life Insurance Payout, etc
 
 
 #   Brokerage = 4  # for long term capital gains taxes...
 
 
 class IncomeSourceType(Enum):
-    Employment = 1
-    Pension = 2
-    Social_Security = 3
+    EMPLOYMENT = 1
+    PENSION = 2
+    SOCIAL_SECURITY = 3
 
 
-class FederalTaxStatusType(Enum):
-    Single = 1
-    Married_Filing_Jointly = 2
-    Married_Filing_Separately = 3
-    Head_Of_Household = 4
-
-    @classmethod
-    def has_member(cls, s):
-        return s in cls.__members__
+class FederalTaxStatusType(StrEnum):
+    SINGLE = "Single"
+    MARRIED_FILING_JOINTLY = "Married Filing Jointly"
+    MARRIED_FILING_SEPARATELY = "Married Filing Separately"
+    HEAD_OF_HOUSEHOLD = "Head Of Household"
 
 
-class WithdrawOrderType(Enum):
-    TaxDeferred_Regular_TaxFree = 1
-    TaxDeferred_TaxFree_Regular = 2
-    Regular_TaxFree_TaxDeferred = 3
-    Regular_TaxDeferred_TaxFree = 4
-    TaxFree_TaxDeferred_Regular = 5
-    TaxFree_Regular_TaxDeferred = 6
+class WithdrawOrderType(StrEnum):
+    TAXDEFERRED_REGULAR_TAXFREE = "Tax Deferred, Regular, Tax Free"
+    TAXDEFERRED_TAXFREE_REGULAR = "Tax Deferred, Tax Free, Regular"
+    REGULAR_TAXFREE_TAXDEFERRED = "Regular, Tax Free, Tax Deferred"
+    REGULAR_TAXDEFERRED_TAXFREE = "Regular, Tax Deferred, Tax Free"
+    TAXFREE_TAXDEFERRED_REGULAR = "Tax Free, Tax Deferred, Regular"
+    TAXFREE_REGULAR_TAXDEFERRED = "Tax Free, Regular, Tax Deferred"

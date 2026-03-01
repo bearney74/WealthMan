@@ -1,6 +1,10 @@
 from datetime import date
 
-from .EnumTypes import IncomeSourceType, AmountPeriodType, AccountOwnerType
+from .EnumTypes import (
+    IncomeSourceType,
+    AmountPeriodType,
+    PersonType,
+)  # AccountOwnerType
 from .IncomeExpenseBase import IncomeExpenseBase
 from .Person import Person
 
@@ -12,7 +16,7 @@ class IncomeSource(IncomeExpenseBase):
         IncomeType: IncomeSourceType,
         Amount: int,
         AmountPeriod: AmountPeriodType,
-        Owner: AccountOwnerType,
+        Owner: PersonType,
         BirthDate: date,
         BeginAge: int = None,
         EndAge: int = None,
@@ -35,7 +39,7 @@ class IncomeSource(IncomeExpenseBase):
         assert isinstance(IncomeType, IncomeSourceType)
         self.IncomeType = IncomeType
 
-        assert isinstance(Owner, AccountOwnerType) or Owner is None
+        assert isinstance(Owner, PersonType) or Owner is None
         self.Owner = Owner
 
     def calc_balance_by_year(self, year):
@@ -55,7 +59,7 @@ class SocialSecurity(IncomeSource):
         Person: Person,
         BirthDate: date,
         FRAAmount: int,
-        Owner: AccountOwnerType,
+        Owner: PersonType,
         BeginAge: int = None,
         LifeSpanAge: int = None,
         COLA: float = 0.0,
@@ -84,9 +88,9 @@ class SocialSecurity(IncomeSource):
 
         super(SocialSecurity, self).__init__(
             Name=Name,
-            IncomeType=IncomeSourceType.Social_Security,
+            IncomeType=IncomeSourceType.SOCIAL_SECURITY,
             Amount=FRAAmount,
-            AmountPeriod=AmountPeriodType.Annual,
+            AmountPeriod=AmountPeriodType.ANNUAL,
             Owner=Owner,
             BirthDate=BirthDate,
             BeginAge=BeginAge,

@@ -1,10 +1,8 @@
 import unittest
 from datetime import date
 
-from src.libs.EnumTypes import AccountOwnerType
+from src.libs.EnumTypes import PersonType
 from src.libs.Person import Person
-
-# from libs.SocialSecurity import SocialSecurity
 from src.libs.IncomeSources import SocialSecurity
 
 # FRA means Full Retirement Age
@@ -21,7 +19,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
             FRAAmount=0,
             Person=_p,
             BirthDate=_p.birthDate,
-            Owner=AccountOwnerType.Client,
+            Owner=PersonType.CLIENT,
         )
         self.assertEqual(_ss.calc_full_retirement_age(), 67)
 
@@ -31,7 +29,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
             FRAAmount=0,
             Person=_p,
             BirthDate=_p.birthDate,
-            Owner=AccountOwnerType.Client,
+            Owner=PersonType.CLIENT,
         )
         self.assertEqual(_ss.calc_full_retirement_age(), 67)
 
@@ -42,7 +40,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
             FRAAmount=0,
             Person=_p,
             BirthDate=_p.birthDate,
-            Owner=AccountOwnerType.Client,
+            Owner=PersonType.CLIENT,
         )
         self.assertEqual(_ss.calc_full_retirement_age(), 66)
 
@@ -68,7 +66,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
                 FRAAmount=3000,
                 Person=_p,
                 BirthDate=_p.birthDate,
-                Owner=AccountOwnerType.Client,
+                Owner=PersonType.CLIENT,
                 BeginAge=_age,
             )
 
@@ -93,7 +91,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
                 FRAAmount=2500,
                 Person=_p,
                 BirthDate=_p.birthDate,
-                Owner=AccountOwnerType.Client,
+                Owner=PersonType.CLIENT,
                 BeginAge=_age,
             )
 

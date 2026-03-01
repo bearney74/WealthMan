@@ -9,35 +9,35 @@ from src.libs.EnumTypes import AccountType, AccountOwnerType, WithdrawOrderType
 class WithdrawOrderTest(unittest.TestCase):
     def test_WithdrawOrderType2List(self):
         self.assertEqual(
-            WithdrawOrderType2List(WithdrawOrderType.TaxDeferred_Regular_TaxFree),
-            [AccountType.TaxDeferred, AccountType.Regular, AccountType.TaxFree],
+            WithdrawOrderType2List(WithdrawOrderType.TAXDEFERRED_REGULAR_TAXFREE),
+            [AccountType.TAXDEFERRED, AccountType.REGULAR, AccountType.TAXFREE],
         )
         self.assertEqual(
-            WithdrawOrderType2List(WithdrawOrderType.TaxDeferred_TaxFree_Regular),
-            [AccountType.TaxDeferred, AccountType.TaxFree, AccountType.Regular],
+            WithdrawOrderType2List(WithdrawOrderType.TAXDEFERRED_TAXFREE_REGULAR),
+            [AccountType.TAXDEFERRED, AccountType.TAXFREE, AccountType.REGULAR],
         )
         self.assertEqual(
-            WithdrawOrderType2List(WithdrawOrderType.Regular_TaxFree_TaxDeferred),
-            [AccountType.Regular, AccountType.TaxFree, AccountType.TaxDeferred],
+            WithdrawOrderType2List(WithdrawOrderType.REGULAR_TAXFREE_TAXDEFERRED),
+            [AccountType.REGULAR, AccountType.TAXFREE, AccountType.TAXDEFERRED],
         )
         self.assertEqual(
-            WithdrawOrderType2List(WithdrawOrderType.Regular_TaxDeferred_TaxFree),
-            [AccountType.Regular, AccountType.TaxDeferred, AccountType.TaxFree],
+            WithdrawOrderType2List(WithdrawOrderType.REGULAR_TAXDEFERRED_TAXFREE),
+            [AccountType.REGULAR, AccountType.TAXDEFERRED, AccountType.TAXFREE],
         )
         self.assertEqual(
-            WithdrawOrderType2List(WithdrawOrderType.TaxFree_TaxDeferred_Regular),
-            [AccountType.TaxFree, AccountType.TaxDeferred, AccountType.Regular],
+            WithdrawOrderType2List(WithdrawOrderType.TAXFREE_TAXDEFERRED_REGULAR),
+            [AccountType.TAXFREE, AccountType.TAXDEFERRED, AccountType.REGULAR],
         )
         self.assertEqual(
-            WithdrawOrderType2List(WithdrawOrderType.TaxFree_Regular_TaxDeferred),
-            [AccountType.TaxFree, AccountType.Regular, AccountType.TaxDeferred],
+            WithdrawOrderType2List(WithdrawOrderType.TAXFREE_REGULAR_TAXDEFERRED),
+            [AccountType.TAXFREE, AccountType.REGULAR, AccountType.TAXDEFERRED],
         )
 
-    def test_TaxDeferred_Regular_TaxFree(self):
+    def test_TAXDEFERRED_REGULAR_TAXFREE(self):
         # tax deferred
         _trad = TraditionalIRA(
             Name="Trad IRA",
-            Owner=AccountOwnerType.Client,
+            Owner=AccountOwnerType.CLIENT,
             BirthDate=date(1990, 1, 1),
             Balance=1000,
             InterestRate=1.0,
@@ -46,23 +46,23 @@ class WithdrawOrderTest(unittest.TestCase):
         # tax free
         _roth = RothIRA(
             Name="Roth IRA",
-            Owner=AccountOwnerType.Client,
+            Owner=AccountOwnerType.CLIENT,
             BirthDate=date(1990, 1, 1),
             Balance=500,
             InterestRate=2.0,
         )
 
-        # Regular
+        # REGULAR
         _brokerage = Brokerage(
             Name="Brokerage",
-            Owner=AccountOwnerType.Client,
+            Owner=AccountOwnerType.CLIENT,
             BirthDate=date(1990, 1, 1),
             Balance=500,
             InterestRate=2.0,
         )
 
         _ws = WithdrawStrategy(
-            WithdrawOrderType.TaxDeferred_Regular_TaxFree,
+            WithdrawOrderType.TAXDEFERRED_REGULAR_TAXFREE,
             60,
             True,
             60,
@@ -72,9 +72,9 @@ class WithdrawOrderTest(unittest.TestCase):
         _deficit, _dict = _ws.reconcile_required_withdraw(100)
 
         self.assertEqual(_deficit, 0)
-        self.assertEqual(_dict[AccountType.TaxDeferred], 100)
-        self.assertEqual(_dict[AccountType.TaxFree], 0)
-        self.assertEqual(_dict[AccountType.Regular], 0)
+        self.assertEqual(_dict[AccountType.TAXDEFERRED], 100)
+        self.assertEqual(_dict[AccountType.TAXFREE], 0)
+        self.assertEqual(_dict[AccountType.REGULAR], 0)
         self.assertEqual(_trad.Balance, 900)
         self.assertEqual(_roth.Balance, 500)
         self.assertEqual(_brokerage.Balance, 500)
@@ -83,7 +83,7 @@ class WithdrawOrderTest(unittest.TestCase):
         # tax deferred
         _trad = TraditionalIRA(
             Name="Trad IRA",
-            Owner=AccountOwnerType.Client,
+            Owner=AccountOwnerType.CLIENT,
             BirthDate=date(1990, 1, 1),
             Balance=1000,
             InterestRate=1.0,
@@ -91,14 +91,14 @@ class WithdrawOrderTest(unittest.TestCase):
 
         _roth = RothIRA(
             Name="Roth IRA",
-            Owner=AccountOwnerType.Spouse,
+            Owner=AccountOwnerType.SPOUSE,
             BirthDate=date(1990, 1, 1),
             Balance=0,
             InterestRate=2.0,
         )
 
         _ws = WithdrawStrategy(
-            WithdrawOrderType.TaxDeferred_Regular_TaxFree,
+            WithdrawOrderType.TAXDEFERRED_REGULAR_TAXFREE,
             60,
             True,
             60,
@@ -109,9 +109,9 @@ class WithdrawOrderTest(unittest.TestCase):
         _deficit, _dict = _ws.reconcile_required_withdraw(5_000)
 
         self.assertEqual(_deficit, 4000)
-        self.assertEqual(_dict[AccountType.TaxDeferred], 1000)
-        self.assertEqual(_dict[AccountType.TaxFree], 0)
-        self.assertEqual(_dict[AccountType.Regular], 0)
+        self.assertEqual(_dict[AccountType.TAXDEFERRED], 1000)
+        self.assertEqual(_dict[AccountType.TAXFREE], 0)
+        self.assertEqual(_dict[AccountType.REGULAR], 0)
         self.assertEqual(_trad.Balance, 0)
         self.assertEqual(_roth.Balance, 0)
 

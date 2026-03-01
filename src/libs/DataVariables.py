@@ -2,7 +2,6 @@ from datetime import date, datetime
 
 from .EnumTypes import (
     RelationStatusType,
-    AccountOwnerType,
     FederalTaxStatusType,
     PersonType,
 )
@@ -26,7 +25,8 @@ class BaseRecord:
         self.amount = amount
         assert isinstance(COLA, float)
         self.COLA = COLA
-        assert isinstance(owner, (AccountOwnerType, PersonType))
+        # assert isinstance(owner, (AccountOwnerType, PersonType))
+        assert isinstance(owner, PersonType)
         self.owner = owner
         assert isinstance(begin_age, int) or begin_age is None
         self.begin_age = begin_age
@@ -113,7 +113,7 @@ class DataVariables:
         self.clientBirthDate: date = None
         self.clientLifeSpanAge: int = None  # age
         self.clientRetirementAge: int = None
-        self.relationStatus: RelationStatusType = RelationStatusType.Single
+        self.relationStatus: RelationStatusType = RelationStatusType.SINGLE
 
         self.spouseName: str = ""
         self.spouseBirthDate: date = None

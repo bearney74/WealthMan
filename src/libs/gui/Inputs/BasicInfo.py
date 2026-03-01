@@ -18,8 +18,8 @@ class BasicInfoTab(QWidget):
         self.parent = parent
         hlayout = QHBoxLayout()
 
-        self._clientinfo = PersonBasicInfo(PersonType.Client, self)
-        self._spouseinfo = PersonBasicInfo(PersonType.Spouse, self)
+        self._clientinfo = PersonBasicInfo(PersonType.CLIENT, self)
+        self._spouseinfo = PersonBasicInfo(PersonType.SPOUSE, self)
         self._spouseinfo.setEnabled(False)
 
         hlayout.addWidget(self._clientinfo)
@@ -39,7 +39,7 @@ class BasicInfoTab(QWidget):
         return self._clientinfo.is_valid() and self._spouse_info.is_valid()
 
     def client_is_married(self) -> bool:
-        return self._clientinfo._status.get() == RelationStatusType.Married
+        return self._clientinfo._status.get() == RelationStatusType.MARRIED
 
     def clear_form(self):
         self._clientinfo.clear_form()
@@ -81,41 +81,34 @@ class BasicInfoTab(QWidget):
 
 
 class PersonBasicInfo(QWidget):
-    def __init__(self, person_type: str, parent):
+    def __init__(self, person_type: PersonType, parent):
         super(PersonBasicInfo, self).__init__(parent)
         self.parent = parent
 
         assert isinstance(person_type, PersonType)
         self._person_type = person_type
 
+        _type = person_type.value
         vlayout = QVBoxLayout()
-        vlayout.addWidget(QLabel("<b><u>%s Information</u></b>" % self._person_type))
+        vlayout.addWidget(QLabel("<b><u>%s Information</u></b>" % _type))
 
         formlayout = QFormLayout()
         vlayout.addLayout(formlayout)
 
         self._name = QLineEdit()
-        formlayout.addRow(QLabel("%s Name:" % self._person_type), self._name)
+        formlayout.addRow(QLabel("%s Name:" % _type), self._name)
 
         self._birthDate = DateEntry(self.parent)
-        formlayout.addRow(QLabel("%s BirthDate:" % self._person_type), self._birthDate)
+        formlayout.addRow(QLabel("%s BirthDate:" % _type), self._birthDate)
 
         self._retirement_age = AgeEntry()
-        formlayout.addRow(
-            QLabel("%s Retirement Age:" % self._person_type), self._retirement_age
-        )
+        formlayout.addRow(QLabel("%s Retirement Age:" % _type), self._retirement_age)
 
         self._lifespan_age = AgeEntry()
-        formlayout.addRow(
-            QLabel("%s Lifespan Age:" % self._person_type), self._lifespan_age
-        )
+        formlayout.addRow(QLabel("%s Lifespan Age:" % _type), self._lifespan_age)
 
-        if self._person_type == PersonType.Client:
+        if self._person_type == PersonType.CLIENT:
             self._status = RelationStatusTypeEntry()
-            # self._status = QComboBox()
-            # self._status.addItems(
-            #    [RelationStatus.Single.name, RelationStatus.Married.name]
-            # )  # "Single", "Married"])
             self._status.currentIndexChanged.connect(self.selectionchange)
             formlayout.addRow(QLabel("Married Status:"), self._status)
 
@@ -125,7 +118,7 @@ class PersonBasicInfo(QWidget):
 
     def selectionchange(self, i):
         self.parent._spouseinfo.setEnabled(
-            self._status.enumValue() == RelationStatusType.Married
+            self._status.enumValue() == RelationStatusType.MARRIED
         )
 
     def validate_form(self) -> bool:
@@ -172,6 +165,5 @@ class PersonBasicInfo(QWidget):
         self._retirement_age.setText("")
         self._lifespan_age.setText("")
 
-        if self._person_type == PersonType.Client:
-            # self._status.setCurrentText(RelationStatusType.Single)
-            self._status.set(RelationStatusType.Single)
+        if self._person_type == PersonType.CLIENT:
+            self._status.set(RelationStatusType.SINGLE)

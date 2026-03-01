@@ -130,13 +130,9 @@ class ExpenseInfoTab(QWidget):
             _item = self.gridLayout.itemAtPosition(_i, 2)
             _item.widget().setText(_record.COLA)
 
-            # if _record.owner == AccountOwnerType.Spouse:
-            #    _owner = PersonType.Spouse
-            # else:
-            #    _owner = PersonType.Client
             _item = self.gridLayout.itemAtPosition(_i, 3)
             _item.widget().set(_record.owner)  # setCurrentText(_owner)
-            _item.widget().setEnabled(d.relationStatus == RelationStatusType.Married)
+            _item.widget().setEnabled(d.relationStatus == RelationStatusType.MARRIED)
 
             _item = self.gridLayout.itemAtPosition(_i, 4)
             _item.widget().setText(_record.begin_age)

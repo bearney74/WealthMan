@@ -73,12 +73,12 @@ class FillFormClearForm(TestCaseQt):
         self._testAge(_client._lifespan_age, "69")
         self._testAge(_client._lifespan_age, "")
 
-        self.assertEqual(_status.get(), RelationStatusType.Single)
+        self.assertEqual(_status.get(), RelationStatusType.SINGLE)
 
         _status.set(
-            RelationStatusType.Married
+            RelationStatusType.MARRIED
         )  # setCurrentText(RelationStatus.Married.name)
-        self.assertEqual(_status.get(), RelationStatusType.Married)
+        self.assertEqual(_status.get(), RelationStatusType.MARRIED)
 
     def test_BasicInfoTab_spouse(self):
         _spouse = self.BasicInfoTab._spouseinfo

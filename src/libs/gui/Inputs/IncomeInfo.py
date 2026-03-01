@@ -12,11 +12,11 @@ from libs.gui.guihelpers.Entry import (
     AgeEntry,
     MoneyEntry,
     PercentEntry,
-    AccountOwnerTypeEntry,
+    PersonTypeEntry,
 )
 
 from libs.DataVariables import DataVariables, IncomeRecord
-from libs.EnumTypes import AccountOwnerType, PersonType, RelationStatusType
+from libs.EnumTypes import PersonType, RelationStatusType
 
 
 class SocialSecurityWidget(QWidget):
@@ -27,9 +27,10 @@ class SocialSecurityWidget(QWidget):
         assert isinstance(person_type, PersonType)
         self.person_type = person_type
 
+        _type = person_type.value  # Client or Spouse
         _layout = QVBoxLayout()
         _flayout = QFormLayout()
-        _layout.addWidget(QLabel("%s Social Security" % self.person_type.name))
+        _layout.addWidget(QLabel("%s Social Security" % _type))
 
         self.Amount = MoneyEntry()
         _label = QLabel("FRA Amount:")
@@ -61,10 +62,10 @@ class IncomeInfoTab(QWidget):
         _layout.addWidget(QLabel("<b><u>Social Security</u></b>"))
 
         _hlayout = QHBoxLayout()
-        self.clientSS = SocialSecurityWidget(self.parent, PersonType.Client)
+        self.clientSS = SocialSecurityWidget(self.parent, PersonType.CLIENT)
         _hlayout.addWidget(self.clientSS)
 
-        self.spouseSS = SocialSecurityWidget(self.parent, PersonType.Spouse)
+        self.spouseSS = SocialSecurityWidget(self.parent, PersonType.SPOUSE)
         _hlayout.addWidget(self.spouseSS)
         self.spouseSS.setEnabled(self.BasicInfoTab.client_is_married())
 
@@ -80,7 +81,7 @@ class IncomeInfoTab(QWidget):
         _flayout1.addRow(QLabel("Description"), self.pension1Name)
 
         self.pension1OwnerLabel = QLabel("Owner:")
-        self.pension1Owner = AccountOwnerTypeEntry()
+        self.pension1Owner = PersonTypeEntry()
         # self.pension1Owner = QComboBox()
         # self.pension1Owner.addItems(["Client", "Spouse"])
         _flayout1.addRow(self.pension1OwnerLabel, self.pension1Owner)
@@ -108,7 +109,7 @@ class IncomeInfoTab(QWidget):
         _flayout2.addRow(QLabel("Description"), self.pension2Name)
 
         self.pension2OwnerLabel = QLabel("Owner:")
-        self.pension2Owner = AccountOwnerTypeEntry()
+        self.pension2Owner = PersonTypeEntry()
         # self.pension2Owner = QComboBox()
         # self.pension2Owner.addItems(["Client", "Spouse"])
         _flayout2.addRow(self.pension2OwnerLabel, self.pension2Owner)
@@ -179,7 +180,7 @@ class IncomeInfoTab(QWidget):
         _percent = PercentEntry(self.parent)
         self.gridLayout.addWidget(_percent, _row, 2)
 
-        _owner = AccountOwnerTypeEntry()
+        _owner = PersonTypeEntry()
         # _person = QComboBox()
         # _person.addItems(["Client", "Spouse"])
         self.gridLayout.addWidget(_owner, _row, 3)
@@ -216,7 +217,7 @@ class IncomeInfoTab(QWidget):
 
         dv.pension1Name = self.pension1Name.text()
         if not self.BasicInfoTab.client_is_married():
-            dv.pension1Owner = AccountOwnerType.Client
+            dv.pension1Owner = PersonType.CLIENT
         else:
             # dv.pension1Owner = AccountOwnerType[self.pension1Owner.currentText()]
             dv.pension1Owner = self.pension1Owner.get()
@@ -229,7 +230,7 @@ class IncomeInfoTab(QWidget):
 
         dv.pension2Name = self.pension2Name.text()
         if not self.BasicInfoTab.client_is_married():
-            dv.pension2Owner = AccountOwnerType.Client
+            dv.pension2Owner = PersonType.CLIENT
         else:
             # dv.pension2Owner = AccountOwnerType[self.pension2Owner.currentText()]
             dv.pension2Owner = self.pension2Owner.get()
@@ -305,7 +306,7 @@ class IncomeInfoTab(QWidget):
             _item.widget().setText(_record.COLA)
 
             _item = self.gridLayout.itemAtPosition(_row, 3)
-            _item.widget().setEnabled(dv.relationStatus == RelationStatusType.Married)
+            _item.widget().setEnabled(dv.relationStatus == RelationStatusType.MARRIED)
             _item.widget().set(_record.owner)
 
             _item = self.gridLayout.itemAtPosition(_row, 4)

@@ -1,5 +1,4 @@
 import csv
-from enum import Enum
 
 from PyQt6.QtWidgets import (
     QFileDialog,
@@ -107,25 +106,15 @@ class DataTableTabBase(QWidget):
         for _row in data:
             _j = 0
             for _col in _row:
-                _value = QTableWidgetItem(str(_col))
+                _cell = QTableWidgetItem(str(_col))
                 if isinstance(_col, DataItem):
-                    # _value=QTableWidgetItem(str(_col))
-                    if isinstance(_col.data, (float, int)) < 0:
-                        _value.setForeground(QBrush(QColor(255, 0, 0)))
-                elif isinstance(_col, Enum):
-                    _value = QTableWidgetItem(_col.name)
-                self.table.setItem(_i, _j, _value)
+                    if isinstance(_col.data, (float, int)) and _col.data < 0:
+                        _cell.setForeground(QBrush(QColor(255, 0, 0)))
+                else:
+                    print("Error, '%s' should be a DataItem" % _col)
 
-                # if isinstance(_col, (float, int)):
-                #    _col = str(_col)
-                #    _value = QTableWidgetItem(_col)
-                #    if _col.strip().startswith("-"):
-                #        _value.setForeground(QBrush(QColor(255, 0, 0)))
-                #    self.table.setItem(_i, _j, _value)
-                # elif isinstance(_col, Enum):
-                #    self.table.setItem(_i, _j, QTableWidgetItem(_col.name))
-                # else:
-                #    self.table.setItem(_i, _j, QTableWidgetItem(_col))
+                self.table.setItem(_i, _j, _cell)
+
                 _j += 1
             _i += 1
 

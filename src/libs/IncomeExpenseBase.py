@@ -92,7 +92,9 @@ class IncomeExpenseBase:
         assert False
 
     def _calc_annual_balance(self) -> int:
-        assert self.AmountPeriod == AmountPeriodType.Annual
+        assert (
+            self.AmountPeriod == AmountPeriodType.ANNUAL
+        )  # todo: do we need this variable?
         return self.Amount
 
     def _calc_balance(self) -> int:
