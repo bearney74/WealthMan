@@ -81,6 +81,7 @@ class TableData:
                 _list.append(_balance)
 
             _list.append(_record.ssIncomeTotal)
+            _list.append(_record.activeIncomeTotal)
 
             _list.append(_record.assetTaxDeferredWithdraw)
             _list.append(_record.assetRegularWithdraw)

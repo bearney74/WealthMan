@@ -19,6 +19,7 @@ from .IncomeInfo import IncomeInfoTab
 from .AssetInfo import AssetInfoTab
 from .ExpenseInfo import ExpenseInfoTab
 from .TransferInfo import TransferInfoTab
+from .MiscInfo import MiscInfoTab
 
 from ..guihelpers.Entry import EnumEntry
 
@@ -45,6 +46,7 @@ class InputsTab(QMainWindow):
         self.ExpenseInfoTab = ExpenseInfoTab(self, self.BasicInfoTab)
         self.TransferInfoTab = TransferInfoTab(self, self.BasicInfoTab)
         self.GlobalVariablesTab = GlobalVariablesTab(self)
+        self.MiscInfoTab = MiscInfoTab(self)
 
         self.tabs.addTab(self.BasicInfoTab, "Basic Info")
         self.tabs.addTab(self.IncomeInfoTab, "Income")
@@ -52,6 +54,7 @@ class InputsTab(QMainWindow):
         self.tabs.addTab(self.AssetInfoTab, "Assets")
         self.tabs.addTab(self.TransferInfoTab, "Transfers")
         self.tabs.addTab(self.GlobalVariablesTab, "Global Variables")
+        self.tabs.addTab(self.MiscInfoTab, "Misc")
 
         self.setCentralWidget(self.tabs)
 
@@ -132,6 +135,7 @@ class InputsTab(QMainWindow):
         self.ExpenseInfoTab.clear_form()
         self.TransferInfoTab.clear_form()
         self.GlobalVariablesTab.clear_form()
+        self.MiscInfoTab.clear_form()
 
     def create_projection(self):
         dv = DataVariables()
@@ -142,6 +146,8 @@ class InputsTab(QMainWindow):
         self.AssetInfoTab.export_data(dv)
         self.TransferInfoTab.export_data(dv)
         self.GlobalVariablesTab.export_data(dv)
+        self.MiscInfoTab.export_data(dv)
+        self.parent.AnalysisTab.MonteCarloTab.dataVariables = dv
 
         self.parent.statusbar.showMessage("Calculating projections")
         self.progressDialog = QProgressDialog("Projection in progress...", None, 0, 100)
@@ -157,6 +163,7 @@ class InputsTab(QMainWindow):
     def populate_analysis_tab(self, data):
         self.progressDialog.setValue(50)
         self.parent.AnalysisTab.projectionData = data
+        # self.parent.AnalysisTab.MonteCarloTab.projectionData= data
         self.parent.AnalysisTab.tableData = TableData(
             data,
             InTodaysDollars=self.project.InTodaysDollars,

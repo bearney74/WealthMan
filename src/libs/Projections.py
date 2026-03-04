@@ -95,6 +95,7 @@ class ProjectionYearData:
         self.incomeSources: dict = {}  # key is Name, #value is income
         self.taxableIncomeTotal: DataItem = DataItem("Taxable Income Total")
         self.incomeTotal: DataItem = DataItem("Income Total")
+        self.activeIncomeTotal: DataItem = DataItem("Active Income Total")
         self.FPL: DataItem = DataItem("FPL", "{:.1f}%", 0.0)  # float = 0.0
 
         self.ssIncomeTotal: DataItem = DataItem("SS Income Total")  # int = 0
@@ -137,13 +138,13 @@ class ProjectionYearData:
         # how much we had to pull from assets because expenses > income
         self.assetWithdraw: DataItem = DataItem("Total Asset Withdraws")  # int = 0
         self.assetTaxDeferredWithdraw: DataItem = DataItem(
-            "Asset Tax Deferred Withdraws"
+            "Tax Deferred Asset Withdraws"
         )  # int = 0
         self.assetRegularWithdraw: DataItem = DataItem(
-            "Asset Regular Withdraws"
+            "Regular Asset Withdraws"
         )  # int = 0
         self.assetTaxFreeWithdraw: DataItem = DataItem(
-            "Asset Tax Free Withdraws"
+            "Tax Free Asset Withdraws"
         )  # int = 0
 
         # self.surplus_deficit: int = 0
@@ -568,7 +569,7 @@ class Projections(QRunnable):
                 _income_total += _income  # _src.calc_income_by_year(_year)
                 _taxable_income_total += _income
 
-            # _pyd.incomeTotal = _income_total
+            _pyd.activeIncomeTotal.data = _income_total
             _pyd.ssIncomeTotal.data = _ss_income_total
 
             _expense_total = 0

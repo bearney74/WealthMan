@@ -79,7 +79,7 @@ class GuardRailWithdrawObj(BasicWithdrawObj):
         assert isinstance(top_percent, float)
         self._top_percent = top_percent / 100.0
 
-        assert isinstance(top_percent, float)
+        assert isinstance(bottom_percent, float)
         self._bottom_percent = bottom_percent / 100.0
 
     def amount(self, balance):

@@ -34,37 +34,6 @@ class InitialDelegate(QStyledItemDelegate):
             option.text = ""
         else:
             option.text = text
-        # if text is None:
-        #    option.text = ""
-        # if isinstance(text, DataItem):
-        #    option.text=str(text)
-        #    print(text)
-        # elif isinstance(text, str):
-        #    option.text=text
-        # elif text is None:
-        #    option.text=""
-        # elif FederalTaxStatusType.has_member(text):
-        #    option.text = text
-        # elif "%" in text:
-        #    option.text = text
-        # else:
-        #    try:
-        #        if text.strip() == "":
-        #            option.text = ""
-        #        elif "." in text:
-        #            number = float(text)
-        #            option.text = f"{number:.1f}%"
-        #        else:
-        #            number = int(text)
-        #            if number < 0:
-        #                option.text = f"(${number:,d})"
-        #            else:
-        #                option.text = f"${number:,d}"
-        #    except Exception as e:
-        #        logger.error(e)
-        #        print("DataTable.py:58: %s" % e)
-        #        print(type(text))
-        #        option.text = text
 
 
 class DataTableTabBase(QWidget):

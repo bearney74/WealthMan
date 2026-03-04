@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import QWidget, QPushButton, QLabel, QLineEdit
-from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout
+from PyQt6.QtWidgets import QWidget, QPushButton, QLineEdit
+from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
 
 from PyQt6.QtCore import Qt
 
@@ -10,8 +10,9 @@ from libs.gui.guihelpers.Entry import (
     PersonTypeEntry,
 )
 
+from libs.gui.guihelpers.DeleteRowGridLayout import DeleteRowGridLayout
+
 from libs.DataVariables import DataVariables, ExpenseRecord
-from libs.EnumTypes import RelationStatusType
 
 
 class ExpenseInfoTab(QWidget):
@@ -25,11 +26,21 @@ class ExpenseInfoTab(QWidget):
         _layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self._add_expense_button = QPushButton("Add Expense", self)
         self._add_expense_button.setFixedSize(90, 30)
-        self._add_expense_button.clicked.connect(self.add_row)
+        self._add_expense_button.clicked.connect(self._add_new_row)
         _layout.addWidget(self._add_expense_button)
 
         # Table will fit the screen horizontally
-        self.gridLayout = QGridLayout()
+        self.gridLayout = DeleteRowGridLayout()  # QGridLayout()
+        self.gridLayout.set_header(
+            [
+                "Description",
+                "Annual Amount",
+                "Annual\nPercent\nIncrease",
+                "Person",
+                "Begin Age",
+                "End Age",
+            ]
+        )
         _hlayout = QHBoxLayout()
         _hlayout.addLayout(self.gridLayout)
         _hlayout.addStretch()
@@ -37,105 +48,70 @@ class ExpenseInfoTab(QWidget):
         _layout.addStretch(3)
         self.setLayout(_layout)
 
-    def add_row(self):
-        if self.gridLayout.count() == 0:
-            self.gridLayout.addWidget(QLabel("Description"), 0, 0)
-            self.gridLayout.addWidget(QLabel("Annual Amount"), 0, 1)
-            _temp = QLabel("Annual\nPercent\nIncrease", wordWrap=True)
-            self.gridLayout.addWidget(_temp, 0, 2)
-
-            self.gridLayout.addWidget(QLabel("Person"), 0, 3)
-
-            self.gridLayout.addWidget(QLabel("Begin Age"), 0, 4)
-            self.gridLayout.addWidget(QLabel("End Age"), 0, 5)
-
-        _len = self.gridLayout.count() // 6
+    def _add_new_row(self):
         _descr = QLineEdit()
-        _descr.setMaximumWidth(300)
-        self.gridLayout.addWidget(_descr, _len, 0)
+        _descr.setMaximumWidth(400)
 
         _amount = MoneyEntry(self.parent)
-        self.gridLayout.addWidget(_amount, _len, 1)
 
         _COLA = PercentEntry(self.parent)
-        self.gridLayout.addWidget(_COLA, _len, 2)
 
         _person = PersonTypeEntry()
-        # _person = QComboBox()
-        # _person.addItems(["Client", "Spouse"])
         _person.setEnabled(self.BasicInfoTab.client_is_married())
-        self.gridLayout.addWidget(_person, _len, 3)
 
         _begin_age = AgeEntry(self.parent)
-        self.gridLayout.addWidget(_begin_age, _len, 4)
+        _end_age = AgeEntry(self.parent)
+
+        self.gridLayout.add_row([_descr, _amount, _COLA, _person, _begin_age, _end_age])
+
+    def _add_row(self, descr, amount, COLA, person, begin_age, end_age):
+        _descr = QLineEdit()
+        _descr.setText(descr)
+        _descr.setMaximumWidth(400)
+
+        _amount = MoneyEntry(self.parent)
+        _amount.setText(amount)
+
+        _COLA = PercentEntry(self.parent)
+        _COLA.setText(COLA)
+
+        _person = PersonTypeEntry()
+        _person.setEnabled(self.BasicInfoTab.client_is_married())
+        _person.set(person)
+
+        _begin_age = AgeEntry(self.parent)
+        _begin_age.setText(begin_age)
 
         _end_age = AgeEntry(self.parent)
-        self.gridLayout.addWidget(_end_age, _len, 5)
+        _end_age.setText(end_age)
+
+        self.gridLayout.add_row([_descr, _amount, _COLA, _person, _begin_age, _end_age])
 
     def clear_form(self):
-        _item = self.gridLayout.takeAt(0)
-        while _item is not None:
-            _item.widget().deleteLater()
-            self.gridLayout.removeWidget(_item.widget())
-            self.gridLayout.removeItem(_item)
-            del _item
-            _item = self.gridLayout.takeAt(0)
-
-        self.gridLayout.invalidate()
-
-        assert self.gridLayout.count() == 0
+        self.gridLayout.clear()
 
     def export_data(self, d: DataVariables):
-        _row = self.gridLayout.count() // 6
-        for _i in range(1, _row):
-            _item = self.gridLayout.itemAtPosition(_i, 0)
-            _descr = _item.widget().text()
-
-            _item = self.gridLayout.itemAtPosition(_i, 1)
-            _amount = _item.widget().get_int()
-
-            _item = self.gridLayout.itemAtPosition(_i, 2)
-            _cola = _item.widget().get_float()
-
-            _item = self.gridLayout.itemAtPosition(_i, 3)
-            _person = _item.widget().get()  # currentText()
-
-            _item = self.gridLayout.itemAtPosition(_i, 4)
-            _begin_age = _item.widget().get_int()
-
-            _item = self.gridLayout.itemAtPosition(_i, 5)
-            _end_age = _item.widget().get_int()
-
-            # _owner = AccountOwnerType.Client
-            # if self.BasicInfoTab.client_is_married():
-            #    if _person == "Spouse":
-            #        _owner = AccountOwnerType.Spouse
+        for (
+            _descr_w,
+            _amount_w,
+            _cola_w,
+            _person_w,
+            _begin_age_w,
+            _end_age_w,
+        ) in self.gridLayout.get_data():
+            _descr = _descr_w.text()
+            _amount = _amount_w.get_int()
+            _cola = _cola_w.get_float()
+            _person = _person_w.get()
+            _begin_age = _begin_age_w.get_int()
+            _end_age = _end_age_w.get_int()
 
             d.expenses.append(
                 ExpenseRecord(_descr, _amount, _cola, _person, _begin_age, _end_age)
             )
 
     def import_data(self, d: DataVariables):
-        for _record in d.expenses:
-            self.add_row()
-
-            _i = self.gridLayout.count() // 6 - 1
-
-            _item = self.gridLayout.itemAtPosition(_i, 0)
-            _item.widget().setText(_record.descr)
-
-            _item = self.gridLayout.itemAtPosition(_i, 1)
-            _item.widget().setText(_record.amount)
-
-            _item = self.gridLayout.itemAtPosition(_i, 2)
-            _item.widget().setText(_record.COLA)
-
-            _item = self.gridLayout.itemAtPosition(_i, 3)
-            _item.widget().set(_record.owner)  # setCurrentText(_owner)
-            _item.widget().setEnabled(d.relationStatus == RelationStatusType.MARRIED)
-
-            _item = self.gridLayout.itemAtPosition(_i, 4)
-            _item.widget().setText(_record.begin_age)
-
-            _item = self.gridLayout.itemAtPosition(_i, 5)
-            _item.widget().setText(_record.end_age)
+        for _r in d.expenses:
+            self._add_row(
+                _r.descr, _r.amount, _r.COLA, _r.owner, _r.begin_age, _r.end_age
+            )

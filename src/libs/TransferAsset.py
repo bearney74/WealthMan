@@ -39,6 +39,8 @@ class TransferAssets:
         assert isinstance(endAge, int)
         self.endAge = endAge
 
+        assert self.beginAge <= self.endAge
+
     def do_transfer(self, year=None):
         self.transferred_amount = 0
 

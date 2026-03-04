@@ -10,6 +10,8 @@ from .DataTable import (
 from .Chart import ChartTab
 from .CustomChart import CustomChartTab
 
+from .MonteCarloSimulation import MonteCarloTab
+
 
 class AnalysisTab(QWidget):
     def __init__(self, parent):
@@ -35,6 +37,8 @@ class AnalysisTab(QWidget):
         self.ChartTab = ChartTab(self)
         self.CustomChartTab = CustomChartTab(self)
 
+        self.MonteCarloTab = MonteCarloTab(self)
+
         self.tabs.currentChanged.connect(self.onTabChange)
 
         self.tabs.addTab(self.IncomeDataTableTab, "Income Details")
@@ -44,6 +48,7 @@ class AnalysisTab(QWidget):
         self.tabs.addTab(self.DataTableTab, "Details")
         self.tabs.addTab(self.ChartTab, "Charts")
         self.tabs.addTab(self.CustomChartTab, "Custom Charts")
+        self.tabs.addTab(self.MonteCarloTab, "Monte Carlo")
 
         layout = QVBoxLayout()
         layout.addWidget(self.tabs)
@@ -68,3 +73,5 @@ class AnalysisTab(QWidget):
         match _tabName:
             case "Custom Charts":
                 self.CustomChartTab.AssetTotals()
+            # case "Monte Carlo":
+            #    self.MonteCarloTab.CalcInputs()

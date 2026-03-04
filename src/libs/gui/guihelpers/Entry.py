@@ -16,6 +16,7 @@ from ...EnumTypes import (
 class MinWidthLabel(QLabel):
     def __init__(self, text):
         super(MinWidthLabel, self).__init__(text)
+
         self.setFixedWidth(self.sizeHint().width())
 
 
@@ -48,7 +49,7 @@ class IntegerEntry(Entry):
     def __init__(self, parent=None, limit_size: int = None):
         super(IntegerEntry, self).__init__(parent)
 
-        self.setValidator(QIntValidator())
+        self.setValidator(QIntValidator(parent))
 
     def is_valid(self):
         try:
@@ -68,11 +69,12 @@ class IntegerEntry(Entry):
 
 
 class IntRangeValidator(QIntValidator):
-    def __init__(self, parent, min, max):
-        super(IntRangeValidator, self).__init__()
-        self.parent = parent
-        self.min = min
-        self.max = max
+    def __init__(self, bottom, top, parent=None):
+        super(IntRangeValidator, self).__init__(bottom, top, parent)
+        # self.parent=parent
+
+        self.min = bottom
+        self.max = top
 
     def validate(self, string, pos):
         try:
@@ -92,22 +94,29 @@ class IntRangeValidator(QIntValidator):
         return (QValidator.State.Invalid, string, pos)
 
 
+class IntegerRangeEntry(IntegerEntry):
+    def __init__(self, parent=None, min=0, max=99, limit_size=30):
+        super(IntegerRangeEntry, self).__init__(parent=parent)
+
+        self.setFixedWidth(limit_size)
+        self.setValidator(QIntValidator(bottom=min, top=max, parent=self))
+
+
 class AgeEntry(IntegerEntry):
     def __init__(self, parent=None, min=0, max=99):
         super(AgeEntry, self).__init__(parent=parent)
 
-        self.parent = parent
         self.setFixedWidth(30)
-        self.setValidator(IntRangeValidator(self, min, max))
+        # self.setValidator(IntRangeValidator(bottom=min, top=max, parent=self))
+        self.setValidator(QIntValidator(bottom=min, top=max, parent=self))
 
 
 class YearEntry(IntegerEntry):
     def __init__(self, parent=None, min=1920, max=2099):
         super(YearEntry, self).__init__(parent=parent)
 
-        self.parent = parent
         self.setFixedWidth(60)
-        self.setValidator(IntRangeValidator(self, min, max))
+        self.setValidator(IntRangeValidator(bottom=min, top=max, parent=self))
 
 
 class MoneyEntry(IntegerEntry):

@@ -88,6 +88,8 @@ class TransferRecord:
         assert isinstance(amount, int)
         self.amount = amount
 
+        if COLA is None:
+            COLA = 0.0
         assert isinstance(COLA, float)
         self.COLA = COLA
 
@@ -181,7 +183,7 @@ class DataVariables:
         self.regularContributionEndAge: int = None
 
         # Global Variables
-        self.start_year: int = None
+        self.start_year: int = None  # should change name to startYear
         self.inflation: float = None
         self.ssCola: float = None
         self.withdrawOrder: str = None
@@ -189,3 +191,11 @@ class DataVariables:
         self.inTodaysDollars: bool = False
         self.federalFilingStatus: FederalTaxStatusType = None
         self.federalFilingStatusOnceWidowed: FederalTaxStatusType = None
+
+        # Misc Variables
+        # Monte Carlo
+        self.numberOfRuns: int = None
+        self.avgROR: float = None
+        self.avgRORStdDev: float = None
+        self.avgInflationRate: float = None
+        self.avgInflationRateStdDev: float = None
