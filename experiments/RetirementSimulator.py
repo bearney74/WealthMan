@@ -41,7 +41,7 @@ class HistoricalData:
 
             next(_csv)  # skip header
             next(_csv)  # skip header
-            _dict={}
+            _dict = {}
             for (
                 _year,
                 _sp500,
@@ -53,14 +53,13 @@ class HistoricalData:
                     _year, _sp500, _bond, _cash, _inflation
                 )
 
-        #put data in self._data in year order (ie, sorted by year)
+        # put data in self._data in year order (ie, sorted by year)
         _keys = list(_dict.keys())
         _keys.sort()
         for _key in _keys:
             self._data.append(_dict[_key])
 
         assert len(self._data) > 1
-
 
     def get_data(self, begin_year, end_year):
         _list = []
@@ -108,7 +107,7 @@ class BackTesting:
         for _record in self._data:
             _inflation *= _record.Inflation
             _year = _record.Year
-            #add incomes to balance
+            # add incomes to balance
             if _year in self.incomes:
                 self.balance += self.incomes[_year]
 
@@ -149,8 +148,8 @@ if __name__ == "__main__":
         expenses = {}
 
         allocationPeriods = [
-           # AllocationPeriod(1928, 2000, 80, 15, 5),
-           # AllocationPeriod(2001, None, 80, 15, 5),
+            # AllocationPeriod(1928, 2000, 80, 15, 5),
+            # AllocationPeriod(2001, None, 80, 15, 5),
             AllocationPeriod(1928, None, 80, 20, 0),
         ]
 
@@ -171,12 +170,12 @@ if __name__ == "__main__":
 
     # single_run(2000, 2010)
     # single_run(2001, 2011)
-    _count=0
-    _total=0
+    _count = 0
+    _total = 0
     for _begin_year in range(1928, 2025 - 30 + 1):
-        _success, _balance=single_run(_begin_year, _begin_year + 30)
-        _total+=1
+        _success, _balance = single_run(_begin_year, _begin_year + 30)
+        _total += 1
         if _success:
-            _count+=1
+            _count += 1
 
-    print("Success: %4.2f%%" % (100.0*_count/_total))
+    print("Success: %4.2f%%" % (100.0 * _count / _total))

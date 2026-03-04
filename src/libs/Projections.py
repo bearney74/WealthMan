@@ -92,7 +92,7 @@ class ProjectionYearData:
         self.spouseAge: int = None
         self.spouseIsAlive: bool = None
 
-        self.incomeSources: [IncomeSources] = []
+        self.incomeSources = []
         self.taxableIncomeTotal: DataItem = DataItem("Taxable Income Total")
         self.incomeTotal: DataItem = DataItem("Income Total")
         self.activeIncomeTotal: DataItem = DataItem("Active Income Total")
@@ -102,7 +102,7 @@ class ProjectionYearData:
         self.ssTaxableIncome: DataItem = DataItem("SS Taxable Income")  # int = 0
         self.ssTaxRate: DataItem = DataItem("SS Tax Rate", "{:.1f}%")
 
-        self.expenseSources: [ExpenseSources] = []
+        self.expenseSources = []
         self.expenseTotal: DataItem = DataItem("Expense Total")  # int = 0
 
         self.cashFlow: DataItem = DataItem(
@@ -149,7 +149,7 @@ class ProjectionYearData:
 
         # self.surplus_deficit: int = 0
 
-        self.assetSources= []
+        self.assetSources = []
         self.assetContributions = []
 
         self.assetTotal: DataItem = DataItem("Total Assets")  # int = 0

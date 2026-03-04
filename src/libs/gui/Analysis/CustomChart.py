@@ -234,11 +234,10 @@ class CustomChartTab(QWidget):
             )
             self.chart.show(True)
         else:
-            #self.chart.stackplot([], [], [])
-            #self.chart.canvas.axes.clear()
+            # self.chart.stackplot([], [], [])
+            # self.chart.canvas.axes.clear()
             self.chart.show(False)
 
-    
     def IncomeVsExpenses(self):
         _years = []
 
@@ -251,7 +250,6 @@ class CustomChartTab(QWidget):
                 _data["Income"].append(_record.incomeTotal.data)
                 _data["Expense"].append(_record.expenseTotal.data)
 
-    
         self.chart.setTitle("Income Vs Expenses")
         if self.parent.tableData.InTodaysDollars:
             self.chart.setSubTitle("In Today's Dollars")

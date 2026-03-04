@@ -121,9 +121,8 @@ class ChartTab(QWidget):
         _data = self.parent.tableData.get_chart_data()
         _categories = []
         for _key, _dataItem in _data[0].items():
-            #print(_dataItem)
-            if (_key != "federalTaxFilingStatus"
-            ):
+            # print(_dataItem)
+            if _key != "federalTaxFilingStatus":
                 _categories.append(_dataItem.header)
 
         self.variables.addItems(_categories)

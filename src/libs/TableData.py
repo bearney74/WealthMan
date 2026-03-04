@@ -188,10 +188,10 @@ class TableData:
     def get_chart_data(self):
         _data = []
         for _record in self.projectionData:
-            _dict={}
+            _dict = {}
             for _key, _attr in _record.__dict__.items():
                 if isinstance(_attr, DataItem):
-                   _dict[_key]=_attr
+                    _dict[_key] = _attr
             _data.append(_dict)
 
         return _data

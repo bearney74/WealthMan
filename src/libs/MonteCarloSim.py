@@ -31,7 +31,7 @@ class MonteCarloSimulator:
 
         self._bankrupt = False
         self._bankrupt_step = None  # the iterator in which we went bankrupt.
-        
+
         assert isinstance(avgReturnGen, StdDevRandomNumberGenerator)
         self._avg_return_generator = avgReturnGen
 
@@ -69,8 +69,8 @@ class MonteCarloSimulator:
             if self._balance > 0:
                 # if we have a positive balance, adjust by average return
                 self._balance *= 1.0 + (_avg_return - _period_inflation_rate)
-            else: # since we have a negative balance, we need to add the inflation
-                self._balance *= (1.0 + _period_inflation_rate)
+            else:  # since we have a negative balance, we need to add the inflation
+                self._balance *= 1.0 + _period_inflation_rate
                 self._bankrupt = True
                 if self._bankrupt_step is None:
                     self._bankrupt_step = _step
