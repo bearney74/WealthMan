@@ -91,6 +91,7 @@ class MenuBar:
         self.parent.InputsTab.TransferInfoTab.import_data(dv)
         self.parent.InputsTab.AssetInfoTab.import_data(dv)
         self.parent.InputsTab.GlobalVariablesTab.import_data(dv)
+        self.parent.InputsTab.MiscInfoTab.import_data(dv)
 
         self.parent.setWindowTitle(
             "%s :%s" % (self.parent.title, os.path.basename(_fname))
@@ -137,6 +138,7 @@ class MenuBar:
         self.parent.InputsTab.TransferInfoTab.export_data(dv)
         self.parent.InputsTab.AssetInfoTab.export_data(dv)
         self.parent.InputsTab.GlobalVariablesTab.export_data(dv)
+        self.parent.InputsTab.MiscInfoTab.export_data(dv)
 
         with open(self._filename, "wb") as _fp:
             pickle.dump(dv, _fp)
