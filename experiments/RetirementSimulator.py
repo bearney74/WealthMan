@@ -34,13 +34,14 @@ class AnnualReturnData:
 
 class HistoricalData:
     def __init__(self):
-        self._data = {}
+        self._data = []
 
         with open("asset_return_rates.csv", "r") as _fp:
             _csv = csv.reader(_fp)
 
             next(_csv)  # skip header
             next(_csv)  # skip header
+            _dict={}
             for (
                 _year,
                 _sp500,
@@ -48,9 +49,15 @@ class HistoricalData:
                 _inflation,
             ) in _csv:
                 _cash = 0.0  # cash has a return rate of 0
-                self._data[int(_year)] = AnnualReturnData(
+                _dict[int(_year)] = AnnualReturnData(
                     _year, _sp500, _bond, _cash, _inflation
                 )
+
+        #put data in self._data in year order (ie, sorted by year)
+        _keys = list(_dict.keys())
+        _keys.sort()
+        for _key in _keys:
+            self._data.append(_dict[_key])
 
         assert len(self._data) > 1
 
@@ -58,12 +65,10 @@ class HistoricalData:
     def get_data(self, begin_year, end_year):
         _list = []
 
-        _keys = list(self._data.keys())
-        _keys.sort()
-        for _year in _keys:
+        for _record in self._data:
             # if _year is between begin_year and end_year:
-            if _year >= begin_year and _year <= end_year:
-                _list.append((_year, self._data[_year]))
+            if _record.Year >= begin_year and _record.Year <= end_year:
+                _list.append(_record)
 
         return _list
 
@@ -100,8 +105,10 @@ class BackTesting:
     def execute(self):
         _success = True
         _inflation = 1.0
-        for _year, _ard in self._data:
-            _inflation *= _ard.Inflation
+        for _record in self._data:
+            _inflation *= _record.Inflation
+            _year = _record.Year
+            #add incomes to balance
             if _year in self.incomes:
                 self.balance += self.incomes[_year]
 
@@ -113,16 +120,18 @@ class BackTesting:
             # find correct allocation
             _ap = self.get_allocation_period(_year)
             if _ap is None:
+                print("AP is None")
                 if self.defaultReturnRate is None:
                     print("DefaultReturnRate is None")
                     # log an error..
                     # send a message?
                 else:
                     self.balance *= 1.0 + self.defaultReturnRate / 100.0
+                    print("Using Default")
             else:  # we have a valid allocation Period..
-                _balance = self.balance * _ap.pctStocks * _ard.Stocks
-                _balance += self.balance * _ap.pctBonds * _ard.Bonds
-                _balance += self.balance * _ap.pctCash * _ard.Cash
+                _balance = self.balance * _ap.pctStocks * _record.Stocks
+                _balance += self.balance * _ap.pctBonds * _record.Bonds
+                _balance += self.balance * _ap.pctCash * _record.Cash
 
                 self.balance = _balance
 
@@ -140,12 +149,13 @@ if __name__ == "__main__":
         expenses = {}
 
         allocationPeriods = [
-            AllocationPeriod(1928, 2000, 50, 25, 25),
-            AllocationPeriod(2001, None, 75, 20, 5),
+           # AllocationPeriod(1928, 2000, 80, 15, 5),
+           # AllocationPeriod(2001, None, 80, 15, 5),
+            AllocationPeriod(1928, None, 80, 20, 0),
         ]
 
         for _i in range(begin_year, end_year + 1):
-            expenses[_i] = 5
+            expenses[_i] = 4
 
         _rs = BackTesting(
             begin_year,
@@ -157,9 +167,16 @@ if __name__ == "__main__":
             DefaultReturnRate=5.0,
         )
         _success, _balance = _rs.execute()
-        print("%s->%s: %s, %s" % (begin_year, end_year, _success, _balance))
+        return _success, _balance
 
     # single_run(2000, 2010)
     # single_run(2001, 2011)
-    for _begin_year in range(1928, 2023 - 30 + 1):
-        single_run(_begin_year, _begin_year + 30)
+    _count=0
+    _total=0
+    for _begin_year in range(1928, 2025 - 30 + 1):
+        _success, _balance=single_run(_begin_year, _begin_year + 30)
+        _total+=1
+        if _success:
+            _count+=1
+
+    print("Success: %4.2f%%" % (100.0*_count/_total))
