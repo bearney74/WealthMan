@@ -120,15 +120,14 @@ class ChartTab(QWidget):
         self.variables.clear()
         _data = self.parent.tableData.get_chart_data()
         _categories = []
-        for _key in _data[0].keys():
-            if (
-                isinstance(_data[0][_key], DataItem)
-                and _key != "federalTaxFilingStatus"
+        for _key, _dataItem in _data[0].items():
+            #print(_dataItem)
+            if (_key != "federalTaxFilingStatus"
             ):
-                _categories.append(_data[0][_key].header)
+                _categories.append(_dataItem.header)
 
         self.variables.addItems(_categories)
-        self.variables.setCurrentText(_categories[1])
+        self.variables.setCurrentText("Total Assets")
 
     def _selectionchange(self, i):
         _ndx = self.variables.currentIndex()
@@ -137,10 +136,10 @@ class ChartTab(QWidget):
 
         # figure out the variable name from the "user friendly" category variable..
         _variable_name = None
-        for _key in _data[0].keys():
-            if isinstance(_data[0][_key], DataItem):
-                if _category == _data[0][_key].header:
-                    _variable_name = _key
+        for _var_name, _dataItem in _data[0].items():
+            if isinstance(_dataItem, DataItem):
+                if _category == _dataItem.header:
+                    _variable_name = _var_name
 
         if _variable_name is not None:
             _chart_data = []

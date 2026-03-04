@@ -166,8 +166,8 @@ class CustomChartTab(QWidget):
                 if _record.projectionYear.data not in _years:
                     _years.append(_record.projectionYear.data)
 
-                for _name, _value in _record.assetSources.items():
-                    _data[_name].append(_value.data)
+                for _dataItem in _record.assetSources:
+                    _data[_dataItem.header].append(_dataItem.data)
 
                 if _record.surplusBalance.data > 0:
                     _surplus_flag = True
@@ -196,8 +196,8 @@ class CustomChartTab(QWidget):
                 if _record.projectionYear.data not in _years:
                     _years.append(_record.projectionYear.data)
 
-                for _name, _value in _record.incomeSources.items():
-                    _data[_name].append(_value.data)
+                for _dataItem in _record.incomeSources:
+                    _data[_dataItem.header].append(_dataItem.data)
 
         self.chart.setTitle("Income Totals")
         if self.parent.tableData.InTodaysDollars:
@@ -219,10 +219,9 @@ class CustomChartTab(QWidget):
                 if _record.projectionYear.data not in _years:
                     _years.append(_record.projectionYear.data)
 
-                for _name, _value in _record.assetContributions.items():
-                    _data[_name].append(_value.data)
+                for _dataItem in _record.assetContributions:
+                    _data[_dataItem.header].append(_dataItem.data)
 
-        # self.chart.show(False)
         self.chart.setTitle("Asset Contribution Totals")
         if self.parent.tableData.InTodaysDollars:
             self.chart.setSubTitle("In Today's Dollars")
@@ -233,10 +232,13 @@ class CustomChartTab(QWidget):
             self.chart.stackplot(
                 _years, _data.values(), _data.keys(), legend_location="upper right"
             )
+            self.chart.show(True)
         else:
-            self.chart.stackplot([], [], [])
-        self.chart.show(True)
+            #self.chart.stackplot([], [], [])
+            #self.chart.canvas.axes.clear()
+            self.chart.show(False)
 
+    
     def IncomeVsExpenses(self):
         _years = []
 
@@ -249,10 +251,7 @@ class CustomChartTab(QWidget):
                 _data["Income"].append(_record.incomeTotal.data)
                 _data["Expense"].append(_record.expenseTotal.data)
 
-                # for _name, _value in _record.assetContributions.items():
-                #    _data[_name].append(_value.data)
-
-        # self.chart.show(False)
+    
         self.chart.setTitle("Income Vs Expenses")
         if self.parent.tableData.InTodaysDollars:
             self.chart.setSubTitle("In Today's Dollars")

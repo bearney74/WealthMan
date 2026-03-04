@@ -92,7 +92,7 @@ class ProjectionYearData:
         self.spouseAge: int = None
         self.spouseIsAlive: bool = None
 
-        self.incomeSources: dict = {}  # key is Name, #value is income
+        self.incomeSources: [IncomeSources] = []
         self.taxableIncomeTotal: DataItem = DataItem("Taxable Income Total")
         self.incomeTotal: DataItem = DataItem("Income Total")
         self.activeIncomeTotal: DataItem = DataItem("Active Income Total")
@@ -102,7 +102,7 @@ class ProjectionYearData:
         self.ssTaxableIncome: DataItem = DataItem("SS Taxable Income")  # int = 0
         self.ssTaxRate: DataItem = DataItem("SS Tax Rate", "{:.1f}%")
 
-        self.expenseSources: dict = {}
+        self.expenseSources: [ExpenseSources] = []
         self.expenseTotal: DataItem = DataItem("Expense Total")  # int = 0
 
         self.cashFlow: DataItem = DataItem(
@@ -149,8 +149,8 @@ class ProjectionYearData:
 
         # self.surplus_deficit: int = 0
 
-        self.assetSources: dict = {}
-        self.assetContributions: dict = {}
+        self.assetSources= []
+        self.assetContributions = []
 
         self.assetTotal: DataItem = DataItem("Total Assets")  # int = 0
         self.assetContributionTotal: DataItem = DataItem("Total Asset Contributions")
@@ -564,7 +564,7 @@ class Projections(QRunnable):
                 else:
                     _income = _src.calc_balance_by_year(_year)
 
-                _pyd.incomeSources[_src.Name] = DataItem(_src.Name, "${:,}", _income)
+                _pyd.incomeSources.append(DataItem(_src.Name, "${:,}", _income))
 
                 _income_total += _income  # _src.calc_income_by_year(_year)
                 _taxable_income_total += _income
@@ -575,7 +575,7 @@ class Projections(QRunnable):
             _expense_total = 0
             for _src in self._Expenses:
                 _expense = _src.calc_balance_by_year(_year)
-                _pyd.expenseSources[_src.Name] = _expense
+                _pyd.expenseSources.append(DataItem(_src.Name, "${:,}", _expense))
 
                 _expense_total += _expense
             _pyd.expenseTotal.data = _expense_total
@@ -591,7 +591,7 @@ class Projections(QRunnable):
                     _pyd.assetContributions[_src.Name] = _contribution
                     _contribution_total += _contribution
 
-                _pyd.assetSources[_src.Name] = DataItem(_src.Name, "${:,}", _balance)
+                _pyd.assetSources.append(DataItem(_src.Name, "${:,}", _balance))
 
                 if _src.Type == AccountType.TAXDEFERRED:
                     if _src.Owner == AccountOwnerType.CLIENT:
@@ -815,6 +815,7 @@ class Projections(QRunnable):
             )  # + _pyd.assetTaxDeferredWithdraw)
 
             # federal taxes
+            # fix me!
             _ft = FederalTax(_pyd.federalTaxFilingStatus.data, 2024)
             # _taxable_income = (
             #    _income_total - _ss_income_total + _pyd.ssTaxableIncome

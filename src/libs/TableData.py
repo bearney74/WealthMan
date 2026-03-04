@@ -51,8 +51,8 @@ class TableData:
                 "%s:%s" % (_record.projectionYear, self._calc_ages(_record))
             )
 
-            for _name, _balance in _record.expenseSources.items():
-                _list.append(DataItem(_name, "${:,}", _balance))
+            for _dataItem in _record.expenseSources:
+                _list.append(_dataItem)
 
             _list.append(_record.expenseTotal)
 
@@ -77,8 +77,8 @@ class TableData:
                 "%s:%s" % (_record.projectionYear, self._calc_ages(_record))
             )
 
-            for _name, _balance in _record.incomeSources.items():
-                _list.append(_balance)
+            for _dataItem in _record.incomeSources:
+                _list.append(_dataItem)
 
             _list.append(_record.ssIncomeTotal)
             _list.append(_record.activeIncomeTotal)
@@ -112,8 +112,8 @@ class TableData:
                 "%s:%s" % (_record.projectionYear, self._calc_ages(_record))
             )
 
-            for _name, _balance in _record.assetSources.items():
-                _list.append(_balance)
+            for _dataItem in _record.assetSources:
+                _list.append(_dataItem)
 
             if self.UseSurplusAccount:
                 _list.append(_record.surplusBalance)
@@ -121,8 +121,8 @@ class TableData:
 
             _list.append(_record.assetTotal)
 
-            for _name, _contribution in _record.assetContributions.items():
-                _list.append(_contribution)
+            for _dataItem in _record.assetContributions:
+                _list.append(_dataItem)
 
             _list.append(_record.assetContributionTotal)
 
@@ -188,7 +188,11 @@ class TableData:
     def get_chart_data(self):
         _data = []
         for _record in self.projectionData:
-            _data.append(_record.__dict__)
+            _dict={}
+            for _key, _attr in _record.__dict__.items():
+                if isinstance(_attr, DataItem):
+                   _dict[_key]=_attr
+            _data.append(_dict)
 
         return _data
 

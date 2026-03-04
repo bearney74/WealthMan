@@ -31,8 +31,7 @@ class MonteCarloSimulator:
 
         self._bankrupt = False
         self._bankrupt_step = None  # the iterator in which we went bankrupt.
-        # self._values = {}
-
+        
         assert isinstance(avgReturnGen, StdDevRandomNumberGenerator)
         self._avg_return_generator = avgReturnGen
 
@@ -57,40 +56,21 @@ class MonteCarloSimulator:
         self._balances = []
         self._bankrupt = False
 
-        # _balance = self._balance
         _purchase_power = 1.0  # start at 1.0
         for _step, _expense in enumerate(self._expenses):
             # get average return
             _avg_return = self._avg_return_generator.get_rate()
             _period_inflation_rate = self._avg_inflation_rate_generator.get_rate()
 
-            # adjust purchase power by inflation rate
-            # _purchase_power *= (1.0 + _period_inflation_rate)
-
-            # _period_expense = int(_expense * _purchase_power)
-
-            # if DEBUG:
-            #    print(
-            #        "%d, %4.2f%%, %4.2f%%, %5.2f, %d"
-            #        % (
-            #            self._balance,
-            #            _avg_return * 100.0,
-            #            _period_inflation_rate * 100.0,
-            #            _purchase_power,
-            #            _period_expense,
-            #        )
-            #    )
-
-            # subtract the expense from the balance
-            # don't know if we should subtract expense or the inflated expense value
+            # subtract the expense from the balance (after applying the inflation factor)
             self._balance -= _expense * (1.0 + _period_inflation_rate)
 
             # check if we have a positive balance or not
             if self._balance > 0:
                 # if we have a positive balance, adjust by average return
                 self._balance *= 1.0 + (_avg_return - _period_inflation_rate)
-            else:
-                self._balance *= 1.0 + _period_inflation_rate
+            else: # since we have a negative balance, we need to add the inflation
+                self._balance *= (1.0 + _period_inflation_rate)
                 self._bankrupt = True
                 if self._bankrupt_step is None:
                     self._bankrupt_step = _step

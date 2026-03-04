@@ -44,7 +44,7 @@ class MonteCarloSimTest(unittest.TestCase):
         self.assertGreater(_sim.bankrupt_step(), -1)
         self.assertLess(_sim.bankrupt_step(), 10)
         
-        #success is 0
+        #success is < 100
         self.assertLess(_sim.percent_success(), 100.0)
         
         #should have 10 balances, one for each year..
