@@ -54,32 +54,51 @@ class MonteCarloSimulator:
 
     def process(self):
         self._balances = []
+        self._returns = []
+        self._inflations = []
         self._bankrupt = False
 
+        # import csv
+        # _csv=csv.writer(open("mcs.csv", "w"))
+        # _csv.writerow(["balance", "expense", "avg return", "inflation", "expense1", "ror", "balance_after"])
         _purchase_power = 1.0  # start at 1.0
         for _step, _expense in enumerate(self._expenses):
             # get average return
             _avg_return = self._avg_return_generator.get_rate()
-            _period_inflation_rate = self._avg_inflation_rate_generator.get_rate()
+            _inflation_rate = self._avg_inflation_rate_generator.get_rate()
 
+            # _data=[self._balance, _expense, _avg_return, _inflation_rate]
             # subtract the expense from the balance (after applying the inflation factor)
-            self._balance -= _expense * (1.0 + _period_inflation_rate)
+            _inflated_expense = _expense * (1.0 + _inflation_rate)
+            self._balance -= _inflated_expense
 
             # check if we have a positive balance or not
+            _ror = _avg_return - _inflation_rate
             if self._balance > 0:
                 # if we have a positive balance, adjust by average return
-                self._balance *= 1.0 + (_avg_return - _period_inflation_rate)
+                self._balance *= 1.0 + _ror
             else:  # since we have a negative balance, we need to add the inflation
-                self._balance *= 1.0 + _period_inflation_rate
+                # since the buying power of this balance is still reduced..
+                self._balance *= 1.0 + _inflation_rate
                 self._bankrupt = True
                 if self._bankrupt_step is None:
                     self._bankrupt_step = _step
 
+            # _data += [_inflated_expense, _ror, self._balance]
+            # _csv.writerow(_data)
             # add this balance for record keeping if we want it..
             self._balances.append(self._balance)
+            self._returns.append(_avg_return)
+            self._inflations.append(_inflation_rate)
 
     def get_balances(self):
         return self._balances
+
+    def get_returns(self):
+        return self._returns
+
+    def get_inflations(self):
+        return self._inflations
 
 
 def stats(data: list[int]):
@@ -156,7 +175,7 @@ if __name__ == "__main__":
         ax.axhline(y=0, color="gray", linestyle="dashed")  # dashed line at 0
         return fig, ax
 
-    _results = run_simulator(10_000, 1000, [40] * 35)
+    _results = run_simulator(1, 1000, [40] * 35)
 
-    fig, ax = create_fanchart(_results)
-    plt.show()
+    # fig, ax = create_fanchart(_results)
+    # plt.show()

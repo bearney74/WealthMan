@@ -11,6 +11,7 @@ from .Chart import ChartTab
 from .CustomChart import CustomChartTab
 
 from .MonteCarloSimulation import MonteCarloTab
+from .HistoricalAnalysis import HistoricalAnalysisTab
 
 
 class AnalysisTab(QWidget):
@@ -37,7 +38,9 @@ class AnalysisTab(QWidget):
         self.ChartTab = ChartTab(self)
         self.CustomChartTab = CustomChartTab(self)
 
+        # advanced tabs
         self.MonteCarloTab = MonteCarloTab(self)
+        self.HistoricalAnalysisTab = HistoricalAnalysisTab(self)
 
         self.tabs.currentChanged.connect(self.onTabChange)
 
@@ -49,6 +52,7 @@ class AnalysisTab(QWidget):
         self.tabs.addTab(self.ChartTab, "Charts")
         self.tabs.addTab(self.CustomChartTab, "Custom Charts")
         self.tabs.addTab(self.MonteCarloTab, "Monte Carlo")
+        self.tabs.addTab(self.HistoricalAnalysisTab, "Historical")
 
         layout = QVBoxLayout()
         layout.addWidget(self.tabs)

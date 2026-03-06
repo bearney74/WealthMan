@@ -9,10 +9,10 @@ matplotlib.use("QtAgg")
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton
 
-from libs.MonteCarloSim import MonteCarloSimulator, StdDevRandomNumberGenerator
+from libs.HistoricalAnalysis import HistoricalAnalysis, AllocationPeriod
 
 
-class MonteCarloTab(QWidget):
+class HistoricalAnalysisTab(QWidget):
     def __init__(self, parent=None):
         super(QWidget, self).__init__(parent)
 
@@ -24,12 +24,11 @@ class MonteCarloTab(QWidget):
         # layout.addWidget(self.text)
         # layout.addWidget(self.table)
 
-        # add a widget to ask for the avg return rate, and std dev
-        # add a widget to aks for the avg inflation rate, and std dev.
+        # ask for start year and end year (or 1928 to present)
 
         # add a button to run the monte carlo sim
         self._button = QPushButton("Run Simulation")
-        self._button.clicked.connect(self._run_simulation)
+        self._button.clicked.connect(self._run_analysis)
         # add a chart.  #maybe hide the chart until the button is pressed?
 
         layout.addWidget(self._button)
@@ -42,7 +41,34 @@ class MonteCarloTab(QWidget):
         # self._asset_contributions=[]
         # self._expenses=[]
 
-    def _run_simulation(self):
+    def _run_single_period(self, begin_year, end_year, balance, incomes, expenses):
+        # balance = 100
+        # incomes = []
+        # expenses = []
+
+        allocationPeriods = [
+            AllocationPeriod(0, 10, 80, 15, 5),
+            AllocationPeriod(11, 20, 70, 25, 5),
+            AllocationPeriod(20, None, 60, 40, 0),
+        ]
+
+        # for _i in range(begin_year, end_year + 1):
+        #    incomes.append(0)
+        #    expenses.append(4)
+
+        _rs = HistoricalAnalysis(
+            begin_year,
+            end_year,
+            incomes,
+            expenses,
+            balance,
+            allocationPeriods,
+            DefaultReturnRate=5.0,
+        )
+        _success, _balance = _rs.execute()
+        return _success, _balance
+
+    def _run_analysis(self):
         """calculate total assets as well as expenses and asset contributions for each year"""
 
         # retrieve the variables we need for the Monte Carlo Simulation
@@ -50,54 +76,50 @@ class MonteCarloTab(QWidget):
         # we need the total amount of expenses
 
         _assets_total = self.parent.projectionData[0].assetTotal.data
-        _asset_contributions = []
+        # _asset_contributions = []
+        _incomes = []
         _expenses = []
         for _step, _pyd in enumerate(self.parent.projectionData):
-            _contributions = _pyd.assetContributionTotal.data
+            # _contributions = _pyd.assetContributionTotal.data
 
             # use incomeSources to get regular income (job, SS, pensions, etc)
             _expense_total = _pyd.expenseTotal.data - _pyd.activeIncomeTotal.data
 
-            _asset_contributions.append(_contributions)
+            # _asset_contributions.append(_contributions)
             _expenses.append(_expense_total)
+            _incomes.append(_pyd.activeIncomeTotal.data)
 
         # _percent_success, _failure_rate=run_simulator(10_000, _assets_total, _expenses)
         _success = 0
         _failure_step = []
-        _results = []
-        _number_of_runs = self.dataVariables.numberOfRuns
-        _avg_returns_generator = StdDevRandomNumberGenerator(
-            self.dataVariables.avgROR, self.dataVariables.avgRORStdDev
-        )
-        _inflation_generator = StdDevRandomNumberGenerator(
-            self.dataVariables.avgInflationRate,
-            self.dataVariables.avgInflationRateStdDev,
-        )
+        # _results = []
+        # retrieve the number of years to of retirement
+        _forecast_years = self.dataVariables.forecastYears
 
         _balances = []
-        _returns = []
-        _inflations = []
-        for _i in range(_number_of_runs):
-            _sim = MonteCarloSimulator(
-                _assets_total, _expenses, _avg_returns_generator, _inflation_generator
+        _begin_year = 1928
+        _end_year = 2025
+        # _incomes=[0 for _ in range(_forecast_years+1)] #fix me
+        for _start_year in range(_begin_year, _end_year - _forecast_years - 1):
+            _end_year = _start_year + _forecast_years
+            _success, _balance = self._run_single_period(
+                _start_year, _end_year, _assets_total, _incomes, _expenses
             )
-            _sim.process()
-            _balances.append(_sim.get_balances())
-            _returns.append(_sim.get_returns())
-            _inflations.append(_sim.get_inflations())
 
-            if not _sim.is_bankrupt():
-                _success += 1
-            else:  # keep track of which step we ran out of money??
-                _failure_step.append(_sim.bankrupt_step())
+            _balances.append(_balance)
+            # _returns.append(_sim.get_returns())
+            # _inflations.append(_sim.get_inflations())
+
+            # if not _sim.is_bankrupt():
+            #    _success += 1
+            # else:  # keep track of which step we ran out of money??
+            # if not _success:
+            #    _failure_step.append(_sim.bankrupt_step())
 
         # _percent_success= 100.0 * _success/float(_number_of_runs)
         # _failure_stats=stats(_failure_step)
 
-        # if _number_of_runs >= 1000:
         self._chart.plot(_balances)
-        # else:
-        #   self._chart.plot2(_balances, _returns, _inflations)
         self._chart.show(True)
         # print(_failure_step)
 
@@ -107,11 +129,6 @@ class MonteCarloTab(QWidget):
 class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         self.fig, self.axes = plt.subplots()
-        # self.fig = plt.figure()
-        # grid = self.fig.add_gridspec(2, 3)
-        # self.axes1 = self.fig.add_subplot(grid[:, :-1])  #211
-        # self.axes2=self.fig.add_subplot(grid[0,2])    #221
-        # self.axes3=self.fig.add_subplot(grid[1,2])    #222
         super(MplCanvas, self).__init__(self.fig)
 
 
@@ -170,37 +187,12 @@ class MonteCarloChart(QWidget):
         self.canvas.axes3.xaxis.set_major_formatter(FuncFormatter(format_percent))
     """
 
-    def plot(self, data):
-        result = np.array(data).T
-        x = np.arange(result.shape[0])
+    def plot(self, balances):
+
+        result = np.array(balances).T
+        # x = np.arange(result.shape[0])
         median = np.median(result, axis=1)
-        offsets = (10, 20, 30, 40)
 
-        # print(median)
-        # fig, ax = plt.subplots()
-        self.canvas.axes.clear()
-
-        self._set_yaxis_format()
-
-        # print(median[-1])
-        self.canvas.axes.plot(median, color="black", lw=2)
-        for offset in offsets:
-            low = np.percentile(result, 50 - offset, axis=1)
-            high = np.percentile(result, 50 + offset, axis=1)
-            # since `offset` will never be bigger than 50, do 55-offset so that
-            # even for the whole range of the graph the fanchart is visible
-            alpha = (55 - offset) / 100
-            self.canvas.axes.fill_between(x, low, high, color="blue", alpha=alpha)
-        self.canvas.axes.legend(["Median"] + [f"Pct{2 * o}" for o in offsets])
-        self.canvas.axes.axhline(
-            y=0, color="gray", linestyle="dashed"
-        )  # dashed line at 0
-
-        self.canvas.axes.set_xlim(left=0, right=len(data[0]) - 1)
-
-        self.canvas.draw()
-
-    def plot2(self, balances, returns, inflations):
         self.canvas.axes.clear()
         self._set_yaxis_format()
         _years = [x for x in range(len(balances[0]))]
@@ -208,6 +200,8 @@ class MonteCarloChart(QWidget):
         for _series in balances:
             _last.append(_series[-1])
             self.canvas.axes.plot(_years, _series)
+
+        self.canvas.axes.plot(median, color="black", lw=2)
 
         self.canvas.axes.axhline(
             y=0, color="gray", linestyle="dashed"
@@ -220,7 +214,7 @@ class MonteCarloChart(QWidget):
         _last.sort()
         _ymax80 = _last[int(len(_last) * 0.98)]
         # print(_ymax80)
-        self.canvas.axes.set_ylim(top=_ymax80)
+        # self.canvas.axes.set_ylim(top=_ymax80)
         self.canvas.axes.set_xlabel("Year")
         # self.canvas.axes.set_ylabel("Dollar")
 

@@ -39,7 +39,11 @@ class HistoricalData:
     def __init__(self):
         self._data = []
 
-        with open("asset_return_rates.csv", "r") as _fp:
+        # print(__file__)
+        # import os
+        # print(os.getcwd())
+
+        with open("src/libs/data/asset_return_rates.csv", "r") as _fp:
             _csv = csv.reader(_fp)
 
             next(_csv)  # skip header
@@ -97,6 +101,7 @@ class HistoricalAnalysis:
         _hd = HistoricalData()
         self._data = _hd.get_data(begin_year, end_year)
 
+        print(len(incomes), len(expenses), len(self._data))
         assert len(incomes) == len(expenses) == len(self._data)
 
     def get_allocation_period(self, year):
@@ -139,7 +144,7 @@ class HistoricalAnalysis:
 
             self._balances.append(self._balance)
 
-        return _success, int(self._balance)
+        return _success, self._balances
 
     def get_balances(self):
         return self._balance

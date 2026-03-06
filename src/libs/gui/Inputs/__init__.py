@@ -148,6 +148,7 @@ class InputsTab(QMainWindow):
         self.GlobalVariablesTab.export_data(dv)
         self.MiscInfoTab.export_data(dv)
         self.parent.AnalysisTab.MonteCarloTab.dataVariables = dv
+        self.parent.AnalysisTab.HistoricalAnalysisTab.dataVariables = dv
 
         self.parent.statusbar.showMessage("Calculating projections")
         self.progressDialog = QProgressDialog("Projection in progress...", None, 0, 100)
