@@ -18,6 +18,7 @@ class HistoricalAnalysisTab(QWidget):
 
         self.parent = parent
         self.dataVariables = None
+        self.projections = None  # an instance of Projections
         # self.text = QPlainTextEdit()
 
         layout = QVBoxLayout()
@@ -33,33 +34,29 @@ class HistoricalAnalysisTab(QWidget):
 
         layout.addWidget(self._button)
 
-        self._chart = MonteCarloChart(self)
+        self._chart = HistoricalAnalysisChart(self)
         layout.addWidget(self._chart)
         self.setLayout(layout)
 
-        # self._assets_total=0
-        # self._asset_contributions=[]
-        # self._expenses=[]
-
-    def _run_single_period(self, begin_year, end_year, balance, incomes, expenses):
+    def _run_single_period(
+        self,
+        begin_year,
+        end_year,
+        balance,
+        incomes_fixed,
+        incomes_with_COLA,
+        expenses,
+        allocationPeriods,
+    ):
         # balance = 100
         # incomes = []
         # expenses = []
 
-        allocationPeriods = [
-            AllocationPeriod(0, 10, 80, 15, 5),
-            AllocationPeriod(11, 20, 70, 25, 5),
-            AllocationPeriod(20, None, 60, 40, 0),
-        ]
-
-        # for _i in range(begin_year, end_year + 1):
-        #    incomes.append(0)
-        #    expenses.append(4)
-
         _rs = HistoricalAnalysis(
             begin_year,
             end_year,
-            incomes,
+            incomes_fixed,
+            incomes_with_COLA,
             expenses,
             balance,
             allocationPeriods,
@@ -77,7 +74,9 @@ class HistoricalAnalysisTab(QWidget):
 
         _assets_total = self.parent.projectionData[0].assetTotal.data
         # _asset_contributions = []
-        _incomes = []
+        _incomes_fixed = []
+        _incomes_with_COLA = []
+
         _expenses = []
         for _step, _pyd in enumerate(self.parent.projectionData):
             # _contributions = _pyd.assetContributionTotal.data
@@ -87,9 +86,36 @@ class HistoricalAnalysisTab(QWidget):
 
             # _asset_contributions.append(_contributions)
             _expenses.append(_expense_total)
-            _incomes.append(_pyd.activeIncomeTotal.data)
+
+            # need to get to the projections object for the income data since we need
+            # more info (ie, does it have a COLA?)
+            _fixed = 0
+            _with_COLA = 0
+            _year = _pyd.projectionYear.data
+            for _item in self.projections._IncomeSources:
+                # print("Year", _year)
+                # print(_item.Name)
+                # print(_item.BeginDate.year)
+                # print(_item.EndDate.year)
+                # print(_item.LifeSpanDate.year)
+                # print(_item.Amount)
+                # print(_item._COLA_Flag)
+                if (
+                    _item.BeginDate.year <= _year
+                    and _item.LifeSpanDate.year >= _year
+                    and _item.EndDate.year >= _year
+                ):
+                    if _item.get_COLA_Flag():
+                        _with_COLA += _item.Amount
+                    else:
+                        _fixed += _item.Amount
+
+            _incomes_fixed.append(_fixed)
+            _incomes_with_COLA.append(_with_COLA)
 
         # _percent_success, _failure_rate=run_simulator(10_000, _assets_total, _expenses)
+        # print(_incomes_fixed)
+        # print(_incomes_with_COLA)
         _success = 0
         _failure_step = []
         # _results = []
@@ -99,11 +125,22 @@ class HistoricalAnalysisTab(QWidget):
         _balances = []
         _begin_year = 1928
         _end_year = 2025
+        _allocationPeriods = [
+            AllocationPeriod(0, 10, 80, 15, 5),
+            AllocationPeriod(11, 20, 70, 25, 5),
+            AllocationPeriod(20, None, 60, 40, 0),
+        ]
         # _incomes=[0 for _ in range(_forecast_years+1)] #fix me
         for _start_year in range(_begin_year, _end_year - _forecast_years - 1):
             _end_year = _start_year + _forecast_years
             _success, _balance = self._run_single_period(
-                _start_year, _end_year, _assets_total, _incomes, _expenses
+                _start_year,
+                _end_year,
+                _assets_total,
+                _incomes_fixed,
+                _incomes_with_COLA,
+                _expenses,
+                _allocationPeriods,
             )
 
             _balances.append(_balance)
@@ -132,9 +169,9 @@ class MplCanvas(FigureCanvasQTAgg):
         super(MplCanvas, self).__init__(self.fig)
 
 
-class MonteCarloChart(QWidget):
+class HistoricalAnalysisChart(QWidget):
     def __init__(self, parent=None):
-        super(MonteCarloChart, self).__init__(parent)
+        super(HistoricalAnalysisChart, self).__init__(parent)
 
         _layout = QVBoxLayout()
         self.canvas = MplCanvas(self, width=5, height=45, dpi=100)

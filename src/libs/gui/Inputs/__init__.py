@@ -161,6 +161,8 @@ class InputsTab(QMainWindow):
         self.threadpool.start(self.project)
         self.progressDialog.setValue(25)
 
+        self.parent.AnalysisTab.HistoricalAnalysisTab.projections = self.project
+
     def populate_analysis_tab(self, data):
         self.progressDialog.setValue(50)
         self.parent.AnalysisTab.projectionData = data

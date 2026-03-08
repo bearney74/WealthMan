@@ -1,3 +1,4 @@
+import os
 import csv
 
 
@@ -32,7 +33,9 @@ class AnnualReturnData:
         self.Stocks = 1.0 + float(Stocks) / 100.0
         self.Bonds = 1.0 + float(Bonds) / 100.0
         self.Cash = 1.0 + float(Cash) / 100.0
-        self.Inflation = float(Inflation) / 100.0
+        self.Inflation = (
+            float(Inflation) / 100.0
+        )  # sometimes we add this (expenses) sometimes subtract (balance)
 
 
 class HistoricalData:
@@ -42,8 +45,11 @@ class HistoricalData:
         # print(__file__)
         # import os
         # print(os.getcwd())
+        _filename = "data/asset_return_rates.csv"
+        if not os.path.exists(_filename):
+            _filename = "src/libs/data/asset_return_rates.csv"
 
-        with open("src/libs/data/asset_return_rates.csv", "r") as _fp:
+        with open(_filename, "r") as _fp:
             _csv = csv.reader(_fp)
 
             next(_csv)  # skip header
@@ -84,7 +90,8 @@ class HistoricalAnalysis:
         self,
         begin_year,
         end_year,
-        incomes,
+        incomes_fixed,
+        incomes_with_COLA,
         expenses,
         accountBalance,
         accountAllocations,
@@ -93,7 +100,8 @@ class HistoricalAnalysis:
         self._balances = []
         self._balance = accountBalance
 
-        self._incomes = incomes
+        self._incomes_fixed = incomes_fixed
+        self._incomes_with_COLA = incomes_with_COLA
         self._expenses = expenses
         self._accountAllocations = accountAllocations
         self._defaultReturnRate = DefaultReturnRate
@@ -101,8 +109,13 @@ class HistoricalAnalysis:
         _hd = HistoricalData()
         self._data = _hd.get_data(begin_year, end_year)
 
-        print(len(incomes), len(expenses), len(self._data))
-        assert len(incomes) == len(expenses) == len(self._data)
+        # print(len(incomes_fixed), len(incomes_with_COLA), len(expenses), len(self._data))
+        assert (
+            len(incomes_fixed)
+            == len(incomes_with_COLA)
+            == len(expenses)
+            == len(self._data)
+        )
 
     def get_allocation_period(self, year):
         for _ap in self._accountAllocations:
@@ -113,11 +126,12 @@ class HistoricalAnalysis:
         return None
 
     def execute(self):
-        self._balances = []
+        self._balances = [self._balance]
         _success = True
         # _inflation = 1.0
         for _pos, _record in enumerate(self._data):
-            self._balance += self._incomes[_pos]  # income inflation adjustment?
+            self._balance += self._incomes_fixed[_pos]
+            self._balance += self._incomes_with_COLA[_pos] * (1.0 + _record.Inflation)
             self._balance -= self._expenses[_pos] * (1.0 + _record.Inflation)
 
             # print(self.balance, _return)
@@ -154,7 +168,8 @@ if __name__ == "__main__":
 
     def single_run(begin_year, end_year):
         balance = 100
-        incomes = []
+        incomes_fixed = []
+        incomes_with_COLA = []
         expenses = []
 
         allocationPeriods = [
@@ -164,13 +179,15 @@ if __name__ == "__main__":
         ]
 
         for _i in range(begin_year, end_year + 1):
-            incomes.append(0)
+            incomes_fixed.append(0)
+            incomes_with_COLA.append(0)
             expenses.append(4)
 
         _rs = HistoricalAnalysis(
             begin_year,
             end_year,
-            incomes,
+            incomes_fixed,
+            incomes_with_COLA,
             expenses,
             balance,
             allocationPeriods,

@@ -238,7 +238,7 @@ class Projections(QRunnable):
                 Owner=PersonType.CLIENT,
                 BeginAge=dv.clientSSBeginAge,
                 LifeSpanAge=dv.clientLifeSpanAge,
-                COLA=dv.ssCola - self._inflation,
+                COLA=dv.ssCola,
             )
             self._IncomeSources.append(_client_ss)
 
@@ -252,7 +252,7 @@ class Projections(QRunnable):
                     Owner=PersonType.SPOUSE,
                     BeginAge=dv.spouseSSBeginAge,
                     LifeSpanAge=dv.spouseLifeSpanAge,
-                    COLA=dv.ssCola - self._inflation,
+                    COLA=dv.ssCola,
                 )
                 self._IncomeSources.append(_spouse_ss)
 
@@ -278,9 +278,13 @@ class Projections(QRunnable):
                 BirthDate=_birthdate,
                 BeginAge=dv.pension1BeginAge,
                 LifeSpanAge=_lifespan,
+                EndAge=dv.pension1EndAge,
                 SurvivorPercent=dv.pension1SurvivorBenefits,
-                COLA=dv.pension1Cola - self._inflation,
+                COLA=dv.pension1Cola,
             )
+            # if dv.pension1Cola is not None and dv.pension1Cola != 0.0:
+            #    _is.set_COLA_Flag(True)
+
             self._IncomeSources.append(_is)
 
         if dv.pension2Name is not None and dv.pension2Name.strip() != "":
@@ -297,9 +301,13 @@ class Projections(QRunnable):
                 Amount=dv.pension2Amount,
                 BirthDate=_birthdate,
                 BeginAge=dv.pension2BeginAge,
+                EndAge=dv.pension2EndAge,
                 SurvivorPercent=dv.pension2SurvivorBenefits,
-                COLA=dv.pension2Cola - self._inflation,
+                COLA=dv.pension2Cola,
             )
+            # if dv.pension2Cola is not None and dv.pension2Cola != 0.0:
+            #    _is.set_COLA_Flag(True)
+
             self._IncomeSources.append(_is)
 
         for _record in dv.otherIncomes:
@@ -312,8 +320,9 @@ class Projections(QRunnable):
                     _record.begin_age = 0
                 if _record.end_age is None:
                     _record.end_age = 99
-                if _record.COLA is None:
-                    _record.COLA = 0.0
+                _COLA = None
+                if _record.COLA is not None:
+                    _COLA = _record.COLA
                 _is = IncomeSource(
                     _record.descr,
                     IncomeSourceType.EMPLOYMENT,
@@ -323,9 +332,13 @@ class Projections(QRunnable):
                     BeginAge=_record.begin_age,
                     EndAge=_record.end_age,
                     Taxable=True,
-                    COLA=_record.COLA - self._inflation,
+                    COLA=_COLA,
                 )
+                # print("COLA='%s'" % _record.COLA)
+                # if _record.COLA is not None and _record.COLA != 0.0:
+                #    _is.set_COLA_Flag(True)
 
+                # print("COLA Flag='%s'" % _is.get_COLA_Flag())
                 self._IncomeSources.append(_is)
             else:
                 if _record.amount is None:
@@ -557,12 +570,9 @@ class Projections(QRunnable):
             _income_total = 0
             _ss_income_total = 0
             for _src in self._IncomeSources:
-                # _income = _src.calc_balance_by_year(_year)
+                _income = _src.calc_balance_by_year(_year, self._inflation)
                 if _src.IncomeType == IncomeSourceType.SOCIAL_SECURITY:
-                    _income = _src.calc_balance_by_year(_year)
                     _ss_income_total += _income
-                else:
-                    _income = _src.calc_balance_by_year(_year)
 
                 _pyd.incomeSources.append(DataItem(_src.Name, "${:,}", _income))
 

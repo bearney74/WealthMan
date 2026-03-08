@@ -23,7 +23,7 @@ class BaseRecord:
         self.descr = descr
         assert isinstance(amount, int)
         self.amount = amount
-        assert isinstance(COLA, float)
+        assert COLA is None or isinstance(COLA, float)
         self.COLA = COLA
         # assert isinstance(owner, (AccountOwnerType, PersonType))
         assert isinstance(owner, PersonType)
@@ -48,11 +48,12 @@ class IncomeRecord(BaseRecord):
         end_age,
         survivor_benefit: float = None,
     ):
+        # print("COLA='%s'" % COLA)
+        # print(COLA is not None and COLA > 0.0)
+        self._COLA_FLAG = COLA is not None and COLA > 0.0
         super(IncomeRecord, self).__init__(
             descr, amount, COLA, owner, begin_age, end_age, survivor_benefit
         )
-        # assert isinstance(isSocialSecurity, bool)
-        # self._isSocialSecurity = isSocialSecurity
 
 
 class ExpenseRecord(BaseRecord):

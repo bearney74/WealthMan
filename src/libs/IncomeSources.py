@@ -7,6 +7,10 @@ from .EnumTypes import (
 from .IncomeExpenseBase import IncomeExpenseBase
 from .Person import Person
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class IncomeSource(IncomeExpenseBase):
     def __init__(
@@ -39,8 +43,8 @@ class IncomeSource(IncomeExpenseBase):
         assert isinstance(Owner, PersonType) or Owner is None
         self.Owner = Owner
 
-    def calc_balance_by_year(self, year):
-        _balance = IncomeExpenseBase.calc_balance_by_year(self, year)
+    def calc_balance_by_year(self, year, inflation=0.0):
+        _balance = IncomeExpenseBase.calc_balance_by_year(self, year, inflation)
 
         if self.LifeSpanDate is not None and self.LifeSpanDate.year < year:
             return int(self.SurvivorPercent / 100.0 * _balance)
@@ -93,6 +97,7 @@ class SocialSecurity(IncomeSource):
             LifeSpanAge=LifeSpanAge,
             COLA=COLA,
         )
+        self.set_COLA_Flag(True)  ## SS always has a COLA
 
     def set_SpouseSS(self, SpouseObj):
         # this is used for survivor benefits (ie max(clientBenefit, spouse Benefit)
@@ -101,7 +106,7 @@ class SocialSecurity(IncomeSource):
     def IamDead(self, year) -> bool:
         return self.LifeSpanDate.year < year
 
-    def calc_balance_by_year(self, year) -> int:
+    def calc_balance_by_year(self, year, inflation=0.0) -> int:
         if year > self.LifeSpanDate.year:
             return 0  # assume we are dead..
 
@@ -109,15 +114,17 @@ class SocialSecurity(IncomeSource):
         if self.SpouseObj is not None:
             if self.SpouseObj.IamDead(year):
                 return max(
-                    self.SpouseObj.calc_balance_by_year_for_SpouseBenefit(year),
-                    IncomeSource.calc_balance_by_year(self, year),
+                    self.SpouseObj.calc_balance_by_year_for_SpouseBenefit(
+                        year, inflation
+                    ),
+                    IncomeSource.calc_balance_by_year(self, year, inflation),
                 )
 
         # if we get here, #we are single, or #spouse is still alive
-        return IncomeSource.calc_balance_by_year(self, year)
+        return IncomeSource.calc_balance_by_year(self, year, inflation)
 
-    def calc_balance_by_year_for_SpouseBenefit(self, year):
-        return IncomeSource.calc_balance_by_year(self, year)
+    def calc_balance_by_year_for_SpouseBenefit(self, year, inflation=0.0):
+        return IncomeSource.calc_balance_by_year(self, year, inflation)
 
     def calc_full_retirement_age(self):
         if self.Person.birthDate >= date(1960, 1, 1):

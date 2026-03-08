@@ -1,7 +1,5 @@
 from datetime import date
 
-from .DateHelper import DateHelper
-
 import logging
 
 logger = logging.getLogger(__name__)
@@ -41,15 +39,26 @@ class IncomeExpenseBase:
         )
         self.EndDate = date(BirthDate.year + EndAge, BirthDate.month, BirthDate.day)
 
+        if SurvivorPercent is None:
+            SurvivorPercent = 0.0
         self.SurvivorPercent = SurvivorPercent
+
         assert isinstance(COLA, float) or COLA is None
         if COLA is None:
             COLA = 0.0
         self.COLA = COLA
 
+        self._COLA_Flag = COLA != 0.0
+
         self._annual_balance = 0
 
-    def calc_balance_by_year(self, year) -> int:
+    def set_COLA_Flag(self, flag: bool):
+        self._COLA_Flag = flag
+
+    def get_COLA_Flag(self):
+        return self._COLA_Flag
+
+    def calc_balance_by_year(self, year, inflation=0.0) -> int:
         # this income source is still in the future..  just return 0.
         if self.BeginDate.year > year:
             return 0
@@ -59,43 +68,19 @@ class IncomeExpenseBase:
             return 0
 
         # check for a full year of income  #this is the usual case...
-        if self.BeginDate.year < year and self.EndDate.year > year:
-            return self._calc_balance()
-
-        if self.BeginDate.year == year:
-            if self.EndDate.year > year:
-                _dh = DateHelper(self.BeginDate, date(year, 12, 31))
-                return int(_dh.percent_of_year() / 100.0 * self._calc_balance())
-            else:  # Endyear also equal to year
-                _dh = DateHelper(self.BeginDate, self.EndDate)
-                return int(_dh.percent_of_year() / 100.0 * self._calc_balance())
-
-        if self.EndDate.year == year:
-            if self.BeginDate.year < year:
-                _dh = DateHelper(date(year, 1, 1), self.EndDate)
-                return int(_dh.percent_of_year() / 100.0 * self._calc_balance())
-            else:  # begin date is also equal to year
-                _dh = DateHelper(self.BeginDate, self.EndDate)
-                return int(_dh.percent_of_year() / 100.0 * self._calc_balance())
-
-        # we shouldn't get here..
-        logger.error("Something went wrong calculating balance for income/expense")
-        logger.error(
-            "year=%s, Begin Year=%s, End Year=%s"
-            % (year, self.BeginDate.year, self.EndDate.year)
-        )
-        assert False
+        # we assume each year goes in order (2004-> 2005, -> 2006)
+        # if self.BeginDate.year < year and self.EndDate.year > year:
+        return self._calc_balance(inflation)
 
     def _calc_annual_balance(self) -> int:
         return self.Amount
 
-    def _calc_balance(self) -> int:
+    def _calc_balance(self, inflation=0.0) -> int:
         if self._annual_balance == 0:
             self._annual_balance = self._calc_annual_balance()
             return self._annual_balance
 
-        if self.COLA != 0:
-            self._annual_balance = int(self._annual_balance * (1.0 + self.COLA / 100.0))
-            return self._annual_balance
-
+        self._annual_balance = int(
+            self._annual_balance * (1.0 + (self.COLA - inflation) / 100.0)
+        )
         return self._annual_balance
