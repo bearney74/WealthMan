@@ -97,10 +97,10 @@ class TransferRecord:
         assert isinstance(person, PersonType)
         self.person = person
 
-        assert isinstance(beginAge, int)
+        assert beginAge is None or isinstance(beginAge, int)
         self.beginAge = beginAge
 
-        assert isinstance(endAge, int)
+        assert endAge is None or isinstance(endAge, int)
         self.endAge = endAge
 
 

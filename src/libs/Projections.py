@@ -199,7 +199,6 @@ class Projections(QRunnable):
             self._inflation = 0
 
         self.UseSurplusAccount = dv.SurplusAccount
-        # print(self.UseSurplusAccount)
         self.SurplusAccountInterestRate = dv.SurplusAccountInterestRate
 
         _is_married = dv.relationStatus == RelationStatusType.MARRIED
@@ -282,8 +281,6 @@ class Projections(QRunnable):
                 SurvivorPercent=dv.pension1SurvivorBenefits,
                 COLA=dv.pension1Cola,
             )
-            # if dv.pension1Cola is not None and dv.pension1Cola != 0.0:
-            #    _is.set_COLA_Flag(True)
 
             self._IncomeSources.append(_is)
 
@@ -305,8 +302,6 @@ class Projections(QRunnable):
                 SurvivorPercent=dv.pension2SurvivorBenefits,
                 COLA=dv.pension2Cola,
             )
-            # if dv.pension2Cola is not None and dv.pension2Cola != 0.0:
-            #    _is.set_COLA_Flag(True)
 
             self._IncomeSources.append(_is)
 
@@ -320,9 +315,11 @@ class Projections(QRunnable):
                     _record.begin_age = 0
                 if _record.end_age is None:
                     _record.end_age = 99
+
                 _COLA = None
                 if _record.COLA is not None:
                     _COLA = _record.COLA
+
                 _is = IncomeSource(
                     _record.descr,
                     IncomeSourceType.EMPLOYMENT,
@@ -334,11 +331,6 @@ class Projections(QRunnable):
                     Taxable=True,
                     COLA=_COLA,
                 )
-                # print("COLA='%s'" % _record.COLA)
-                # if _record.COLA is not None and _record.COLA != 0.0:
-                #    _is.set_COLA_Flag(True)
-
-                # print("COLA Flag='%s'" % _is.get_COLA_Flag())
                 self._IncomeSources.append(_is)
             else:
                 if _record.amount is None:
@@ -367,7 +359,7 @@ class Projections(QRunnable):
                     BirthDate=_birthdate,
                     BeginAge=_record.begin_age,
                     EndAge=_record.end_age,
-                    COLA=_record.COLA - self._inflation,
+                    COLA=_record.COLA,
                 )
 
                 self._Expenses.append(_e)
@@ -379,28 +371,18 @@ class Projections(QRunnable):
 
         self._Assets = []
 
-        if dv.clientIRACola is None:
-            _interest = -self._inflation
-        else:
-            _interest = dv.clientIRACola - self._inflation
-
         self._Assets.append(
             TraditionalIRA(
                 Name="Client Trad IRA",
                 Owner=AccountOwnerType.CLIENT,
                 BirthDate=dv.clientBirthDate,
                 Balance=dv.clientIRABalance,
-                InterestRate=_interest,
+                InterestRate=dv.clientIRACola,
                 Contribution=dv.clientIRAContribution,
                 ContributionBeginAge=dv.clientIRAContributionBeginAge,
                 ContributionEndAge=dv.clientIRAContributionEndAge,
             )
         )
-
-        if dv.clientRothIRACola is None:
-            _interest = -self._inflation
-        else:
-            _interest = dv.clientRothIRACola - self._inflation
 
         self._Assets.append(
             RothIRA(
@@ -408,17 +390,12 @@ class Projections(QRunnable):
                 Owner=AccountOwnerType.CLIENT,
                 BirthDate=dv.clientBirthDate,
                 Balance=dv.clientRothIRABalance,
-                InterestRate=_interest,
+                InterestRate=dv.clientRothIRACola,
                 Contribution=dv.clientRothContribution,
                 ContributionBeginAge=dv.clientRothContributionBeginAge,
                 ContributionEndAge=dv.clientRothContributionEndAge,
             )
         )
-
-        if dv.spouseIRACola is None:
-            _interest = -self._inflation
-        else:
-            _interest = dv.spouseIRACola - self._inflation
 
         self._Assets.append(
             TraditionalIRA(
@@ -426,41 +403,33 @@ class Projections(QRunnable):
                 Owner=AccountOwnerType.SPOUSE,
                 Balance=dv.spouseIRABalance,
                 BirthDate=dv.spouseBirthDate,
-                InterestRate=_interest,
+                InterestRate=dv.spouseIRACola,
                 Contribution=dv.spouseIRAContribution,
                 ContributionBeginAge=dv.spouseIRAContributionBeginAge,
                 ContributionEndAge=dv.spouseIRAContributionEndAge,
             )
         )
 
-        if dv.spouseRothIRACola is None:
-            _interest = -self._inflation
-        else:
-            _interest = dv.spouseRothIRACola - self._inflation
         self._Assets.append(
             RothIRA(
                 Name="Spouse Roth IRA",
                 Owner=AccountOwnerType.SPOUSE,
                 BirthDate=dv.spouseBirthDate,
                 Balance=dv.spouseRothIRABalance,
-                InterestRate=_interest,
+                InterestRate=dv.spouseRothIRACola,
                 Contribution=dv.spouseRothContribution,
                 ContributionBeginAge=dv.spouseRothContributionBeginAge,
                 ContributionEndAge=dv.spouseRothContributionEndAge,
             )
         )
 
-        if dv.regularCola is None:
-            _interest = -self._inflation
-        else:
-            _interest = dv.regularCola - self._inflation
         self._Assets.append(
             Brokerage(
                 Name="Regular Taxable",
                 Owner=AccountOwnerType.BOTH,
                 BirthDate=dv.clientBirthDate,
                 Balance=dv.regularBalance,
-                InterestRate=_interest,
+                InterestRate=dv.regularCola,
                 Contribution=dv.regularContribution,
                 ContributionBeginAge=dv.regularContributionBeginAge,
                 ContributionEndAge=dv.regularContributionEndAge,
@@ -521,8 +490,6 @@ class Projections(QRunnable):
         if self._spouse is not None:
             _spouseRMD = RMD(self._spouse, self._client)
 
-        # _surplusBalance = 0
-        # _surplusInterestRate = self.SurplusAccountInterestRate
         _surplusAccount = SurplusAccount(0, self.SurplusAccountInterestRate)
 
         _lastYearsFederalTaxes = 0
@@ -584,7 +551,7 @@ class Projections(QRunnable):
 
             _expense_total = 0
             for _src in self._Expenses:
-                _expense = _src.calc_balance_by_year(_year)
+                _expense = _src.calc_balance_by_year(_year, self._inflation)
                 _pyd.expenseSources.append(DataItem(_src.Name, "${:,}", _expense))
 
                 _expense_total += _expense
@@ -595,7 +562,9 @@ class Projections(QRunnable):
             _spouse_ira_total = 0
             _contribution_total = 0
             for _src in self._Assets:
-                _balance, _contribution = _src.calc_balance(year=_year)
+                _balance, _contribution = _src.calc_balance(
+                    year=_year, inflation=self._inflation
+                )
 
                 if _src.Contribution is not None and _src.Contribution != 0:
                     _pyd.assetContributions[_src.Name] = _contribution

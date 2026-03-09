@@ -21,7 +21,7 @@ class AccountTest(unittest.TestCase):
 
     def test_AccountInterestRate(self):
         _a = Account(
-            "Cola", AccountType.REGULAR, AccountOwnerType.CLIENT, InterestRate=0.1
+            "Cola", AccountType.REGULAR, AccountOwnerType.CLIENT, InterestRate=10.0
         )
         _a.deposit(500)
         self.assertEqual(_a.Balance, 500)
@@ -50,7 +50,7 @@ class AccountTest(unittest.TestCase):
             Contribution=1000,
             ContributionBeginAge=20,
             ContributionEndAge=30,
-            InterestRate=0.1,
+            InterestRate=10.0,
         )
 
         # balance is 0

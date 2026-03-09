@@ -7,7 +7,8 @@ from matplotlib.ticker import FuncFormatter
 matplotlib.use("QtAgg")
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel
+from PyQt6.QtCore import Qt
 
 from libs.HistoricalAnalysis import HistoricalAnalysis, AllocationPeriod
 
@@ -19,19 +20,18 @@ class HistoricalAnalysisTab(QWidget):
         self.parent = parent
         self.dataVariables = None
         self.projections = None  # an instance of Projections
-        # self.text = QPlainTextEdit()
 
         layout = QVBoxLayout()
-        # layout.addWidget(self.text)
-        # layout.addWidget(self.table)
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         # ask for start year and end year (or 1928 to present)
 
         # add a button to run the monte carlo sim
+        self._text_output = QLabel("")
         self._button = QPushButton("Run Simulation")
         self._button.clicked.connect(self._run_analysis)
-        # add a chart.  #maybe hide the chart until the button is pressed?
 
+        layout.addWidget(self._text_output)
         layout.addWidget(self._button)
 
         self._chart = HistoricalAnalysisChart(self)
@@ -48,9 +48,6 @@ class HistoricalAnalysisTab(QWidget):
         expenses,
         allocationPeriods,
     ):
-        # balance = 100
-        # incomes = []
-        # expenses = []
 
         _rs = HistoricalAnalysis(
             begin_year,
@@ -93,13 +90,14 @@ class HistoricalAnalysisTab(QWidget):
             _with_COLA = 0
             _year = _pyd.projectionYear.data
             for _item in self.projections._IncomeSources:
-                # print("Year", _year)
-                # print(_item.Name)
-                # print(_item.BeginDate.year)
-                # print(_item.EndDate.year)
-                # print(_item.LifeSpanDate.year)
-                # print(_item.Amount)
-                # print(_item._COLA_Flag)
+                if False:
+                    print("Year", _year)
+                    print(_item.Name)
+                    print(_item.BeginDate.year)
+                    print(_item.EndDate.year)
+                    print(_item.LifeSpanDate.year)
+                    print(_item.Amount)
+                    print(_item._COLA_Flag)
                 if (
                     _item.BeginDate.year <= _year
                     and _item.LifeSpanDate.year >= _year
@@ -113,16 +111,12 @@ class HistoricalAnalysisTab(QWidget):
             _incomes_fixed.append(_fixed)
             _incomes_with_COLA.append(_with_COLA)
 
-        # _percent_success, _failure_rate=run_simulator(10_000, _assets_total, _expenses)
-        # print(_incomes_fixed)
-        # print(_incomes_with_COLA)
         _success = 0
         _failure_step = []
-        # _results = []
-        # retrieve the number of years to of retirement
         _forecast_years = self.dataVariables.forecastYears
 
         _balances = []
+        # fix me..
         _begin_year = 1928
         _end_year = 2025
         _allocationPeriods = [
@@ -130,7 +124,9 @@ class HistoricalAnalysisTab(QWidget):
             AllocationPeriod(11, 20, 70, 25, 5),
             AllocationPeriod(20, None, 60, 40, 0),
         ]
-        # _incomes=[0 for _ in range(_forecast_years+1)] #fix me
+
+        _total = 0
+        _count = 0
         for _start_year in range(_begin_year, _end_year - _forecast_years - 1):
             _end_year = _start_year + _forecast_years
             _success, _balance = self._run_single_period(
@@ -144,23 +140,17 @@ class HistoricalAnalysisTab(QWidget):
             )
 
             _balances.append(_balance)
-            # _returns.append(_sim.get_returns())
-            # _inflations.append(_sim.get_inflations())
 
-            # if not _sim.is_bankrupt():
-            #    _success += 1
-            # else:  # keep track of which step we ran out of money??
-            # if not _success:
-            #    _failure_step.append(_sim.bankrupt_step())
+            _total += 1
+            if _success:
+                _count += 1
 
-        # _percent_success= 100.0 * _success/float(_number_of_runs)
-        # _failure_stats=stats(_failure_step)
-
+        self._text_output.setText(
+            "Successful runs: %s out of %s, (%4.2f%%)"
+            % (_count, _total, 100.0 * _count / _total)
+        )
         self._chart.plot(_balances)
         self._chart.show(True)
-        # print(_failure_step)
-
-        # self.text.setPlainText("Percent Success:%s\nFailure Stats:%s" % (_percent_success, _failure_stats))
 
 
 class MplCanvas(FigureCanvasQTAgg):
@@ -207,35 +197,16 @@ class HistoricalAnalysisChart(QWidget):
             return f"$ {x:,d}"
 
         self.canvas.axes.yaxis.set_major_formatter(FuncFormatter(format_dollar))
-        # self.canvas.axes2.yaxis.set_major_formatter(FuncFormatter(format_num_obs))
-        # self.canvas.axes3.yaxis.set_major_formatter(FuncFormatter(format_num_obs))
-
-    """
-    def _set_xaxis_format(self):
-        def format_percent(x, pos):
-            x=int(x*100.0)
-            return f"{x:d}%"
-        
-        #def format_percent(x, pos):
-        #    x=float(x)
-        #    return f"{x:3.1f}%"
-        
-        self.canvas.axes2.xaxis.set_major_formatter(FuncFormatter(format_percent))
-        self.canvas.axes3.xaxis.set_major_formatter(FuncFormatter(format_percent))
-    """
 
     def plot(self, balances):
 
         result = np.array(balances).T
-        # x = np.arange(result.shape[0])
         median = np.median(result, axis=1)
 
         self.canvas.axes.clear()
         self._set_yaxis_format()
         _years = [x for x in range(len(balances[0]))]
-        _last = []  # contains the last element in each series
         for _series in balances:
-            _last.append(_series[-1])
             self.canvas.axes.plot(_years, _series)
 
         self.canvas.axes.plot(median, color="black", lw=2)
@@ -248,19 +219,12 @@ class HistoricalAnalysisChart(QWidget):
         self._set_yaxis_format()
 
         self.canvas.axes.set_xlim(left=0, right=_years[-1])
-        _last.sort()
-        _ymax80 = _last[int(len(_last) * 0.98)]
-        # print(_ymax80)
-        # self.canvas.axes.set_ylim(top=_ymax80)
-        self.canvas.axes.set_xlabel("Year")
-        # self.canvas.axes.set_ylabel("Dollar")
 
-        """
-        #flatten lists
-        _returns = [x for x1 in returns for x in x1]
-        _inflations = [x for x1 in inflations for x in x1]
-        self.canvas.axes2.hist(_returns)
-        self.canvas.axes2.set_title("Returns")
-        self.canvas.axes3.hist(_inflations)
-        self.canvas.axes3.set_title("Inflation")
-        """
+        self.canvas.fig.suptitle("Historical Analysis (1928 - present)")
+        self.canvas.fig.text(
+            0.5, 0.9, "In Today's Dollar", horizontalalignment="center"
+        )
+
+        self.canvas.axes.set_xlabel("Year")
+        self.canvas.axes.set_ylabel("Dollar")
+        self.canvas.draw()

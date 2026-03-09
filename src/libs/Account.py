@@ -32,10 +32,7 @@ class Account:
             self._balance = Balance
 
         assert isinstance(InterestRate, float)
-        if abs(InterestRate) >= 1:
-            self.InterestRate = 1.0 + InterestRate / 100.0
-        else:
-            self.InterestRate = 1.0 + InterestRate
+        self.InterestRate = InterestRate
 
         self._taxable_income: int = 0
         self._ltcg_taxable: int = 0
@@ -95,9 +92,11 @@ class Account:
 
         self._balance -= amount
 
-    def calc_balance(self, year=None):
+    def calc_balance(self, year=None, inflation=0.0):
         if self._balance > 0:
-            self._balance = int(self._balance * self.InterestRate)
+            self._balance = int(
+                self._balance * (1.0 + (self.InterestRate - inflation) / 100.0)
+            )
 
         if (
             self.Contribution > 0
@@ -141,10 +140,10 @@ class TraditionalIRA(Account):
 
         self._taxable_income = amount
 
-    def calc_balance(self, year=None):
+    def calc_balance(self, year=None, inflation=0.0):
         self._taxable_income = 0
 
-        return super().calc_balance(year)
+        return super().calc_balance(year, inflation)
 
 
 class RothIRA(Account):
@@ -209,9 +208,9 @@ class Brokerage(Account):
         self.ltcg_income = amount
         self.taxable_income = 0
 
-    def calc_balance(self, year=None):
+    def calc_balance(self, year=None, inflation=0.0):
         # calculate the interest.. (ie, taxable income)
         self.ltcg_income = 0
-        self.taxable_income = int(self._balance * (self.InterestRate - 1.0))
+        self.taxable_income = int(self._balance * (self.InterestRate / 100.0))
 
-        return super().calc_balance(year)
+        return super().calc_balance(year, inflation)

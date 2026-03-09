@@ -33,9 +33,13 @@ class TransferAssets:
         assert isinstance(person, Person)
         self.person = person
 
+        if beginAge is None:
+            beginAge = 0
         assert isinstance(beginAge, int)
         self.beginAge = beginAge
 
+        if endAge is None:
+            endAge = 99
         assert isinstance(endAge, int)
         self.endAge = endAge
 

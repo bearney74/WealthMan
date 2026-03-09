@@ -7,9 +7,10 @@ from matplotlib.ticker import FuncFormatter
 matplotlib.use("QtAgg")
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel
+from PyQt6.QtCore import Qt
 
-from libs.MonteCarloSim import MonteCarloSimulator, StdDevRandomNumberGenerator
+from libs.MonteCarloSim import MonteCarloSimulator, StdDevRandomNumberGenerator, stats
 
 
 class MonteCarloTab(QWidget):
@@ -21,17 +22,15 @@ class MonteCarloTab(QWidget):
         # self.text = QPlainTextEdit()
 
         layout = QVBoxLayout()
-        # layout.addWidget(self.text)
-        # layout.addWidget(self.table)
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        # add a widget to ask for the avg return rate, and std dev
-        # add a widget to aks for the avg inflation rate, and std dev.
+        self._text_output = QLabel("")
 
-        # add a button to run the monte carlo sim
         self._button = QPushButton("Run Simulation")
         self._button.clicked.connect(self._run_simulation)
         # add a chart.  #maybe hide the chart until the button is pressed?
 
+        layout.addWidget(self._text_output)
         layout.addWidget(self._button)
 
         self._chart = MonteCarloChart(self)
@@ -94,8 +93,18 @@ class MonteCarloTab(QWidget):
         # _percent_success= 100.0 * _success/float(_number_of_runs)
         # _failure_stats=stats(_failure_step)
 
+        self._text_output.setText(
+            "Successful Runs: %s out of %s, (%4.2f%%)"
+            % (_success, _number_of_runs, 100.0 * _success / _number_of_runs)
+        )
+        self._chart.set_subtitle(
+            "%4.1f%% Success Rate" % (100.0 * _success / _number_of_runs)
+        )
+        if len(_failure_step) > 0:
+            print(stats(_failure_step))
         # if _number_of_runs >= 1000:
         self._chart.plot(_balances)
+
         # else:
         #   self._chart.plot2(_balances, _returns, _inflations)
         self._chart.show(True)
@@ -126,6 +135,11 @@ class MonteCarloChart(QWidget):
         _layout.addWidget(self.canvas)
         self.canvas.hide()
         self.setLayout(_layout)
+
+        self._subtitle = None
+
+    def set_subtitle(self, subtitle):
+        self._subtitle = subtitle
 
     def show(self, flag: bool):
         assert isinstance(flag, bool)
@@ -197,6 +211,10 @@ class MonteCarloChart(QWidget):
         )  # dashed line at 0
 
         self.canvas.axes.set_xlim(left=0, right=len(data[0]) - 1)
+
+        self.canvas.fig.suptitle("Monte Carlo Simulation")
+        if self._subtitle is not None:
+            self.canvas.fig.text(0.5, 0.9, self._subtitle, horizontalalignment="center")
 
         self.canvas.draw()
 
