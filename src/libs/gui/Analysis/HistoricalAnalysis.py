@@ -7,10 +7,45 @@ from matplotlib.ticker import FuncFormatter
 matplotlib.use("QtAgg")
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QTabWidget
 from PyQt6.QtCore import Qt
 
 from libs.HistoricalAnalysis import HistoricalAnalysis, AllocationPeriod
+from libs.Projections import DataItem
+
+from .DataTable import DataTableTabBase
+
+
+class DataTableTab(DataTableTabBase):
+    def __init__(self, parent=None):
+        super(DataTableTab, self).__init__(parent)
+
+    def createTable(self, data):
+        _data = []
+        for _record in data:
+            _list = []
+            for _attr in _record.__dict__:
+                if isinstance(getattr(_record, _attr), DataItem):
+                    _list.append(getattr(_record, _attr))
+
+            _data.append(_list)
+
+        _header = [_h.header for _h in _data[0]]
+        super(DataTableTab, self).createTable(_header, [], _data)
+
+
+class ChartTab(QWidget):
+    def __init__(self, parent=None):
+        super(QWidget, self).__init__(parent)
+
+        self.parent = parent
+
+        layout = QVBoxLayout()
+        self._text_output = QLabel("")
+        layout.addWidget(self._text_output)
+        self._chart = HistoricalAnalysisChart(self)
+        layout.addWidget(self._chart)
+        self.setLayout(layout)
 
 
 class HistoricalAnalysisTab(QWidget):
@@ -27,15 +62,22 @@ class HistoricalAnalysisTab(QWidget):
         # ask for start year and end year (or 1928 to present)
 
         # add a button to run the monte carlo sim
-        self._text_output = QLabel("")
         self._button = QPushButton("Run Simulation")
         self._button.clicked.connect(self._run_analysis)
 
-        layout.addWidget(self._text_output)
         layout.addWidget(self._button)
 
-        self._chart = HistoricalAnalysisChart(self)
-        layout.addWidget(self._chart)
+        self.tabs = QTabWidget()
+        self.tabs.setTabPosition(QTabWidget.TabPosition.North)
+
+        self.chartTab = ChartTab(self)
+        self.tableTab = DataTableTab(self)
+        self.detailedTableTab = DataTableTab(self)
+        self.tabs.addTab(self.chartTab, "Chart")
+        self.tabs.addTab(self.tableTab, "Data")
+        self.tabs.addTab(self.detailedTableTab, "Detailed Data")
+
+        layout.addWidget(self.tabs)
         self.setLayout(layout)
 
     def _run_single_period(
@@ -59,8 +101,8 @@ class HistoricalAnalysisTab(QWidget):
             allocationPeriods,
             DefaultReturnRate=5.0,
         )
-        _success, _balance = _rs.execute()
-        return _success, _balance
+        _success, _balance, _perioddata, _pd = _rs.execute()
+        return _success, _balance, _perioddata, _pd
 
     def _run_analysis(self):
         """calculate total assets as well as expenses and asset contributions for each year"""
@@ -81,6 +123,8 @@ class HistoricalAnalysisTab(QWidget):
             # use incomeSources to get regular income (job, SS, pensions, etc)
             _expense_total = _pyd.expenseTotal.data - _pyd.activeIncomeTotal.data
 
+            if _expense_total < 0.0:  # sometimes we may have a surplus of income...
+                _expense_total = 0.0
             # _asset_contributions.append(_contributions)
             _expenses.append(_expense_total)
 
@@ -111,6 +155,7 @@ class HistoricalAnalysisTab(QWidget):
             _incomes_fixed.append(_fixed)
             _incomes_with_COLA.append(_with_COLA)
 
+        # print(_expenses)
         _success = 0
         _failure_step = []
         _forecast_years = self.dataVariables.forecastYears
@@ -127,9 +172,11 @@ class HistoricalAnalysisTab(QWidget):
 
         _total = 0
         _count = 0
+        _detailed_period_data = []
+        _period_datas = []
         for _start_year in range(_begin_year, _end_year - _forecast_years - 1):
             _end_year = _start_year + _forecast_years
-            _success, _balance = self._run_single_period(
+            _success, _balance, _perioddata, _pd = self._run_single_period(
                 _start_year,
                 _end_year,
                 _assets_total,
@@ -140,17 +187,22 @@ class HistoricalAnalysisTab(QWidget):
             )
 
             _balances.append(_balance)
+            _detailed_period_data += _pd
+            _period_datas.append(_perioddata)
 
             _total += 1
             if _success:
                 _count += 1
 
-        self._text_output.setText(
+        self.chartTab._text_output.setText(
             "Successful runs: %s out of %s, (%4.2f%%)"
             % (_count, _total, 100.0 * _count / _total)
         )
-        self._chart.plot(_balances)
-        self._chart.show(True)
+        self.chartTab._chart.plot(_balances)
+        self.chartTab._chart.show(True)
+
+        self.detailedTableTab.createTable(_detailed_period_data)
+        self.tableTab.createTable(_period_datas)
 
 
 class MplCanvas(FigureCanvasQTAgg):

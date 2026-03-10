@@ -195,7 +195,7 @@ class Projections(QRunnable):
 
         if dv.inTodaysDollars:
             self._inflation = dv.inflation
-        else:
+        else:  # think about removing this.. it doesn't make sense to look at things in future dollars
             self._inflation = 0
 
         self.UseSurplusAccount = dv.SurplusAccount

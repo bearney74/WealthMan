@@ -1,6 +1,53 @@
 import os
 import csv
 
+from .Projections import DataItem
+
+
+class PeriodData:
+    def __init__(self, beginYear: int, endYear: int):
+        self.Period = DataItem("Period", "{}", "%s-%s" % (beginYear, endYear))
+        self.EndingBalance = DataItem("Ending Balance")
+        self.Success = DataItem("Successful Period", "{}", True)
+        self.BankruptYear = DataItem("Bankrupt Year", "{:}", None)
+
+
+class DetailedPeriodData:
+    def __init__(self, beginYear: int, endYear: int, currentYear: int):
+        assert isinstance(beginYear, int)
+        assert isinstance(endYear, int)
+        self.period = DataItem("Period", "{}", "%s-%s" % (beginYear, endYear))
+
+        assert isinstance(currentYear, int)
+        self.currentYear = DataItem("Current Year", "{}", currentYear)
+
+        self.PctStocks = DataItem("% Stocks", "{:.1f}%", 0.0)
+        self.PctBonds = DataItem("% Bonds", "{:.1f}%", 0.0)
+        self.PctCash = DataItem("% Cash", "{:.1f}%", 0.0)
+
+        self.InflationRate = DataItem("Inflation Rate", "{:.2f}%", 0.0)
+        self.RORStocks = DataItem("Stocks ROR", "{:.2f}%", 0.0)
+        self.RORBonds = DataItem("Bonds ROR", "{:.2f}%", 0.0)
+        self.RORCash = DataItem("Cash ROR", "{:.2f}%", 0.0)
+
+        self.FixedIncome = DataItem("Fixed Income")
+        self.ColaIncome = DataItem("COLA Income")
+        self.ColaIncomeInflation = DataItem("COLA Income Inflation")
+        self.Expenses = DataItem("Expenses")
+        self.ExpenseInflation = DataItem("Expense Inflation")
+
+        self.BalancePostIncomeExpenses = DataItem("Balance Post Income/Expenses")
+
+        self.StocksBalance = DataItem("Stocks Balance")
+        self.BondsBalance = DataItem("Bonds Balance")
+        self.CashBalance = DataItem("Cash Balance")
+
+        self.PreBalance = DataItem(
+            "Pre Balance"
+        )  # balance at the beginning of the period
+        self.Inflation = DataItem("Inflation")  # inflation balance for the year
+        self.PostBalance = DataItem("Post Balance")  # balance at the end of the period
+
 
 class AllocationPeriod:
     def __init__(self, BeginYear, EndYear, pctStocks, pctBonds, pctCash):
@@ -97,6 +144,12 @@ class HistoricalAnalysis:
         accountAllocations,
         DefaultReturnRate=None,
     ):
+        self._begin_year = begin_year
+        self._end_year = end_year
+        self._periodData: [
+            DetailedPeriodData
+        ] = []  # contains the data we put on the gui table
+
         self._balances = []
         self._balance = accountBalance
 
@@ -109,7 +162,6 @@ class HistoricalAnalysis:
         _hd = HistoricalData()
         self._data = _hd.get_data(begin_year, end_year)
 
-        # print(len(incomes_fixed), len(incomes_with_COLA), len(expenses), len(self._data))
         assert (
             len(incomes_fixed)
             == len(incomes_with_COLA)
@@ -128,14 +180,32 @@ class HistoricalAnalysis:
     def execute(self):
         self._balances = [self._balance]
         _success = True
+        _bankrupt_year = None
         # _inflation = 1.0
+        _pds = []
         for _pos, _record in enumerate(self._data):
+            _pd = DetailedPeriodData(
+                self._begin_year, self._end_year, self._begin_year + _pos
+            )
+            _pd.InflationRate.data = 100.0 * _record.Inflation
+            _pd.FixedIncome.data = self._incomes_fixed[_pos]
+            _pd.ColaIncome.data = self._incomes_with_COLA[_pos]
+            _pd.Expenses.data = self._expenses[_pos]
+            _pd.PreBalance.data = self._balance
+
             self._balance += self._incomes_fixed[_pos]
-            self._balance += self._incomes_with_COLA[_pos] * (1.0 + _record.Inflation)
-            self._balance -= self._expenses[_pos] * (1.0 + _record.Inflation)
+
+            _colaInflation = int(self._incomes_with_COLA[_pos] * _record.Inflation)
+            _pd.ColaIncomeInflation.data = _colaInflation
+            self._balance += self._incomes_with_COLA[_pos] + _colaInflation
+
+            _expenseInflation = int(self._expenses[_pos] * _record.Inflation)
+            _pd.ExpenseInflation.data = _expenseInflation
+            self._balance -= self._expenses[_pos] + _expenseInflation
 
             # print(self.balance, _return)
             # find correct allocation
+            _pd.BalancePostIncomeExpenses.data = self._balance
             _ap = self.get_allocation_period(_pos)
             if _ap is None:
                 print("AP is None pos=%s" % _pos)
@@ -146,19 +216,49 @@ class HistoricalAnalysis:
                 else:
                     self._balance *= 1.0 + self._defaultReturnRate / 100.0
                     print("Using Default")
+
             else:  # we have a valid allocation Period..
-                _balance = self._balance * _ap.pctStocks * _record.Stocks
-                _balance += self._balance * _ap.pctBonds * _record.Bonds
-                _balance += self._balance * _ap.pctCash * _record.Cash
+                _pd.RORStocks.data = 100.0 * (_record.Stocks - 1.0)
+                _pd.RORBonds.data = 100.0 * (_record.Bonds - 1.0)
+                _pd.RORCash.data = 100.0 * (_record.Cash - 1.0)
+                _pd.PctStocks.data = 100.0 * _ap.pctStocks
+                _pd.PctBonds.data = 100.0 * _ap.pctBonds
+                _pd.PctCash.data = 100.0 * _ap.pctCash
 
-                self._balance = _balance * (1.0 - _record.Inflation)
+                _pd.StocksBalance.data = int(
+                    self._balance * _ap.pctStocks * _record.Stocks
+                )
+                _pd.BondsBalance.data = int(
+                    self._balance * _ap.pctBonds * _record.Bonds
+                )
+                _pd.CashBalance.data = int(self._balance * _ap.pctCash * _record.Cash)
 
+                _balance = (
+                    _pd.StocksBalance.data
+                    + _pd.BondsBalance.data
+                    + _pd.CashBalance.data
+                )
+                _inflation = int(_balance * _record.Inflation)
+                _pd.Inflation.data = _inflation
+                self._balance = (
+                    _balance - _inflation
+                )  # int(_balance * (1.0 - _record.Inflation))
+                _pd.PostBalance.data = self._balance
+
+            _pds.append(_pd)
             if self._balance <= 0:
                 _success = False
+                if _bankrupt_year is None:
+                    _bankrupt_year = _pos
 
             self._balances.append(self._balance)
 
-        return _success, self._balances
+        _p = PeriodData(self._begin_year, self._end_year)
+        _p.EndingBalance.data = self._balance
+        _p.Success.data = _success
+        _p.BankruptYear.data = "" if _bankrupt_year is None else _bankrupt_year
+
+        return _success, self._balances, _p, _pds
 
     def get_balances(self):
         return self._balance
@@ -193,16 +293,18 @@ if __name__ == "__main__":
             allocationPeriods,
             DefaultReturnRate=5.0,
         )
-        _success, _balance = _rs.execute()
-        return _success, _balance
+        _success, _balance, _pd = _rs.execute()
+        return _success, _balance, _pd
 
     # single_run(2000, 2010)
     # single_run(2001, 2011)
     _count = 0
     _total = 0
     _num_years = 25
+    _period_data = []
     for _begin_year in range(1928, 2025 - _num_years + 1):
-        _success, _balance = single_run(_begin_year, _begin_year + _num_years)
+        _success, _balance, _pd = single_run(_begin_year, _begin_year + _num_years)
+        _period_data.append(_pd)
         _total += 1
         if _success:
             _count += 1
