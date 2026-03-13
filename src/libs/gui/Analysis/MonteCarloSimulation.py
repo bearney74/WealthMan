@@ -27,6 +27,7 @@ class MonteCarloTab(QWidget):
         self._text_output = QLabel("")
 
         self._button = QPushButton("Run Simulation")
+        self._button.setMaximumWidth(200)
         self._button.clicked.connect(self._run_simulation)
         # add a chart.  #maybe hide the chart until the button is pressed?
 
@@ -51,6 +52,7 @@ class MonteCarloTab(QWidget):
         _assets_total = self.parent.projectionData[0].assetTotal.data
         _asset_contributions = []
         _expenses = []
+        # fix me   maybe add future incomes?  SS, etc??
         for _step, _pyd in enumerate(self.parent.projectionData):
             _contributions = _pyd.assetContributionTotal.data
 

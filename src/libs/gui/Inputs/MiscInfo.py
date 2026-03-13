@@ -1,6 +1,6 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout
+from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QSpacerItem, QSizePolicy
 
-from libs.gui.guihelpers.Entry import IntegerRangeEntry, FloatEntry
+from libs.gui.guihelpers.Entry import IntegerRangeEntry, FloatEntry, PercentEntry
 
 from libs.DataVariables import DataVariables
 
@@ -13,7 +13,7 @@ class MiscInfoTab(QWidget):
 
         formlayout = QFormLayout()
 
-        _title = QLabel("Monte Carlo Variables")
+        _title = QLabel("<b><u>Monte Carlo Variables</u></b>")
         formlayout.addRow(_title)
         # Monte Carlo Variables
 
@@ -47,6 +47,23 @@ class MiscInfoTab(QWidget):
         )
         self._inflation_stdDev.setText(3.90)  # set this each release 1928-2025 avg
         formlayout.addRow(QLabel("Inflation Std. Dev.:"), self._inflation_stdDev)
+
+        _spacer = QSpacerItem(
+            5, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum
+        )
+        formlayout.addItem(_spacer)
+
+        formlayout.addRow(QLabel("<b><u>Historical Analysis Variables</u></b>"))
+        formlayout.addRow(QLabel("Asset Allocation"))
+
+        formlayout.addRow(QLabel("Total of Stocks and Bonds should be <= 100%"))
+        formlayout.addRow(QLabel("If total is < 100%, the rest is assumed to be cash."))
+
+        self._pctStocks = PercentEntry(parent, min=0, max=100, num_decimal_places=0)
+        formlayout.addRow(QLabel("Percent Stocks:"), self._pctStocks)
+
+        self._pctBonds = PercentEntry(parent, min=0, max=100, num_decimal_places=0)
+        formlayout.addRow(QLabel("Percent Bonds:"), self._pctBonds)
 
         self.setLayout(formlayout)
 

@@ -45,8 +45,14 @@ class TransferAssets:
 
         assert self.beginAge <= self.endAge
 
+        self.transferred_amount = 0
+        self._taxable_income = 0
+        self._ltcg_income = 0
+
     def do_transfer(self, year=None):
         self.transferred_amount = 0
+        self._taxable_income = 0
+        self._ltcg_income = 0
 
         _age = self.person.calc_age_by_year(year)
         if _age < self.beginAge or _age > self.endAge:
@@ -67,10 +73,14 @@ class TransferAssets:
         # adjust amount by cola for next time (ie, next year)
         self.amount = int(self.amount * self.COLA)
 
+        # set income values for this transfer..
+        self._taxable_income = self.sourceAccount.taxable_income
+        self._ltcg_income = self.sourceAccount.ltcg_income
+
     @property
     def taxable_income(self):
-        return self.sourceAccount.taxable_income
+        return self._taxable_income
 
     @property
     def ltcg_income(self):
-        return self.sourceAccount.ltcg_income
+        return self._ltcg_income

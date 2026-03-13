@@ -201,6 +201,9 @@ class FloatEntry(Entry):
             return float(self.text())
         return None
 
+    def set(self, value):
+        self.setText(value)
+
 
 class PercentEntry(FloatEntry):
     def __init__(self, parent=None, min=0.0, max=9.9, num_decimal_places: int = 1):

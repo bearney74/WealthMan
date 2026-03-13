@@ -7,13 +7,22 @@ from matplotlib.ticker import FuncFormatter
 matplotlib.use("QtAgg")
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QTabWidget
+from PyQt6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QPushButton,
+    QLabel,
+    QTabWidget,
+    QGridLayout,
+)
 from PyQt6.QtCore import Qt
 
 from libs.HistoricalAnalysis import HistoricalAnalysis, AllocationPeriod
 from libs.Projections import DataItem
 
 from .DataTable import DataTableTabBase
+from libs.gui.guihelpers.Entry import PercentEntry
 
 
 class DataTableTab(DataTableTabBase):
@@ -57,15 +66,66 @@ class HistoricalAnalysisTab(QWidget):
         self.projections = None  # an instance of Projections
 
         layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
-        # ask for start year and end year (or 1928 to present)
+        layout.addWidget(QLabel("Total of Stocks and Bonds should be <= 100%"))
+        layout.addWidget(
+            QLabel("If total is < 100%, the remainder is assumed to be cash.")
+        )
 
-        # add a button to run the monte carlo sim
+        ## ask for start year and end year (or 1928 to present)
+
+        # ask for asset allocation
+        glayout = QGridLayout()
+
+        self._pctStocks = PercentEntry(parent, min=0, max=100, num_decimal_places=0)
+        _label = QLabel("Percent Stocks:")
+        _label.setFixedWidth(100)
+        glayout.addWidget(_label, 0, 0)
+        glayout.addWidget(self._pctStocks, 0, 1)
+
+        self._bt_copy_from_input = QPushButton("Copy from Input")
+        self._bt_copy_from_input.setMaximumWidth(200)
+
+        # self._bt_copy_from_input.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        self._bt_copy_from_input.clicked.connect(self._copy_from_input)
+        glayout.addWidget(self._bt_copy_from_input, 0, 2)
+
+        self._pctBonds = PercentEntry(parent, min=0, max=100, num_decimal_places=0)
+        _label = QLabel("Percent Bonds:")
+        _label.setFixedWidth(100)
+        glayout.addWidget(_label, 1, 0)
+        glayout.addWidget(self._pctBonds, 1, 1)
+
+        self._bt_copy_to_input = QPushButton("Copy to Input")
+        self._bt_copy_to_input.setMaximumWidth(200)
+
+        # self._bt_copy_to_input.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        self._bt_copy_to_input.clicked.connect(self._copy_to_input)
+        glayout.addWidget(self._bt_copy_to_input, 1, 2)
+
+        # formlayout.addRow(self._bt_copy_from_input, self._bt_copy_to_input)
+
+        _hbox = QHBoxLayout()
+        _hbox.addLayout(glayout)
+        _hbox.addStretch()
+        layout.addLayout(_hbox)  # Qt.AlignmentFlag.AlignLeft)
+        # layout.addLayout(glayout) # Qt.AlignmentFlag.AlignLeft)
+        _hbox.setAlignment(glayout, Qt.AlignmentFlag.AlignLeft)
+        # layout.addStretch()
+        # ask if we should output detailed period info
+        # self._output_detailed = QCheckBox(text="Output detailed period info?")
+        # self._output_detailed.stateChanged.connect(self._toggle_detailed_output)
+        # add a button to run simulation
+        self._messages = QLabel("")
+        layout.addWidget(self._messages)
+
         self._button = QPushButton("Run Simulation")
+        self._button.setMaximumWidth(200)
         self._button.clicked.connect(self._run_analysis)
 
-        layout.addWidget(self._button)
+        # layout.addWidget(self._output_detailed)
+        layout.addWidget(self._button)  # , alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.tabs = QTabWidget()
         self.tabs.setTabPosition(QTabWidget.TabPosition.North)
@@ -77,8 +137,27 @@ class HistoricalAnalysisTab(QWidget):
         self.tabs.addTab(self.tableTab, "Data")
         self.tabs.addTab(self.detailedTableTab, "Detailed Data")
 
+        self.tabs.setTabVisible(2, False)
+        # self.detailedTableTab.setVisible(False)
+
         layout.addWidget(self.tabs)
         self.setLayout(layout)
+
+    def _copy_to_input(self):
+        self.parent.parent.InputsTab.MiscInfoTab._pctStocks.set(
+            self._pctStocks.get_float(0)
+        )
+        self.parent.parent.InputsTab.MiscInfoTab._pctBonds.set(
+            self._pctBonds.get_float(0)
+        )
+
+    def _copy_from_input(self):
+        self._pctStocks.set(
+            self.parent.parent.InputsTab.MiscInfoTab._pctStocks.get_float(0.0)
+        )
+        self._pctBonds.set(
+            self.parent.parent.InputsTab.MiscInfoTab._pctBonds.get_float(0.0)
+        )
 
     def _run_single_period(
         self,
@@ -155,6 +234,37 @@ class HistoricalAnalysisTab(QWidget):
             _incomes_fixed.append(_fixed)
             _incomes_with_COLA.append(_with_COLA)
 
+        # retrieve allocation Periods..
+
+        _pctStocks = self._pctStocks.get_float(0)
+        _pctBonds = self._pctBonds.get_float(0)
+
+        _pctCash = 0
+        if _pctStocks + _pctBonds > 100:
+            self._messages.setText(
+                # print(
+                "Error! Percent Stocks (%s%%) + Percent Bonds (%s%%) > 100.0%%  , Total:(%s%%)"
+                % (_pctStocks, _pctBonds, _pctStocks + _pctBonds)
+            )
+            self._messages.setStyleSheet("QLabel {color: red}")
+            return
+            # need to product some type of error...
+            # _pctStocks = 80
+            # _pctBonds = 15
+            # _pctCash = 5
+
+        else:
+            _pctCash = 100 - _pctStocks - _pctBonds
+            self._messages.setText(
+                "Pct Stocks: (%s%%), Pct Bonds: (%s%%), Pct Cash: (%s%%)"
+                % (_pctStocks, _pctBonds, _pctCash)
+            )
+            self._messages.setStyleSheet("QLabel {color: black}")
+
+        _allocationPeriods = [
+            AllocationPeriod(None, None, _pctStocks, _pctBonds, _pctCash)
+        ]
+
         # print(_expenses)
         _success = 0
         _failure_step = []
@@ -164,11 +274,11 @@ class HistoricalAnalysisTab(QWidget):
         # fix me..
         _begin_year = 1928
         _end_year = 2025
-        _allocationPeriods = [
-            AllocationPeriod(0, 10, 80, 15, 5),
-            AllocationPeriod(11, 20, 70, 25, 5),
-            AllocationPeriod(20, None, 60, 40, 0),
-        ]
+        # _allocationPeriods = [
+        #    AllocationPeriod(0, 10, 80, 15, 5),
+        #    AllocationPeriod(11, 20, 70, 25, 5),
+        #    AllocationPeriod(20, None, 60, 40, 0),
+        # ]
 
         _total = 0
         _count = 0
@@ -201,7 +311,12 @@ class HistoricalAnalysisTab(QWidget):
         self.chartTab._chart.plot(_balances)
         self.chartTab._chart.show(True)
 
-        self.detailedTableTab.createTable(_detailed_period_data)
+        _output_detailed = True  # fix me   add a menu bar item to output detailed info for historical Analysis
+        self.tabs.setTabVisible(2, _output_detailed)
+
+        if _output_detailed:
+            self.detailedTableTab.createTable(_detailed_period_data)
+
         self.tableTab.createTable(_period_datas)
 
 
@@ -239,11 +354,11 @@ class HistoricalAnalysisChart(QWidget):
         def format_dollar(x, pos):
             x = int(x)
             if x > 1_000_000:
-                x = int(x / 1_000_000)
-                return f"$ {x:,d}M"
+                x = x / 1_000_000.0
+                return f"$ {x:,.1f}M"
             if x > 1_000:
-                x = int(x / 1_000)
-                return f"$ {x:,d}K"
+                x = x / 1_000
+                return f"$ {x:,.1f}K"
 
             x = int(x)
             return f"$ {x:,d}"

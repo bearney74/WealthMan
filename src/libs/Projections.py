@@ -494,6 +494,7 @@ class Projections(QRunnable):
 
         _lastYearsFederalTaxes = 0
         for _year in range(self._begin_year, self._end_year + 1):
+            print("Year:%s" % _year)
             _pyd = ProjectionYearData(_year)
 
             _clientage = self._client.calc_age_by_year(_year)
@@ -584,10 +585,12 @@ class Projections(QRunnable):
             _pyd.assetContributionTotal.data = _contribution_total
 
             # do transfers between accounts
+            # print("Transfers")
             for _tran in self._Transfers:
                 _tran.do_transfer(_year)
-                _pyd.transfersTotal.data = _tran.transferred_amount
+                _pyd.transfersTotal.data += _tran.transferred_amount
                 _taxable_income_total += _tran.taxable_income
+                # print(_tran._descr, _tran.taxable_income)
 
             # do RMD calcs
             _last_day_of_year = date(_year, 12, 31)
@@ -614,7 +617,7 @@ class Projections(QRunnable):
                 - _lastYearsFederalTaxes
                 - _contribution_total
             )
-
+            print("Cashflow: %s" % _pyd.cashFlow)
             if _pyd.cashFlow.data < 0 or _pyd.totalRMD.data > 0:
                 # we need to withdraw money from assets to make up for the cash flow deficit
                 _ws = WithdrawStrategy(
@@ -637,6 +640,7 @@ class Projections(QRunnable):
                 _pyd.assetRegularWithdraw.data = _withdraw_dict[AccountType.REGULAR]
                 _pyd.assetTaxFreeWithdraw.data = _withdraw_dict[AccountType.TAXFREE]
 
+                print("Withdraws..")
                 for _asset_type, _amount in _withdraw_dict.items():
                     _pyd.assetWithdraw.data += _amount
                     if (
@@ -644,7 +648,7 @@ class Projections(QRunnable):
                     ):  # these withdraws are seen as regular income
                         _income_total += _amount
                         _taxable_income_total += _amount
-                        # print(_amount)
+                        print(_amount)
 
                 # _pyd.surplusDeficit = _pyd.cashFlow + _pyd.assetWithdraw - _deficit
             else:
@@ -819,7 +823,8 @@ class Projections(QRunnable):
 
             _pyd.federalEffectiveTaxRate.data = _ft.effective_tax_rate(
                 _pyd.thisYearsFederalTaxes.data,
-                _income_total,
+                # _income_total,
+                _taxable_income_total,
             )
 
             # print(_pyd.federalEffectiveTaxRate, _pyd.thisYearsIncomeTaxes, _pyd.incomeTotal)

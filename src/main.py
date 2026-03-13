@@ -71,6 +71,10 @@ class Main(QMainWindow):
             self.tabs.setCurrentIndex(1)
             self.AnalysisTab.tabs.setCurrentIndex(0)
 
+    def toggleDetailedHistoricalAnalysisTableTab(self):
+        _tabs = self.AnalysisTab.HistoricalAnalysisTab.tabs
+        _tabs.setTabVisble(2, not _tabs.isTabVisible(2))
+
     def _createMenuBar(self):
         self.menubar = MenuBar(self)
         _menubar = self.menubar.get_menubar()

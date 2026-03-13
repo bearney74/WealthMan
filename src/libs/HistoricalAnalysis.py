@@ -256,7 +256,7 @@ class HistoricalAnalysis:
         _p = PeriodData(self._begin_year, self._end_year)
         _p.EndingBalance.data = self._balance
         _p.Success.data = _success
-        _p.BankruptYear.data = "" if _bankrupt_year is None else _bankrupt_year
+        _p.BankruptYear.data = "-" if _bankrupt_year is None else _bankrupt_year
 
         return _success, self._balances, _p, _pds
 
