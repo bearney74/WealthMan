@@ -1,12 +1,3 @@
-import numpy as np
-
-import matplotlib
-import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter
-
-matplotlib.use("QtAgg")
-
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -20,9 +11,10 @@ from PyQt6.QtCore import Qt
 
 from libs.HistoricalAnalysis import HistoricalAnalysis, AllocationPeriod
 from libs.Projections import DataItem
+from libs.gui.guihelpers.Entry import PercentEntry
 
 from .DataTable import DataTableTabBase
-from libs.gui.guihelpers.Entry import PercentEntry
+from .Charts import MultiLineChart
 
 
 class DataTableTab(DataTableTabBase):
@@ -52,7 +44,8 @@ class ChartTab(QWidget):
         layout = QVBoxLayout()
         self._text_output = QLabel("")
         layout.addWidget(self._text_output)
-        self._chart = HistoricalAnalysisChart(self)
+
+        self._chart = MultiLineChart(self)
         layout.addWidget(self._chart)
         self.setLayout(layout)
 
@@ -87,7 +80,6 @@ class HistoricalAnalysisTab(QWidget):
         self._bt_copy_from_input = QPushButton("Copy from Input")
         self._bt_copy_from_input.setMaximumWidth(200)
 
-        # self._bt_copy_from_input.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         self._bt_copy_from_input.clicked.connect(self._copy_from_input)
         glayout.addWidget(self._bt_copy_from_input, 0, 2)
 
@@ -100,23 +92,15 @@ class HistoricalAnalysisTab(QWidget):
         self._bt_copy_to_input = QPushButton("Copy to Input")
         self._bt_copy_to_input.setMaximumWidth(200)
 
-        # self._bt_copy_to_input.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         self._bt_copy_to_input.clicked.connect(self._copy_to_input)
         glayout.addWidget(self._bt_copy_to_input, 1, 2)
-
-        # formlayout.addRow(self._bt_copy_from_input, self._bt_copy_to_input)
 
         _hbox = QHBoxLayout()
         _hbox.addLayout(glayout)
         _hbox.addStretch()
-        layout.addLayout(_hbox)  # Qt.AlignmentFlag.AlignLeft)
-        # layout.addLayout(glayout) # Qt.AlignmentFlag.AlignLeft)
+        layout.addLayout(_hbox)
         _hbox.setAlignment(glayout, Qt.AlignmentFlag.AlignLeft)
-        # layout.addStretch()
-        # ask if we should output detailed period info
-        # self._output_detailed = QCheckBox(text="Output detailed period info?")
-        # self._output_detailed.stateChanged.connect(self._toggle_detailed_output)
-        # add a button to run simulation
+
         self._messages = QLabel("")
         layout.addWidget(self._messages)
 
@@ -124,8 +108,7 @@ class HistoricalAnalysisTab(QWidget):
         self._button.setMaximumWidth(200)
         self._button.clicked.connect(self._run_analysis)
 
-        # layout.addWidget(self._output_detailed)
-        layout.addWidget(self._button)  # , alignment=Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self._button)
 
         self.tabs = QTabWidget()
         self.tabs.setTabPosition(QTabWidget.TabPosition.North)
@@ -138,7 +121,6 @@ class HistoricalAnalysisTab(QWidget):
         self.tabs.addTab(self.detailedTableTab, "Detailed Data")
 
         self.tabs.setTabVisible(2, False)
-        # self.detailedTableTab.setVisible(False)
 
         layout.addWidget(self.tabs)
         self.setLayout(layout)
@@ -248,11 +230,6 @@ class HistoricalAnalysisTab(QWidget):
             )
             self._messages.setStyleSheet("QLabel {color: red}")
             return
-            # need to product some type of error...
-            # _pctStocks = 80
-            # _pctBonds = 15
-            # _pctCash = 5
-
         else:
             _pctCash = 100 - _pctStocks - _pctBonds
             self._messages.setText(
@@ -261,30 +238,26 @@ class HistoricalAnalysisTab(QWidget):
             )
             self._messages.setStyleSheet("QLabel {color: black}")
 
+        # for now, one allocation period will work
+        # future work.. maybe add additional periods?
         _allocationPeriods = [
             AllocationPeriod(None, None, _pctStocks, _pctBonds, _pctCash)
         ]
 
-        # print(_expenses)
         _success = 0
         _failure_step = []
         _forecast_years = self.dataVariables.forecastYears
 
         _balances = []
-        # fix me..
+        # fix me.. hardcoding end year for now..
         _begin_year = 1928
         _end_year = 2025
-        # _allocationPeriods = [
-        #    AllocationPeriod(0, 10, 80, 15, 5),
-        #    AllocationPeriod(11, 20, 70, 25, 5),
-        #    AllocationPeriod(20, None, 60, 40, 0),
-        # ]
 
         _total = 0
         _count = 0
         _detailed_period_data = []
         _period_datas = []
-        for _start_year in range(_begin_year, _end_year - _forecast_years - 1):
+        for _start_year in range(_begin_year, _end_year - _forecast_years):
             _end_year = _start_year + _forecast_years
             _success, _balance, _perioddata, _pd = self._run_single_period(
                 _start_year,
@@ -308,7 +281,17 @@ class HistoricalAnalysisTab(QWidget):
             "Successful runs: %s out of %s, (%4.2f%%)"
             % (_count, _total, 100.0 * _count / _total)
         )
-        self.chartTab._chart.plot(_balances)
+        _years = [_i for _i in range(len(_balances[0]))]  # number of years..
+        _names = [_i for _i in range(len(_balances))]  # can just use numbers
+        if False:
+            print(len(_years))
+            print(len(_balances[0]))
+        self.chartTab._chart.setTitle(
+            "Historical Analysis (%s to %s)" % (_begin_year, _end_year)
+        )
+        self.chartTab._chart.setXLabel("Years")
+        self.chartTab._chart.setYLabel("Dollars", units="$")
+        self.chartTab._chart.plot_data(_years, _balances, _names)
         self.chartTab._chart.show(True)
 
         _output_detailed = True  # fix me   add a menu bar item to output detailed info for historical Analysis
@@ -318,80 +301,3 @@ class HistoricalAnalysisTab(QWidget):
             self.detailedTableTab.createTable(_detailed_period_data)
 
         self.tableTab.createTable(_period_datas)
-
-
-class MplCanvas(FigureCanvasQTAgg):
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        self.fig, self.axes = plt.subplots()
-        super(MplCanvas, self).__init__(self.fig)
-
-
-class HistoricalAnalysisChart(QWidget):
-    def __init__(self, parent=None):
-        super(HistoricalAnalysisChart, self).__init__(parent)
-
-        _layout = QVBoxLayout()
-        self.canvas = MplCanvas(self, width=5, height=45, dpi=100)
-        self.canvas.axes.set_xlabel("Year")
-        self.canvas.axes.set_ylabel("Dollars")
-        _layout.addWidget(self.canvas)
-        self.canvas.hide()
-        self.setLayout(_layout)
-
-    def show(self, flag: bool):
-        assert isinstance(flag, bool)
-
-        if flag:
-            self.canvas.show()
-        else:
-            self.canvas.hide()
-
-    def _set_yaxis_format(self):
-        def format_num_obs(x, pos):
-            x = int(x / 1000)
-            return f"{x:,d}K"
-
-        def format_dollar(x, pos):
-            x = int(x)
-            if x > 1_000_000:
-                x = x / 1_000_000.0
-                return f"$ {x:,.1f}M"
-            if x > 1_000:
-                x = x / 1_000
-                return f"$ {x:,.1f}K"
-
-            x = int(x)
-            return f"$ {x:,d}"
-
-        self.canvas.axes.yaxis.set_major_formatter(FuncFormatter(format_dollar))
-
-    def plot(self, balances):
-
-        result = np.array(balances).T
-        median = np.median(result, axis=1)
-
-        self.canvas.axes.clear()
-        self._set_yaxis_format()
-        _years = [x for x in range(len(balances[0]))]
-        for _series in balances:
-            self.canvas.axes.plot(_years, _series)
-
-        self.canvas.axes.plot(median, color="black", lw=2)
-
-        self.canvas.axes.axhline(
-            y=0, color="gray", linestyle="dashed"
-        )  # dashed line at 0
-
-        # self._set_xaxis_format()
-        self._set_yaxis_format()
-
-        self.canvas.axes.set_xlim(left=0, right=_years[-1])
-
-        self.canvas.fig.suptitle("Historical Analysis (1928 - present)")
-        self.canvas.fig.text(
-            0.5, 0.9, "In Today's Dollar", horizontalalignment="center"
-        )
-
-        self.canvas.axes.set_xlabel("Year")
-        self.canvas.axes.set_ylabel("Dollar")
-        self.canvas.draw()

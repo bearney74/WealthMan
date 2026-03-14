@@ -2,7 +2,7 @@ import collections
 
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QComboBox, QStackedWidget
 
-from .ChartBase import StackChart, MultipleLinesChart
+from .Charts import StackChart, MultiLineChart
 import logging
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ class CustomChartTab(QWidget):
         self.stackchart = StackChart(self.stackedWidget)
         self.stackedWidget.addWidget(self.stackchart)
 
-        self.multiplelineschart = MultipleLinesChart(self.stackedWidget)
+        self.multiplelineschart = MultiLineChart(self.stackedWidget)
         self.stackedWidget.addWidget(self.multiplelineschart)
 
         layout = QVBoxLayout()
@@ -63,7 +63,6 @@ class CustomChartTab(QWidget):
 
     def AssetTotals(self):
         _years = []
-
         _data = collections.defaultdict(list)
 
         _surplus_flag = False
@@ -84,65 +83,61 @@ class CustomChartTab(QWidget):
         ):  # we have no surplus data, so lets delete that from the legend..
             del _data["Surplus"]
 
+        # take the values in the dict and create a list of lists..
+        _list = []
+        _names = list(_data.keys())
+        for _name in _names:
+            _list.append(_data[_name])
+
         self.stackedWidget.setCurrentIndex(0)  # set to stacked chart
         self.stackchart.setTitle("Asset Totals")
+        self.stackchart.setXLabel("Year")
+        self.stackchart.setYLabel("Dollars", units="$")
+        self.stackchart.addLegend()
         if self.parent.tableData.InTodaysDollars:
             self.stackchart.setSubTitle("In Today's Dollars")
         else:
             self.stackchart.setSubTitle("")
 
-        self.stackchart.plot(_years, _data.values(), _data.keys())
+        self.stackchart.plot_data(_years, _list, _names)
         self.stackchart.show(True)
 
     def IncomeTotals(self):
-        _years = []
-
-        _data = collections.defaultdict(list)
-        for _record in self.parent.projectionData:
-            if _record.clientIsAlive or _record.spouseIsAlive:
-                if _record.projectionYear.data not in _years:
-                    _years.append(_record.projectionYear.data)
-
-                for _dataItem in _record.incomeSources:
-                    _data[_dataItem.header].append(_dataItem.data)
-
-        self.stackedWidget.setCurrentIndex(0)  # set to stacked chart
-
-        self.stackchart.setTitle("Income Totals")
-        if self.parent.tableData.InTodaysDollars:
-            self.stackchart.setSubTitle("In Today's Dollars")
-        else:
-            self.stackchart.setSubTitle("")
-
-        self.stackchart.plot(
-            _years, _data.values(), _data.keys(), legend_location="upper right"
-        )
-        self.stackchart.show(True)
+        self._StackChartHelper("incomeSources", "Income Totals")
 
     def AssetContributionTotals(self):
+        self._StackChartHelper("assetContributions", "Asset Contribution Totals")
+
+    def _StackChartHelper(self, attr, title):
         _years = []
 
-        _data = collections.defaultdict(list)
+        _dict = collections.defaultdict(list)
         for _record in self.parent.projectionData:
             if _record.clientIsAlive or _record.spouseIsAlive:
                 if _record.projectionYear.data not in _years:
                     _years.append(_record.projectionYear.data)
 
-                for _dataItem in _record.assetContributions:
-                    _data[_dataItem.header].append(_dataItem.data)
+                for _dataItem in getattr(_record, attr):
+                    _dict[_dataItem.header].append(_dataItem.data)
+
+        _data = []
+        _names = list(_dict.keys())
+        for _name in _names:
+            _data.append(_dict[_name])
 
         self.stackedWidget.setCurrentIndex(0)  # set to stacked chart
 
-        self.stackchart.setTitle("Asset Contribution Totals")
+        self.stackchart.setTitle(title)
+        self.stackchart.setXLabel("Year")
+        self.stackchart.setYLabel("Dollars", units="$")
+        self.stackchart.addLegend()
         if self.parent.tableData.InTodaysDollars:
             self.stackchart.setSubTitle("In Today's Dollars")
         else:
             self.stackchart.setSubTitle("")
 
-        if len(_data.values()) > 0:
-            self.stackchart.plot(
-                _years, _data.values(), _data.keys(), legend_location="upper right"
-            )
+        if len(_names) > 0:
+            self.stackchart.plot_data(_years, _data, _names)
             self.stackchart.show(True)
         else:
             self.stackchart.show(False)
@@ -150,27 +145,31 @@ class CustomChartTab(QWidget):
     def IncomeVsExpenses(self):
         _years = []
 
-        _data = collections.defaultdict(list)
+        _incomes = []
+        _expenses = []
         for _record in self.parent.projectionData:
             if _record.clientIsAlive or _record.spouseIsAlive:
                 if _record.projectionYear.data not in _years:
                     _years.append(_record.projectionYear.data)
 
-                _data["Income"].append(_record.incomeTotal.data)
-                _data["Expense"].append(_record.expenseTotal.data)
+                _incomes.append(_record.incomeTotal.data)
+                _expenses.append(_record.expenseTotal.data)
 
         self.stackedWidget.setCurrentIndex(1)  # set to multiple lines chart
 
         self.multiplelineschart.setTitle("Income Vs Expenses")
+        self.multiplelineschart.setXLabel("Year")
+        self.multiplelineschart.setYLabel("Dollars", units="$")
+        self.multiplelineschart.addLegend()
         if self.parent.tableData.InTodaysDollars:
             self.multiplelineschart.setSubTitle("In Today's Dollars")
         else:
             self.multiplelineschart.setSubTitle("")
 
-        if len(_data.values()) > 0:
-            self.multiplelineschart.plot(
-                _years, _data, _data.keys(), legend_location="upper right"
+        if len(_incomes) > 0:
+            self.multiplelineschart.plot_data(
+                _years, [_incomes, _expenses], ["Incomes", "Expenses"]
             )
         else:
-            self.multiplelineschart.plotlines([], [], [])
+            self.multiplelineschart.plot_data([], [], [])
         self.multiplelineschart.show(True)

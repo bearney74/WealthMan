@@ -7,8 +7,8 @@ from .DataTable import (
     AssetDataTableTab,
     TaxDataTableTab,
 )
-from .Chart import ChartTab
-from .CustomChart import CustomChartTab
+from .ChartTab import ChartTab
+from .CustomChartTab import CustomChartTab
 
 from .MonteCarloSimulation import MonteCarloTab
 from .HistoricalAnalysis import HistoricalAnalysisTab

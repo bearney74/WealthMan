@@ -1,48 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QComboBox
 
 from ...Projections import DataItem
-from .ChartBase import LineChart, FuncFormatter
-
-
-class Chart(LineChart):
-    def __init__(self, parent, width=5, height=45, dpi=100):
-        # super(Chart, self).__init__(parent)
-        super().__init__(parent)
-
-    # fix me....  Is there a better way to do this?
-    def setLabels(self, category):
-        def format_percent(x, pos):
-            if isinstance(x, str):
-                if x.endswith("%"):
-                    x = x[:-1]
-                    x = int(x)
-            return "%s" % x
-
-        def format_string(x, pos):
-            x = int(x)
-            return f"{x:,d}"
-
-        match category:
-            case (
-                "Client RMD %"
-                | "Spouse RMD %"
-                | "Total RMD %"
-                | "Federal Marginal Tax Rate"
-                | "Federal Effective Tax Rate"
-                | "AWR"
-            ):
-                self.canvas.axes.set_xlabel("Year")
-                self.canvas.axes.set_ylabel("Percent")
-
-                self.canvas.axes.yaxis.set_major_formatter(
-                    FuncFormatter(format_percent)
-                )
-
-            case _:
-                self.canvas.axes.set_xlabel("Year")
-                self.canvas.axes.set_ylabel("Dollars")
-
-                self.canvas.axes.yaxis.set_major_formatter(FuncFormatter(format_string))
+from .Chartpyqtgraph import LineChart
 
 
 class ChartTab(QWidget):
@@ -52,7 +11,7 @@ class ChartTab(QWidget):
 
         self.variables = QComboBox(self.parent)
 
-        self.chart = Chart(self, width=5, height=45, dpi=100)
+        self.chart = LineChart(self)
 
         layout = QVBoxLayout()
         hlayout = QHBoxLayout()
@@ -69,7 +28,6 @@ class ChartTab(QWidget):
         _data = self.parent.tableData.get_chart_data()
         _categories = []
         for _key, _dataItem in _data[0].items():
-            # print(_dataItem)
             if _key != "federalTaxFilingStatus":
                 _categories.append(_dataItem.header)
 
@@ -89,16 +47,19 @@ class ChartTab(QWidget):
                     _variable_name = _var_name
 
         if _variable_name is not None:
-            _chart_data = []
+            _x = []
+            _y = []
             for _record in _data:
-                _chart_data.append(
-                    (_record["projectionYear"].data, _record[_variable_name].data)
-                )
+                _x.append(_record["projectionYear"].data)
+                _y.append(_record[_variable_name].data)
 
             self.chart.setTitle(_category)
-            self.chart.setLabels(_category)
+            self.chart.setXLabel("Year")
+            self.chart.setYLabel("Dollars", units="$")
+
+            # fix me currently subtitles don't work well
             if self.parent.tableData.InTodaysDollars:
                 self.chart.setSubTitle("In Today's Dollars")
 
-            self.chart.plot(_chart_data)
+            self.chart.plot_data(_x, _y)
             self.chart.show(True)
