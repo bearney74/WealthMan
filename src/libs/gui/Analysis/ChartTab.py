@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QComboBox
 
 from ...Projections import DataItem
-from .Chartpyqtgraph import LineChart
+from .Charts import LineChart
 
 
 class ChartTab(QWidget):
