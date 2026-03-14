@@ -1,4 +1,5 @@
-matplotlib >= 3.9
 PyQt6 >= 6.7.0
+Numpy >= 2.4.0
+PyQtGraph >= 0.14.0
 ruff >= 0.15.2
 ty >= 0.0.19
