@@ -269,7 +269,10 @@ class EnumEntry(QWidget):
         if isinstance(item, str):
             self._widget.setCurrentText(item)
         else:
-            print("Error, invalid item for set function")
+            print(
+                "EnumEntry: %s Error, invalid item (%s) for set function"
+                % (self._enum, type(item))
+            )
 
     def get(self) -> StrEnum:
         return self._enum(self._widget.currentText())

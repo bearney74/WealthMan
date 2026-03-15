@@ -2,10 +2,10 @@ from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QFileDialog
 
 import os
-import pickle
 
-from libs.DataVariables import DataVariables
+from libs.DataVariables import DataVariables, DataVariablesSchema
 from libs.Version import FILE_VERSION
+
 
 import logging
 
@@ -74,8 +74,10 @@ class MenuBar:
         if _fname == "":
             return
 
-        with open(_fname, "rb") as _fp:
-            dv = pickle.load(_fp)
+        with open(_fname, "r") as _fp:
+            _data = _fp.read()
+            dv_schema = DataVariablesSchema()
+            dv = dv_schema.loads(_data)
 
         logger.info("__version__ = '%s'" % dv.__version__)
         # see if
@@ -96,11 +98,11 @@ class MenuBar:
         self.parent.setWindowTitle(
             "%s :%s" % (self.parent.title, os.path.basename(_fname))
         )
-        # _import.get_gui_data(self.parent)
         self._filename = _fname
 
     def convert_file(self, dv):
         # TODO:  create a class to handle these types of conversions in the future
+        # maybe use marshmallow to do this????
         if dv.__version__ == "0.2 alpha":
             dv.ssCola = dv.clientSSCola
 
@@ -140,8 +142,10 @@ class MenuBar:
         self.parent.InputsTab.GlobalVariablesTab.export_data(dv)
         self.parent.InputsTab.MiscInfoTab.export_data(dv)
 
-        with open(self._filename, "wb") as _fp:
-            pickle.dump(dv, _fp)
+        with open(self._filename, "w") as _fp:
+            _dvs = DataVariablesSchema()
+            _result = _dvs.dumps(dv)
+            _fp.write(_result)
 
     def file_exit(self):
         logger.debug("file exit")

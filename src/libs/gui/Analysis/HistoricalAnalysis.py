@@ -216,6 +216,8 @@ class HistoricalAnalysisTab(QWidget):
             _incomes_fixed.append(_fixed)
             _incomes_with_COLA.append(_with_COLA)
 
+        # print(_incomes_fixed)
+        # print(_incomes_with_COLA)
         # retrieve allocation Periods..
 
         _pctStocks = self._pctStocks.get_float(0)
@@ -291,7 +293,8 @@ class HistoricalAnalysisTab(QWidget):
         )
         self.chartTab._chart.setXLabel("Years")
         self.chartTab._chart.setYLabel("Dollars", units="$")
-        self.chartTab._chart.plot_data(_years, _balances, _names)
+        self.chartTab._chart.addLegend()
+        self.chartTab._chart.plot_data(_years, _balances, _names, median=True)
         self.chartTab._chart.show(True)
 
         _output_detailed = True  # fix me   add a menu bar item to output detailed info for historical Analysis

@@ -63,15 +63,15 @@ class AssetInfoTab(QWidget):
             self._clientinfo.IRAContribution.EndAge.get_int()
         )
 
-        d.clientRothIRABalance = self._clientinfo.RothIRABalance.get_int()
-        d.clientRothIRACola = self._clientinfo.RothIRACola.get_float()
-        d.clientRothIRAContribution = (
+        d.clientRothBalance = self._clientinfo.RothIRABalance.get_int()
+        d.clientRothCola = self._clientinfo.RothIRACola.get_float()
+        d.clientRothContribution = (
             self._clientinfo.RothIRAContribution.Contribution.get_int()
         )
-        d.clientRothIRAContributionBeginAge = (
+        d.clientRothContributionBeginAge = (
             self._clientinfo.RothIRAContribution.BeginAge.get_int()
         )
-        d.clientRothIRAContributionEndAge = (
+        d.clientRothContributionEndAge = (
             self._clientinfo.RothIRAContribution.EndAge.get_int()
         )
 
@@ -88,15 +88,15 @@ class AssetInfoTab(QWidget):
                 self._spouseinfo.IRAContribution.EndAge.get_int()
             )
 
-            d.spouseRothIRABalance = self._spouseinfo.RothIRABalance.get_int()
-            d.spouseRothIRACola = self._spouseinfo.RothIRACola.get_float()
-            d.spouseRothIRAContribution = (
+            d.spouseRothBalance = self._spouseinfo.RothIRABalance.get_int()
+            d.spouseRothCola = self._spouseinfo.RothIRACola.get_float()
+            d.spouseRothContribution = (
                 self._spouseinfo.RothIRAContribution.Contribution.get_int()
             )
-            d.spouseRothIRAContributionBeginAge = (
+            d.spouseRothContributionBeginAge = (
                 self._spouseinfo.RothIRAContribution.BeginAge.get_int()
             )
-            d.spouseRothIRAContributionEndAge = (
+            d.spouseRothContributionEndAge = (
                 self._spouseinfo.RothIRAContribution.EndAge.get_int()
             )
 
@@ -115,16 +115,16 @@ class AssetInfoTab(QWidget):
         )
         self._clientinfo.IRAContribution.EndAge.setText(d.clientIRAContributionEndAge)
 
-        self._clientinfo.RothIRABalance.setText(d.clientRothIRABalance)
-        self._clientinfo.RothIRACola.setText(d.clientRothIRACola)
+        self._clientinfo.RothIRABalance.setText(d.clientRothBalance)
+        self._clientinfo.RothIRACola.setText(d.clientRothCola)
         self._clientinfo.RothIRAContribution.Contribution.setText(
-            d.clientRothIRAContribution
+            d.clientRothContribution
         )
         self._clientinfo.RothIRAContribution.BeginAge.setText(
-            d.clientRothIRAContributionBeginAge
+            d.clientRothContributionBeginAge
         )
         self._clientinfo.RothIRAContribution.EndAge.setText(
-            d.clientRothIRAContributionEndAge
+            d.clientRothContributionEndAge
         )
 
         self.RegularBalance.setText(d.regularBalance)
@@ -148,17 +148,17 @@ class AssetInfoTab(QWidget):
                 d.spouseIRAContributionEndAge
             )
 
-            self._spouseinfo.RothIRABalance.setText(d.spouseRothIRABalance)
-            self._spouseinfo.RothIRACola.setText(d.spouseRothIRACola)
+            self._spouseinfo.RothIRABalance.setText(d.spouseRothBalance)
+            self._spouseinfo.RothIRACola.setText(d.spouseRothCola)
             # self._spouseinfo.RothIRAContribution.setText(d.spouseRothIRAContribution)
             self._spouseinfo.RothIRAContribution.Contribution.setText(
-                d.spouseRothIRAContribution
+                d.spouseRothContribution
             )
             self._spouseinfo.RothIRAContribution.BeginAge.setText(
-                d.spouseRothIRAContributionBeginAge
+                d.spouseRothContributionBeginAge
             )
             self._spouseinfo.RothIRAContribution.EndAge.setText(
-                d.spouseRothIRAContributionEndAge
+                d.spouseRothContributionEndAge
             )
 
 

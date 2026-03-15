@@ -389,8 +389,8 @@ class Projections(QRunnable):
                 Name="Client Roth IRA",
                 Owner=AccountOwnerType.CLIENT,
                 BirthDate=dv.clientBirthDate,
-                Balance=dv.clientRothIRABalance,
-                InterestRate=dv.clientRothIRACola,
+                Balance=dv.clientRothBalance,
+                InterestRate=dv.clientRothCola,
                 Contribution=dv.clientRothContribution,
                 ContributionBeginAge=dv.clientRothContributionBeginAge,
                 ContributionEndAge=dv.clientRothContributionEndAge,
@@ -415,8 +415,8 @@ class Projections(QRunnable):
                 Name="Spouse Roth IRA",
                 Owner=AccountOwnerType.SPOUSE,
                 BirthDate=dv.spouseBirthDate,
-                Balance=dv.spouseRothIRABalance,
-                InterestRate=dv.spouseRothIRACola,
+                Balance=dv.spouseRothBalance,
+                InterestRate=dv.spouseRothCola,
                 Contribution=dv.spouseRothContribution,
                 ContributionBeginAge=dv.spouseRothContributionBeginAge,
                 ContributionEndAge=dv.spouseRothContributionEndAge,
@@ -494,7 +494,7 @@ class Projections(QRunnable):
 
         _lastYearsFederalTaxes = 0
         for _year in range(self._begin_year, self._end_year + 1):
-            print("Year:%s" % _year)
+            # print("Year:%s" % _year)
             _pyd = ProjectionYearData(_year)
 
             _clientage = self._client.calc_age_by_year(_year)
@@ -617,7 +617,7 @@ class Projections(QRunnable):
                 - _lastYearsFederalTaxes
                 - _contribution_total
             )
-            print("Cashflow: %s" % _pyd.cashFlow)
+            # print("Cashflow: %s" % _pyd.cashFlow)
             if _pyd.cashFlow.data < 0 or _pyd.totalRMD.data > 0:
                 # we need to withdraw money from assets to make up for the cash flow deficit
                 _ws = WithdrawStrategy(
@@ -640,7 +640,7 @@ class Projections(QRunnable):
                 _pyd.assetRegularWithdraw.data = _withdraw_dict[AccountType.REGULAR]
                 _pyd.assetTaxFreeWithdraw.data = _withdraw_dict[AccountType.TAXFREE]
 
-                print("Withdraws..")
+                # print("Withdraws..")
                 for _asset_type, _amount in _withdraw_dict.items():
                     _pyd.assetWithdraw.data += _amount
                     if (
@@ -648,7 +648,7 @@ class Projections(QRunnable):
                     ):  # these withdraws are seen as regular income
                         _income_total += _amount
                         _taxable_income_total += _amount
-                        print(_amount)
+                        # print(_amount)
 
                 # _pyd.surplusDeficit = _pyd.cashFlow + _pyd.assetWithdraw - _deficit
             else:

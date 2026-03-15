@@ -50,14 +50,24 @@ class MultiLineChart(ChartBase):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
 
-    def plot_data(self, x, y, names, pen=None):
+    def plot_data(self, x, y, names, pen=None, median=False):
         self.clear()
         if isinstance(y[0], list):
             # _max=len(names)
-            for _i, _y in enumerate(y):
-                # self.plot(x, _y, pen=pg.mkPen((_i, _max), width=3), name=names[_i])
-                self.plot(x, _y, pen=pg.mkPen(_i, width=3), name=names[_i])
-                # _line.setZValue(_max - _i)
+            if len(y) > 10:
+                for _i, _y in enumerate(y):
+                    self.plot(x, _y, pen=pg.mkPen(_i, width=3))
+            else:
+                for _i, _y in enumerate(y):
+                    self.plot(x, _y, pen=pg.mkPen(_i, width=3), name=names[_i])
+
+            if median:  # plot median line?
+                result = np.array(y).T
+                x = np.arange(result.shape[0])
+                _median = np.median(result, axis=1)
+
+                self.plot(x, _median, pen=pg.mkPen("k", width=3), name="median")
+
         else:  # single line
             _color = pg.mkColor(0, 0, 255)  # blue
             if pen is None:
@@ -103,6 +113,7 @@ class MonteCarloChart(ChartBase):
         offsets = (10, 20, 30, 40)
 
         # print(median[-1])
+        self.addLegend()
 
         for offset in offsets:
             low = np.percentile(result, 50 - offset, axis=1)
@@ -115,4 +126,4 @@ class MonteCarloChart(ChartBase):
             self.addItem(_fill)
 
         # plot the median values
-        self.plot(x, median, pen=pg.mkPen(color="k", width=3))
+        self.plot(x, median, pen=pg.mkPen(color="k", width=3), name="median")

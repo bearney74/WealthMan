@@ -1,3 +1,4 @@
 PyQt6 >= 6.7.0
 Numpy >= 2.4.0
 PyQtGraph >= 0.14.0
+marshmallow >= 4.2.2

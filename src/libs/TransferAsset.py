@@ -24,8 +24,10 @@ class TransferAssets:
 
         self.amount = amount
 
-        assert isinstance(COLA, float)
-        if abs(COLA) >= 1:
+        assert COLA is None or isinstance(COLA, float)
+        if COLA is None:
+            self.COLA = 1.0  # (no cola)
+        elif abs(COLA) >= 1:
             self.COLA = 1.0 + COLA / 100.0
         else:
             self.COLA = 1.0 + COLA
