@@ -109,6 +109,15 @@ class AccountTest(unittest.TestCase):
             _a.end_of_year_bookkeeping()  # this is the only way to adjust the balance..
             self.assertEqual(_a.balance, _total, "Year=%s" % _year)
 
+    def test_Contribution(self):
+        _con = ContributionClass(1000, birthYear=2000, beginAge=10, endAge=None)
+
+        for _year in range(2000, 2010):
+            self.assertEqual(0, _con.get_Contribution_by_year(_year))
+
+        for _year in range(2010, 2030):
+            self.assertEqual(1000, _con.get_Contribution_by_year(_year))
+
 
 class TraditionalIRATest(unittest.TestCase):
     def test_basic(self):
