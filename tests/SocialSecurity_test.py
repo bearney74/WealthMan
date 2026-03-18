@@ -5,6 +5,8 @@ from src.libs.EnumTypes import PersonType
 from src.libs.Person import Person
 from src.libs.IncomeSources import SocialSecurity
 
+# from src.libs.MiscLibs import PeriodValidator
+
 # FRA means Full Retirement Age
 
 
@@ -19,6 +21,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
             FRAAmount=0,
             Person=_p,
             BirthDate=_p.birthDate,
+            BeginAge=62,
             Owner=PersonType.CLIENT,
         )
         self.assertEqual(_ss.calc_full_retirement_age(), 67)
@@ -29,6 +32,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
             FRAAmount=0,
             Person=_p,
             BirthDate=_p.birthDate,
+            BeginAge=62,
             Owner=PersonType.CLIENT,
         )
         self.assertEqual(_ss.calc_full_retirement_age(), 67)
@@ -40,6 +44,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
             FRAAmount=0,
             Person=_p,
             BirthDate=_p.birthDate,
+            BeginAge=62,
             Owner=PersonType.CLIENT,
         )
         self.assertEqual(_ss.calc_full_retirement_age(), 66)
@@ -48,8 +53,8 @@ class SocialSecurityFRA67Test(unittest.TestCase):
         _p = Person(name="Jane", birthDate=date(1963, 1, 1))
 
         for _age, _amount in (
-            (55, 0),
-            (60, 0),
+            # (55, 0),
+            # (60, 0),
             (62, 2100),
             (63, 2250),
             (64, 2400),
@@ -61,20 +66,22 @@ class SocialSecurityFRA67Test(unittest.TestCase):
             (70, 3720),
             (71, 3720),
         ):
+            # _pv=PeriodValidator(birthYear=_p.birthDate.year, beginAge=_age)
             _ss = SocialSecurity(
                 Name="Janes SS",
                 FRAAmount=3000,
                 Person=_p,
                 BirthDate=_p.birthDate,
                 Owner=PersonType.CLIENT,
+                # Period=_pv
                 BeginAge=_age,
             )
 
             self.assertEqual(_ss.calc_benefit_amount_by_age(_age), _amount)
 
         for _age, _amount in (
-            (55, 0),
-            (60, 0),
+            # (55, 0),
+            # (60, 0),
             (62, 1750),
             (63, 1875),
             (64, 2000),
@@ -86,16 +93,29 @@ class SocialSecurityFRA67Test(unittest.TestCase):
             (70, 3100),
             (71, 3100),
         ):
+            # _pv=PeriodValidator(birthYear=_p.birthDate.year, beginAge=_age)
             _ss1 = SocialSecurity(
                 "Janes SS",
                 FRAAmount=2500,
                 Person=_p,
                 BirthDate=_p.birthDate,
                 Owner=PersonType.CLIENT,
+                # Period=_pv,
                 BeginAge=_age,
             )
 
             self.assertEqual(_ss1.calc_benefit_amount_by_age(_age), _amount)
+
+            with self.assertRaises(AssertionError):
+                _ss1 = SocialSecurity(
+                    "Janes SS",
+                    FRAAmount=2500,
+                    Person=_p,
+                    BirthDate=_p.birthDate,
+                    Owner=PersonType.CLIENT,
+                    # Period=_pv,
+                    BeginAge=61,
+                )
 
 
 if __name__ == "__main__":

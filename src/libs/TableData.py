@@ -83,12 +83,12 @@ class TableData:
             _list.append(_record.ssIncomeTotal)
             _list.append(_record.activeIncomeTotal)
 
-            _list.append(_record.assetTaxDeferredWithdraw)
-            _list.append(_record.assetRegularWithdraw)
-            _list.append(_record.assetTaxFreeWithdraw)
-            _list.append(_record.assetWithdraw)
-
             _list.append(_record.incomeTotal)
+
+            _list.append(_record.assetTaxDeferredWithdraws)
+            _list.append(_record.assetRegularReturns)
+
+            _list.append(_record.taxableIncomeTotal)
 
             _data.append(_list)
 
@@ -119,18 +119,31 @@ class TableData:
                 _list.append(_record.surplusBalance)
                 _list.append(_record.surplusWithdraw)
 
-            _list.append(_record.assetTotal)
+            _list.append(_record.assetTotalBalance)
+            _list.append(_record.assetTotalDeposits)
+            _list.append(_record.assetTotalWithdraws)
+            _list.append(_record.assetTotalReturns)
+            _list.append(_record.assetTotalContributions)
 
-            for _dataItem in _record.assetContributions:
-                _list.append(_dataItem)
+            """
+            _list.append(_record.assetTaxDeferredBalance)
+            _list.append(_record.assetTaxDeferredDeposits)
+            _list.append(_record.assetTaxDeferredWithdraws)
+            _list.append(_record.assetTaxDeferredReturns)
+            _list.append(_record.assetTaxDeferredContributions)
 
-            _list.append(_record.assetContributionTotal)
+            _list.append(_record.assetTaxFreeBalance)
+            _list.append(_record.assetTaxFreeDeposits)
+            _list.append(_record.assetTaxFreeWithdraws)
+            _list.append(_record.assetTaxFreeReturns)
+            _list.append(_record.assetTaxFreeContributions)
 
-            _list.append(_record.assetTaxDeferredWithdraw)
-            _list.append(_record.assetRegularWithdraw)
-            _list.append(_record.assetTaxFreeWithdraw)
-            _list.append(_record.assetWithdraw)
-
+            _list.append(_record.assetRegularBalance)
+            _list.append(_record.assetRegularDeposits)
+            _list.append(_record.assetRegularWithdraws)
+            _list.append(_record.assetRegularReturns)
+            _list.append(_record.assetRegularContributions)
+            """
             _list.append(_record.transfersTotal)
 
             _list.append(_record.clientRMD)
@@ -216,14 +229,14 @@ class TableData:
             _list.append(_record.FPL)
             _list.append(_record.expenseTotal)
 
-            _list.append(_record.assetContributionTotal)
-            _list.append(_record.assetWithdraw)
+            _list.append(_record.assetTotalContributions)
+            _list.append(_record.assetTotalWithdraws)
 
             _list.append(_record.cashFlow)
 
             _list.append(_record.surplusDeficit)
 
-            _list.append(_record.assetTotal)
+            _list.append(_record.assetTotalBalance)
 
             _list.append(_record.totalRMD)
             _list.append(_record.totalRMDPercent)

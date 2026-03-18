@@ -172,7 +172,7 @@ class HistoricalAnalysisTab(QWidget):
         # we need the total amount of assets
         # we need the total amount of expenses
 
-        _assets_total = self.parent.projectionData[0].assetTotal.data
+        _assets_total = self.parent.projectionData[0].assetTotalBalance.data
         # _asset_contributions = []
         _incomes_fixed = []
         _incomes_with_COLA = []
@@ -203,11 +203,10 @@ class HistoricalAnalysisTab(QWidget):
                     print(_item.LifeSpanDate.year)
                     print(_item.Amount)
                     print(_item._COLA_Flag)
-                if (
-                    _item.BeginDate.year <= _year
-                    and _item.LifeSpanDate.year >= _year
-                    and _item.EndDate.year >= _year
-                ):
+                if _item._period.isa_valid_period(_year):
+                    # amounts not in todays dollars... fix this please
+                    # _number_of_years=_year - self._begin_year
+                    # _amount=todays_dollar(_item.Amount, _item.COLA, dv.inflation, _number_of_years)
                     if _item.get_COLA_Flag():
                         _with_COLA += _item.Amount
                     else:

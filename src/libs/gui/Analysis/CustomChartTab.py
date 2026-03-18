@@ -17,7 +17,7 @@ class CustomChartTab(QWidget):
         self.variables.addItems(
             [
                 "Asset Totals",
-                "Asset Contribution Totals",
+                #   "Asset Contribution Totals",
                 "Income Totals",
                 "Income VS Expense",
             ]
@@ -50,8 +50,8 @@ class CustomChartTab(QWidget):
         match self.variables.currentText():
             case "Asset Totals":
                 self.AssetTotals()
-            case "Asset Contribution Totals":
-                self.AssetContributionTotals()
+            # case "Asset Contribution Totals":
+            #    self.AssetContributionTotals()
             case "Income Totals":
                 self.IncomeTotals()
             case "Income VS Expense":
@@ -105,8 +105,8 @@ class CustomChartTab(QWidget):
     def IncomeTotals(self):
         self._StackChartHelper("incomeSources", "Income Totals")
 
-    def AssetContributionTotals(self):
-        self._StackChartHelper("assetContributions", "Asset Contribution Totals")
+    # def AssetContributionTotals(self):
+    #    self._StackChartHelper("assetTotalContributions", "Asset Contribution Totals")
 
     def _StackChartHelper(self, attr, title):
         _years = []

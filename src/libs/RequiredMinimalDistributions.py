@@ -1,6 +1,7 @@
 from datetime import date
 
 from .Person import Person
+from .Account import TraditionalIRA, Account
 
 import logging
 
@@ -66,7 +67,7 @@ def calc_age(date1: date, date2: date) -> int:
     return int(abs(_diff.days) / 365.2466)
 
 
-class RMD:
+class RMDTable:
     def __init__(self, person1: Person, person2: Person):
         self.Person1 = person1
         self.Person2 = person2
@@ -98,7 +99,10 @@ class RMD:
         # TODO:do we need to start using another lookup table?
         # self._calc_init()
 
-    def calc(self, currdate: date) -> float:
+    def calcPercent(self, currdate: date) -> float:
+        if self.Person1 is None:
+            return 0.0
+
         _age = calc_age(self.Person1.birthDate, currdate)
         if _age <= 72:
             return 0.0
@@ -107,3 +111,35 @@ class RMD:
             return 100.0 / self._table[120]
 
         return 100.0 / self._table[_age]
+
+
+class RMDCalcs:
+    def __init__(self, ira_account: TraditionalIRA, surplus_account: Account):
+        self._iraAccount = ira_account
+        self._surplusAccount = surplus_account
+
+        self.withdraw_amount = 0
+
+    def calcRequiredAmount(self, rmd_percent: float) -> (int, float, int):
+        """calcs and returns the required amount to withdraw, the percentage to withdraw,
+        and the beginning of year balance for the IRA account"""
+
+        if self._iraAccount is None:
+            return 0, 0.0, 0
+
+        _boy_balance = self._iraAccount.beginning_of_year_balance()
+        # _rmd_pct = _clientRMD.calc(_last_day_of_year)
+        # _pyd.clientRMDPercent.data = _rmd_pct
+        self._withdraw_amount = (int(rmd_percent / 100.0 * _boy_balance),)
+
+        return self.withdraw_amount, rmd_percent, _boy_balance
+
+    def do_transfer_if_necessary(self):
+        """do any necessary transfers to meet RMD requirements"""
+        if self._iraAccount is None:
+            return
+
+        _amount = self.withdraw_amount - self._iraAccount.totalWithdraws
+        if _amount > 0:  # we need to do an additional withdraw to meet RMD requirements
+            self._iraAccount.withdraw(_amount)
+            self._surplusAccount.deposit(_amount)

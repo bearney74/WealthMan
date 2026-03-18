@@ -64,7 +64,7 @@ class TransferAssets:
         # take amount from source and put it in target
 
         # if source contains the amount, let use that amount, if not use the lesser amount in the source acct.
-        if self.sourceAccount.Balance >= self.amount:
+        if self.sourceAccount.balance >= self.amount:
             self.transferred_amount = self.amount
         else:
             self.transferred_amount = self.sourceAccount.Balance

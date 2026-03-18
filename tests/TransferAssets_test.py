@@ -12,7 +12,6 @@ class TransferAssetTest(unittest.TestCase):
         _src = TraditionalIRA(
             Name="Trad IRA",
             Owner=AccountOwnerType.CLIENT,
-            BirthDate=date(1990, 1, 1),
             Balance=1000,
             InterestRate=1.0,
         )
@@ -20,7 +19,6 @@ class TransferAssetTest(unittest.TestCase):
         _tgt = RothIRA(
             Name="Roth IRA",
             Owner=AccountOwnerType.CLIENT,
-            BirthDate=date(1990, 1, 1),
             Balance=500,
             InterestRate=2.0,
         )
@@ -37,7 +35,6 @@ class TransferAssetTest(unittest.TestCase):
         _src = TraditionalIRA(
             Name="Trad IRA",
             Owner=AccountOwnerType.CLIENT,
-            BirthDate=date(1990, 1, 1),
             Balance=1000,
             InterestRate=1.0,
         )
@@ -45,7 +42,6 @@ class TransferAssetTest(unittest.TestCase):
         _tgt = Brokerage(
             Name="Roth IRA",
             Owner=AccountOwnerType.CLIENT,
-            BirthDate=date(1990, 1, 1),
             Balance=500,
             InterestRate=2.0,
         )
@@ -62,7 +58,6 @@ class TransferAssetTest(unittest.TestCase):
         _src = RothIRA(
             Name="Trad IRA",
             Owner=AccountOwnerType.CLIENT,
-            BirthDate=date(1990, 1, 1),
             Balance=1000,
             InterestRate=1.0,
         )
@@ -70,7 +65,6 @@ class TransferAssetTest(unittest.TestCase):
         _tgt = Brokerage(
             Name="Roth IRA",
             Owner=AccountOwnerType.CLIENT,
-            BirthDate=date(1990, 1, 1),
             Balance=500,
             InterestRate=2.0,
         )
@@ -87,7 +81,6 @@ class TransferAssetTest(unittest.TestCase):
         _src = Brokerage(
             Name="Brokerage",
             Owner=AccountOwnerType.CLIENT,
-            BirthDate=date(1990, 1, 1),
             Balance=1000,
             InterestRate=1.0,
         )
@@ -95,7 +88,6 @@ class TransferAssetTest(unittest.TestCase):
         _tgt = Brokerage(
             Name="Cash",
             Owner=AccountOwnerType.CLIENT,
-            BirthDate=date(1990, 1, 1),
             Balance=500,
             InterestRate=2.0,
         )

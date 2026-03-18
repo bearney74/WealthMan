@@ -41,12 +41,12 @@ class MonteCarloTab(QWidget):
         # we need the total amount of assets
         # we need the total amount of expenses
 
-        _assets_total = self.parent.projectionData[0].assetTotal.data
+        _assets_total = self.parent.projectionData[0].assetTotalBalance.data
         _asset_contributions = []
         _expenses = []
         # fix me   maybe add future incomes?  SS, etc??
         for _step, _pyd in enumerate(self.parent.projectionData):
-            _contributions = _pyd.assetContributionTotal.data
+            _contributions = _pyd.assetTotalContributions.data
 
             # use incomeSources to get regular income (job, SS, pensions, etc)
             _expense_total = _pyd.expenseTotal.data - _pyd.activeIncomeTotal.data

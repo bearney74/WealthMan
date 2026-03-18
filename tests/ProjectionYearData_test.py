@@ -9,7 +9,7 @@ class ProjectionYearDataTest(unittest.TestCase):
 
         self.assertEqual(_p.projectionYear.data, 2000)
 
-        self.assertEqual(_p.taxableIncomeTotal.header, "Taxable Income Total")
+        self.assertEqual(_p.taxableIncomeTotal.header, "Total Taxable Income")
         self.assertEqual(_p.incomeTotal.header, "Income Total")
 
         self.assertEqual(_p.FPL.header, "FPL")

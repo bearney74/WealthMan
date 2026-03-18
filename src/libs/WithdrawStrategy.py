@@ -87,7 +87,7 @@ class WithdrawStrategy:
         _dict[AccountType.TAXFREE] = 0
         _dict[AccountType.REGULAR] = 0
         for _asset in self._assets:
-            if _asset.Balance <= 0:
+            if _asset.balance <= 0:
                 continue
             if _asset.Type in (AccountType.TAXDEFERRED, AccountType.TAXFREE):
                 # need to check that owner is old enough to take withdraw
@@ -104,18 +104,21 @@ class WithdrawStrategy:
             # need to look into how I can use the new account variables for Taxable income, etc
             # for these since I am taking money out of the accounts.
             # this may simplify the logic below somewhat..
-            if deficit <= _asset.Balance:
+            if deficit <= _asset.balance:
                 _dict[_asset.Type] += deficit
-                _asset.Balance -= deficit
+                _asset.withdraw(deficit)
+                # _asset.Balance -= deficit
                 logger.debug(
                     "taking %s from %s when client is %s, spouse is %s"
                     % (deficit, _asset.Name, self.clientAge, self.spouseAge)
                 )
                 return 0, _dict  # resulting deficit
-            elif _asset.Balance > 0:  # deficit is greater than balance
-                _dict[_asset.Type] += _asset.Balance
-                deficit -= _asset.Balance
-                _asset.Balance = 0
+            elif _asset.balance > 0:  # deficit is greater than balance
+                _dict[_asset.Type] += _asset.balance
+                deficit -= _asset.balance
+                # print(_asset.balance)
+                _asset.withdraw(_asset.balance)
+                # _asset.Balance = 0
                 logger.debug(
                     "taking total balance of %s from %s when client is %s, spouse is %s"
                     % (deficit, _asset.Name, self.clientAge, self.spouseAge)

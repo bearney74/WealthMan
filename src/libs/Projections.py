@@ -2,7 +2,7 @@ from datetime import datetime, date
 
 from PyQt6.QtCore import QRunnable, QObject, pyqtSignal, pyqtSlot
 
-from .Account import TraditionalIRA, RothIRA, Brokerage
+from .Account import TraditionalIRA, RothIRA, Brokerage, ContributionClass
 from .DataVariables import DataVariables
 from .EnumTypes import (
     AccountType,
@@ -16,9 +16,10 @@ from .Expense import Expense
 from .FederalPovertyLevel import FederalPovertyLevel
 from .FederalTax import FederalTax
 from .IncomeSources import IncomeSource, SocialSecurity
+from .MiscLibs import PeriodValidator
 from .Person import Person
 from .ProvisionalIncome import SocialSecurityTaxes
-from .RequiredMinimalDistributions import RMD
+from .RequiredMinimalDistributions import RMDTable, RMDCalcs
 from .SurplusAccount import SurplusAccount
 from .TransferAsset import TransferAssets
 from .WithdrawStrategy import WithdrawStrategy
@@ -93,7 +94,7 @@ class ProjectionYearData:
         self.spouseIsAlive: bool = None
 
         self.incomeSources = []
-        self.taxableIncomeTotal: DataItem = DataItem("Taxable Income Total")
+        self.taxableIncomeTotal: DataItem = DataItem("Total Taxable Income")
         self.incomeTotal: DataItem = DataItem("Income Total")
         self.activeIncomeTotal: DataItem = DataItem("Active Income Total")
         self.FPL: DataItem = DataItem("FPL", "{:.1f}%", 0.0)  # float = 0.0
@@ -105,24 +106,13 @@ class ProjectionYearData:
         self.expenseSources = []
         self.expenseTotal: DataItem = DataItem("Expense Total")  # int = 0
 
-        self.cashFlow: DataItem = DataItem(
-            "Cash Flow"
-        )  # int = 0  # income total - expense total - - lastYearsFederal Taxes - asset contributions
-        self.surplusDeficit: DataItem = DataItem(
-            "Surplus Deficit"
-        )  # int = 0  # cashFlow - assetWithdraws
-
-        # todo format of output for this needs to be fixed. (see Tax Table output)
+        self.cashFlow: DataItem = DataItem("Cash Flow")
+        self.surplusDeficit: DataItem = DataItem("Surplus Deficit")
         self.federalTaxFilingStatus: DataItem = DataItem(
             "Federal Tax Filing Status", "{.value}", None
         )
-        # FederalTaxStatusType = None
-        self.thisYearsFederalTaxes: DataItem = DataItem(
-            "This Years Federal Taxes"
-        )  # int = 0
-        self.lastYearsFederalTaxes: DataItem = DataItem(
-            "Last Years Federal Taxes"
-        )  # int = 0
+        self.thisYearsFederalTaxes: DataItem = DataItem("This Years Federal Taxes")
+        self.lastYearsFederalTaxes: DataItem = DataItem("Last Years Federal Taxes")
 
         self.federalEffectiveTaxRate: DataItem = DataItem(
             "Federal Effective Tax Rate", "{:.1f}%"
@@ -135,43 +125,37 @@ class ProjectionYearData:
 
         # cash flow is just incometotal-expenseTotal - federaltaxes
 
+        self.assetTotalBalance = DataItem("Total Asset Balance")
+        self.assetTotalDeposits = DataItem("Total Asset Deposits")
+        self.assetTotalWithdraws = DataItem("Total Asset Withdraws")
+        self.assetTotalReturns = DataItem("Total Asset Returns")
+        self.assetTotalContributions = DataItem("Total Asset Contributions")
+
+        self.assetTaxDeferredWithdraws = DataItem(
+            "Total Tax Deferred Withdraws"
+        )  # counts as regular income
+        self.assetTaxFreeWithdraws = DataItem("Total Tax Free Withdraws")
+        self.assetRegularReturns = DataItem(
+            "Total Regular Returns"
+        )  # counts as regular income
+
         # how much we had to pull from assets because expenses > income
-        self.assetWithdraw: DataItem = DataItem("Total Asset Withdraws")  # int = 0
-        self.assetTaxDeferredWithdraw: DataItem = DataItem(
-            "Tax Deferred Asset Withdraws"
-        )  # int = 0
-        self.assetRegularWithdraw: DataItem = DataItem(
-            "Regular Asset Withdraws"
-        )  # int = 0
-        self.assetTaxFreeWithdraw: DataItem = DataItem(
-            "Tax Free Asset Withdraws"
-        )  # int = 0
 
         # self.surplus_deficit: int = 0
 
         self.assetSources = []
-        self.assetContributions = []
-
-        self.assetTotal: DataItem = DataItem("Total Assets")  # int = 0
-        self.assetContributionTotal: DataItem = DataItem("Total Asset Contributions")
 
         self.transfersTotal: DataItem = DataItem("Total Transfers")  # int = 0
 
         # required Minimal distributions
         self.clientRMD: DataItem = DataItem("Client RMDs")  # int = 0
-        self.clientRMDPercent: DataItem = DataItem(
-            "% Client RMDs", "{:.1f}%"
-        )  # float = 0.0
+        self.clientRMDPercent: DataItem = DataItem("% Client RMDs", "{:.1f}%")
 
         self.spouseRMD: DataItem = DataItem("Spouse RMDs")  # int = 0
-        self.spouseRMDPercent: DataItem = DataItem(
-            "% Spouse RMDs", "{:.1f}%"
-        )  # float = 0.0
+        self.spouseRMDPercent: DataItem = DataItem("% Spouse RMDs", "{:.1f}%")
 
         self.totalRMD: DataItem = DataItem("Total RMDs")  # int = 0
-        self.totalRMDPercent: DataItem = DataItem(
-            "% Total RMDs", "{:.1f}%"
-        )  # float = 0.0
+        self.totalRMDPercent: DataItem = DataItem("% Total RMDs", "{:.1f}%")
 
         # surplus account
         self.surplusBalance: DataItem = DataItem("Surplus Account")  # int = 0
@@ -179,7 +163,7 @@ class ProjectionYearData:
 
         self.AW: DataItem = DataItem(
             "Total Asset Drawdown"
-        )  # int = 0  # TAD = Total Asset Drawdown
+        )  # TAD = Total Asset Drawdown
         self.AWR: DataItem = DataItem("Asset DrawDown Rate", "{:.1f}%")  # float = 0
 
 
@@ -232,11 +216,10 @@ class Projections(QRunnable):
             _client_ss = SocialSecurity(
                 Name="Client Social Security",
                 Person=self._client,
-                BirthDate=dv.clientBirthDate,
                 FRAAmount=dv.clientSSAmount,
                 Owner=PersonType.CLIENT,
+                BirthDate=dv.clientBirthDate,
                 BeginAge=dv.clientSSBeginAge,
-                LifeSpanAge=dv.clientLifeSpanAge,
                 COLA=dv.ssCola,
             )
             self._IncomeSources.append(_client_ss)
@@ -246,11 +229,10 @@ class Projections(QRunnable):
                 _spouse_ss = SocialSecurity(
                     Name="Spouse Social Security",
                     Person=self._spouse,
-                    BirthDate=dv.spouseBirthDate,
                     FRAAmount=dv.spouseSSAmount,
                     Owner=PersonType.SPOUSE,
+                    BirthDate=dv.spouseBirthDate,
                     BeginAge=dv.spouseSSBeginAge,
-                    LifeSpanAge=dv.spouseLifeSpanAge,
                     COLA=dv.ssCola,
                 )
                 self._IncomeSources.append(_spouse_ss)
@@ -269,16 +251,17 @@ class Projections(QRunnable):
                 _birthdate = dv.spouseBirthDate
                 _lifespan = dv.spouseLifeSpanAge
 
+            _period = PeriodValidator(
+                _birthdate.year, dv.pension1BeginAge, min(_lifespan, dv.pension1EndAge)
+            )
+
             _is = IncomeSource(
                 Name=dv.pension1Name,
                 IncomeType=IncomeSourceType.PENSION,
                 Owner=dv.pension1Owner,
                 Amount=dv.pension1Amount,
-                BirthDate=_birthdate,
-                BeginAge=dv.pension1BeginAge,
-                LifeSpanAge=_lifespan,
-                EndAge=dv.pension1EndAge,
-                SurvivorPercent=dv.pension1SurvivorBenefits,
+                Period=_period,
+                # SurvivorPercent=dv.pension1SurvivorBenefits,
                 COLA=dv.pension1Cola,
             )
 
@@ -291,15 +274,17 @@ class Projections(QRunnable):
                 _birthdate = dv.spouseBirthDate
                 _lifespan = dv.spouseLifeSpanAge
 
+            _period = PeriodValidator(
+                _birthdate.year, dv.pension2BeginAge, min(_lifespan, dv.pension2EndAge)
+            )
+
             _is = IncomeSource(
                 Name=dv.pension2Name,
                 IncomeType=IncomeSourceType.PENSION,
                 Owner=dv.pension2Owner,
                 Amount=dv.pension2Amount,
-                BirthDate=_birthdate,
-                BeginAge=dv.pension2BeginAge,
-                EndAge=dv.pension2EndAge,
-                SurvivorPercent=dv.pension2SurvivorBenefits,
+                Period=_period,
+                # SurvivorPercent=dv.pension2SurvivorBenefits,
                 COLA=dv.pension2Cola,
             )
 
@@ -311,33 +296,23 @@ class Projections(QRunnable):
                 _birthdate = dv.spouseBirthDate
 
             if _record.amount is not None:
-                if _record.begin_age is None:
-                    _record.begin_age = 0
-                if _record.end_age is None:
-                    _record.end_age = 99
-
-                _COLA = None
-                if _record.COLA is not None:
-                    _COLA = _record.COLA
+                _period = PeriodValidator(
+                    _birthdate.year, _record.begin_age, _record.end_age
+                )
 
                 _is = IncomeSource(
-                    _record.descr,
-                    IncomeSourceType.EMPLOYMENT,
-                    _record.amount,
-                    _record.owner,
-                    BirthDate=_birthdate,
-                    BeginAge=_record.begin_age,
-                    EndAge=_record.end_age,
-                    Taxable=True,
-                    COLA=_COLA,
+                    Name=_record.descr,
+                    IncomeType=IncomeSourceType.EMPLOYMENT,
+                    Amount=_record.amount,
+                    Owner=_record.owner,
+                    Period=_period,
+                    COLA=_record.COLA,
                 )
                 self._IncomeSources.append(_is)
             else:
-                if _record.amount is None:
-                    logger.Error(
-                        "Income Source '%s' not used since amount not set"
-                        % _record.descr
-                    )
+                logger.Error(
+                    "Income Source '%s' not used since amount not set" % _record.descr
+                )
 
         self._Expenses = []
         for _record in dv.expenses:
@@ -346,19 +321,14 @@ class Projections(QRunnable):
                 _birthdate = dv.spouseBirthDate
 
             if _record.amount is not None:
-                if _record.begin_age is None:
-                    _record.begin_age = 0
-                if _record.end_age is None:
-                    _record.end_age = 99
-                if _record.COLA is None:
-                    _record.COLA = 0.0
+                _period = PeriodValidator(
+                    _birthdate.year, _record.begin_age, _record.end_age
+                )
 
                 _e = Expense(
                     _record.descr,
                     _record.amount,
-                    BirthDate=_birthdate,
-                    BeginAge=_record.begin_age,
-                    EndAge=_record.end_age,
+                    Period=_period,
                     COLA=_record.COLA,
                 )
 
@@ -371,68 +341,90 @@ class Projections(QRunnable):
 
         self._Assets = []
 
+        # create all basic accounts.. even if they have a zero balance. Someone may
+        # transfer money into an account with zero balance
+
+        _con = ContributionClass(
+            dv.clientIRAContribution,
+            dv.clientBirthDate.year,
+            dv.clientIRAContributionBeginAge,
+            dv.clientIRAContributionEndAge,
+        )
         self._Assets.append(
             TraditionalIRA(
                 Name="Client Trad IRA",
                 Owner=AccountOwnerType.CLIENT,
-                BirthDate=dv.clientBirthDate,
                 Balance=dv.clientIRABalance,
                 InterestRate=dv.clientIRACola,
-                Contribution=dv.clientIRAContribution,
-                ContributionBeginAge=dv.clientIRAContributionBeginAge,
-                ContributionEndAge=dv.clientIRAContributionEndAge,
+                ContributionObj=_con,
             )
+        )
+
+        _con = ContributionClass(
+            dv.clientRothContribution,
+            dv.clientBirthDate.year,
+            dv.clientRothContributionBeginAge,
+            dv.clientRothContributionEndAge,
         )
 
         self._Assets.append(
             RothIRA(
                 Name="Client Roth IRA",
                 Owner=AccountOwnerType.CLIENT,
-                BirthDate=dv.clientBirthDate,
                 Balance=dv.clientRothBalance,
                 InterestRate=dv.clientRothCola,
-                Contribution=dv.clientRothContribution,
-                ContributionBeginAge=dv.clientRothContributionBeginAge,
-                ContributionEndAge=dv.clientRothContributionEndAge,
             )
         )
 
-        self._Assets.append(
-            TraditionalIRA(
-                Name="Spouse Trad IRA",
-                Owner=AccountOwnerType.SPOUSE,
-                Balance=dv.spouseIRABalance,
-                BirthDate=dv.spouseBirthDate,
-                InterestRate=dv.spouseIRACola,
-                Contribution=dv.spouseIRAContribution,
-                ContributionBeginAge=dv.spouseIRAContributionBeginAge,
-                ContributionEndAge=dv.spouseIRAContributionEndAge,
+        if _is_married:
+            _con = ContributionClass(
+                dv.spouseIRAContribution,
+                dv.spouseBirthDate.year,
+                dv.spouseIRAContributionBeginAge,
+                dv.spouseIRAContributionEndAge,
             )
-        )
 
-        self._Assets.append(
-            RothIRA(
-                Name="Spouse Roth IRA",
-                Owner=AccountOwnerType.SPOUSE,
-                BirthDate=dv.spouseBirthDate,
-                Balance=dv.spouseRothBalance,
-                InterestRate=dv.spouseRothCola,
-                Contribution=dv.spouseRothContribution,
-                ContributionBeginAge=dv.spouseRothContributionBeginAge,
-                ContributionEndAge=dv.spouseRothContributionEndAge,
+            self._Assets.append(
+                TraditionalIRA(
+                    Name="Spouse Trad IRA",
+                    Owner=AccountOwnerType.SPOUSE,
+                    Balance=dv.spouseIRABalance,
+                    InterestRate=dv.spouseIRACola,
+                    ContributionObj=_con,
+                )
             )
+
+            _con = ContributionClass(
+                dv.spouseRothContribution,
+                dv.spouseBirthDate.year,
+                dv.spouseRothContributionBeginAge,
+                dv.spouseRothContributionEndAge,
+            )
+
+            self._Assets.append(
+                RothIRA(
+                    Name="Spouse Roth IRA",
+                    Owner=AccountOwnerType.SPOUSE,
+                    Balance=dv.spouseRothBalance,
+                    InterestRate=dv.spouseRothCola,
+                    ContributionObj=_con,
+                )
+            )
+
+        _con = ContributionClass(
+            dv.regularContribution,
+            dv.clientBirthDate.year,
+            dv.regularContributionBeginAge,
+            dv.regularContributionEndAge,
         )
 
         self._Assets.append(
             Brokerage(
                 Name="Regular Taxable",
                 Owner=AccountOwnerType.BOTH,
-                BirthDate=dv.clientBirthDate,
                 Balance=dv.regularBalance,
                 InterestRate=dv.regularCola,
-                Contribution=dv.regularContribution,
-                ContributionBeginAge=dv.regularContributionBeginAge,
-                ContributionEndAge=dv.regularContributionEndAge,
+                ContributionObj=_con,
             )
         )
 
@@ -485,17 +477,54 @@ class Projections(QRunnable):
     def run(self):
         _projection_data = []
 
-        _clientRMD = RMD(self._client, self._spouse)
+        # _surplusAccount=None
+        if self.UseSurplusAccount:
+            _surplusAccount = SurplusAccount(0, self.SurplusAccountInterestRate)
+        else:  # use brokerage as surplus account
+            _surplusAccount = self._retrieve_asset_object(
+                AccountOwnerType.CLIENT, AccountType.REGULAR
+            )
+
+        if _surplusAccount is None:
+            print("Surplus Account is None")
+
+        _clientRMD = RMDTable(self._client, self._spouse)
         _spouseRMD = None
         if self._spouse is not None:
-            _spouseRMD = RMD(self._spouse, self._client)
+            _spouseRMD = RMDTable(self._spouse, self._client)
 
-        _surplusAccount = SurplusAccount(0, self.SurplusAccountInterestRate)
+        _client_ira = self._retrieve_asset_object(
+            AccountOwnerType.CLIENT, AccountType.TAXDEFERRED
+        )
+        if _client_ira is None:
+            print("Error! Client IRA Account not found...")
+
+        _rmd_client = RMDCalcs(_client_ira, _surplusAccount)
+
+        _spouse_ira = self._retrieve_asset_object(
+            AccountOwnerType.SPOUSE, AccountType.TAXDEFERRED
+        )
+        if _spouse_ira is None:
+            print("Error! Spouse IRA Account not found...")
+
+        _rmd_spouse = RMDCalcs(_spouse_ira, _surplusAccount)
 
         _lastYearsFederalTaxes = 0
         for _year in range(self._begin_year, self._end_year + 1):
+            _number_of_years = _year - self._begin_year
+            # reset some asset variables (deposits, withdraws, taxable_income, ltcg_income, etc)
+            for _asset in self._Assets:
+                _asset.beginning_of_year_bookkeeping()
+
+            if self.UseSurplusAccount:
+                _surplusAccount.beginning_of_year_bookkeeping()
+
             # print("Year:%s" % _year)
             _pyd = ProjectionYearData(_year)
+            # fix me
+            _last_day_of_year = date(
+                _year, 12, 31
+            )  # used for rmds.. (should year by least year (year-1)?
 
             _clientage = self._client.calc_age_by_year(_year)
             _clientIsAlive = _clientage <= self._client.lifeSpanAge
@@ -528,7 +557,6 @@ class Projections(QRunnable):
                     continue
 
             # at least one person is still alive...  do the projection for that year...
-
             if not _clientIsAlive or not _spouseIsAlive:
                 _pyd.federalTaxFilingStatus.data = self._federal_tax_status_once_widowed
             else:
@@ -538,14 +566,12 @@ class Projections(QRunnable):
             _income_total = 0
             _ss_income_total = 0
             for _src in self._IncomeSources:
-                _income = _src.calc_balance_by_year(_year, self._inflation)
-                if _src.IncomeType == IncomeSourceType.SOCIAL_SECURITY:
-                    _ss_income_total += _income
-
+                _income = _src.calc_income_by_year(_year, self._inflation)
+                _ss_income_total += _src.ss_income
                 _pyd.incomeSources.append(DataItem(_src.Name, "${:,}", _income))
 
                 _income_total += _income  # _src.calc_income_by_year(_year)
-                _taxable_income_total += _income
+                _taxable_income_total += _src.taxable_income
 
             _pyd.activeIncomeTotal.data = _income_total
             _pyd.ssIncomeTotal.data = _ss_income_total
@@ -558,32 +584,6 @@ class Projections(QRunnable):
                 _expense_total += _expense
             _pyd.expenseTotal.data = _expense_total
 
-            _total = 0
-            _client_ira_total = 0
-            _spouse_ira_total = 0
-            _contribution_total = 0
-            for _src in self._Assets:
-                _balance, _contribution = _src.calc_balance(
-                    year=_year, inflation=self._inflation
-                )
-
-                if _src.Contribution is not None and _src.Contribution != 0:
-                    _pyd.assetContributions[_src.Name] = _contribution
-                    _contribution_total += _contribution
-
-                _pyd.assetSources.append(DataItem(_src.Name, "${:,}", _balance))
-
-                if _src.Type == AccountType.TAXDEFERRED:
-                    if _src.Owner == AccountOwnerType.CLIENT:
-                        _client_ira_total += _balance
-                    elif _src.Owner == AccountOwnerType.SPOUSE:
-                        _spouse_ira_total += _balance
-
-                _total += _balance
-
-            _pyd.assetTotal.data = _total
-            _pyd.assetContributionTotal.data = _contribution_total
-
             # do transfers between accounts
             # print("Transfers")
             for _tran in self._Transfers:
@@ -592,23 +592,48 @@ class Projections(QRunnable):
                 _taxable_income_total += _tran.taxable_income
                 # print(_tran._descr, _tran.taxable_income)
 
-            # do RMD calcs
-            _last_day_of_year = date(_year, 12, 31)
-            _rmd_pct = _clientRMD.calc(_last_day_of_year)
-            _pyd.clientRMDPercent.data = _rmd_pct
-            _pyd.clientRMD.data = int(_rmd_pct / 100.0 * _client_ira_total)
+            # maybe call it RMD amount needed??? RMCCalcs?
+            # all of this RMD stuff should be its own class (figure out which vars are needed, etc)
+            # _pyd.clientRMDPercent.data = 0
+            # _pyd.clientRMD.data = 0
+            # _client_boy_balance=0
 
-            if self._spouse is not None:
-                _rmd_pct = _spouseRMD.calc(_last_day_of_year)
-                _pyd.spouseRMDPercent.data = _rmd_pct
-                _pyd.spouseRMD.data = int(_rmd_pct / 100.0 * _spouse_ira_total)
+            # _client_ira=_retrieve_asset_object(AccountOwner.CLIENT, AccountType.TAXDEFERRED)
+            # _rmd_client=RMDCalcs(_client_ira)
+            _rmd_pct = _clientRMD.calcPercent(_last_day_of_year)
+            _pyd.clientRMD.data, _pyd.clientRMDPercent.data, _client_boy_balance = (
+                _rmd_client.calcRequiredAmount(_rmd_pct)
+            )
+            _rmd_client.do_transfer_if_necessary()
+
+            # _spouse_ira=_retrieve_asset_object(AccountOwner.SPOUSE, AccountType.TAXDEFERRED)
+            # _rmd_spouse=RMDCalcs(_spouse_ira)
+            _rmd_pct = _spouseRMD.calcPercent(_last_day_of_year)
+            _pyd.spouseRMD.data, _pyd.spouseRMDPercent.data, _spouse_boy_balance = (
+                _rmd_client.calcRequiredAmount(_rmd_pct)
+            )
+            _rmd_client.do_transfer_if_necessary()
 
             _pyd.totalRMD.data = _pyd.clientRMD.data + _pyd.spouseRMD.data
-            if _client_ira_total + _spouse_ira_total == 0:
+            if _client_boy_balance + _spouse_boy_balance == 0:
                 _pyd.totalRMDPercent.data = 0.0
             else:
                 _pyd.totalRMDPercent.data = (
-                    100.0 * _pyd.totalRMD.data / (_client_ira_total + _spouse_ira_total)
+                    100.0
+                    * _pyd.totalRMD.data
+                    / (_client_boy_balance + _spouse_boy_balance)
+                )
+
+            # print("%s: invalid logic for withdrawing totalRMD.. fix me" % __file__)
+            # use new Account functions for this.. at the end we can populate the
+            # proper pyd variables for deposit and Withdraws..
+            # calc cash flow
+
+            _contribution_total = 0
+            for _src in self._Assets:
+                # running this does the contributions for all accounts in self._Assets
+                _contribution_total += _src.do_contribution(
+                    _year, _number_of_years, self._inflation
                 )
 
             _pyd.cashFlow.data = (
@@ -617,8 +642,9 @@ class Projections(QRunnable):
                 - _lastYearsFederalTaxes
                 - _contribution_total
             )
-            # print("Cashflow: %s" % _pyd.cashFlow)
-            if _pyd.cashFlow.data < 0 or _pyd.totalRMD.data > 0:
+
+            # fix this mess..
+            if _pyd.cashFlow.data < 0:
                 # we need to withdraw money from assets to make up for the cash flow deficit
                 _ws = WithdrawStrategy(
                     self._withdrawOrder,
@@ -628,93 +654,55 @@ class Projections(QRunnable):
                     _spouseIsAlive,
                     self._Assets,
                 )
-                _neededAssetWithdraw = max(abs(_pyd.cashFlow.data), _pyd.totalRMD.data)
+                # print(_pyd.cashFlow.data)
+                _neededAssetWithdraw = abs(_pyd.cashFlow.data)
                 _deficit, _withdraw_dict = _ws.reconcile_required_withdraw(
                     _neededAssetWithdraw
                 )
 
-                _pyd.assetWithdraw.data = 0
-                _pyd.assetTaxDeferredWithdraw.data = _withdraw_dict[
-                    AccountType.TAXDEFERRED
-                ]
-                _pyd.assetRegularWithdraw.data = _withdraw_dict[AccountType.REGULAR]
-                _pyd.assetTaxFreeWithdraw.data = _withdraw_dict[AccountType.TAXFREE]
-
-                # print("Withdraws..")
-                for _asset_type, _amount in _withdraw_dict.items():
-                    _pyd.assetWithdraw.data += _amount
-                    if (
-                        _asset_type == AccountType.TAXDEFERRED
-                    ):  # these withdraws are seen as regular income
-                        _income_total += _amount
-                        _taxable_income_total += _amount
-                        # print(_amount)
-
-                # _pyd.surplusDeficit = _pyd.cashFlow + _pyd.assetWithdraw - _deficit
-            else:
-                _pyd.assetWithdraw.data = 0
-                _pyd.assetTaxDeferredWithdraw.data = 0
-                _pyd.assetRegularWithdraw.data = 0
-                _pyd.assetTaxFreeWithdraw.data = 0
-
-                _deficit = 0
-                # _pyd.surplusDeficit = _pyd.cashFlow
-                _withdraw_dict = {
-                    AccountType.REGULAR: 0,
-                    AccountType.TAXDEFERRED: 0,
-                }  # no withdraws...
-                # _income_total = 0
-
-            _pyd.taxableIncomeTotal.data = _taxable_income_total
             _pyd.incomeTotal.data = _income_total
 
-            # _pyd.assetWithdraw=0
-            # for _asset_type, _amount in _withdraw_dict.items():
-            #    _pyd.assetWithdraw+=_amount
-            #    if (
-            #        _asset_type == AccountType.TaxDeferred
-            #    ):  # these withdraws are seen as regular income
-            #        _income_total += _amount
-
-            """
-            _total = 0
-            _client_ira_total = 0
-            _spouse_ira_total = 0
-            _contribution_total = 0
             for _src in self._Assets:
-                _src.calc_balance()
-                if (
-                    _src.ContributionBeginDate.year <= _year
-                    and _src.ContributionEndDate.year >= _year
-                ):
-                    _src.deposit(_src.Contribution)
-                    _pyd.assetContributions[_src.Name] = _src.Contribution
-                    _contribution_total += _src.Contribution
-                else:
-                    _pyd.assetContributions[_src.Name] = 0
+                _src.calc_interest(self._inflation)
+                _src.end_of_year_bookkeeping()
 
-                _pyd.assetSources[_src.Name] = _src.Balance
+                _pyd.assetTotalBalance.data += _src.balance
+                _pyd.assetTotalDeposits.data += _src.totalDeposits
+                _pyd.assetTotalWithdraws.data += _src.totalWithdraws
+                _pyd.assetTotalReturns.data += _src.interest
+                _pyd.assetTotalContributions.data += _src.contributions
 
-                if _src.Type == AccountType.TaxDeferred:
-                    if _src.Owner == AccountOwnerType.Client:
-                        _client_ira_total += _src.Balance
-                    elif _src.Owner == AccountOwnerType.Spouse:
-                        _spouse_ira_total += _src.Balance
+                _pyd.assetSources.append(DataItem(_src.Name, "${:,}", _src.balance))
 
-                _total += _src.Balance
+                match _src.Type:
+                    case AccountType.TAXDEFERRED:
+                        # _pyd.assetTaxDeferredBalance.data += _src.balance
+                        # _pyd.assetTaxDeferredDeposits.data += _src.totalDeposits
+                        _pyd.assetTaxDeferredWithdraws.data += _src.totalWithdraws
+                        # _pyd.assetTaxDeferredReturns.data += _src.interest
+                        # _pyd.assetTaxDeferredContributions.data += _src.contributions
+                    case AccountType.TAXFREE:
+                        # _pyd.assetTaxFreeBalance.data += _src.balance
+                        # _pyd.assetTaxFreeDeposits.data += _src.totalDeposits
+                        _pyd.assetTaxFreeWithdraws.data += _src.totalWithdraws
+                        # _pyd.assetTaxFreeReturns.data += _src.interest
+                        # _pyd.assetTaxFreeContributions.data += _src.contributions
+                    case AccountType.REGULAR:
+                        # _pyd.assetRegularBalance.data += _src.balance
+                        # _pyd.assetRegularDeposits.data += _src.totalDeposits
+                        # _pyd.assetRegularWithdraws.data += _src.totalWithdraws
+                        _pyd.assetRegularReturns.data += _src.interest
+                        # _pyd.assetRegularContributions.data += _src.contributions
+                    case _:
+                        print("Error invalid AccountType %s" % (_src.Type))
 
-            _pyd.assetTotal = _total
-            _pyd.assetContributionTotal = _contribution_total
-            """
+            _pyd.taxableIncomeTotal.data = (
+                _pyd.incomeTotal.data
+                + _pyd.assetTaxDeferredWithdraws.data
+                + _pyd.assetRegularReturns.data
+            )
 
-            # _pyd.cashFlow -= _pyd.assetContributionTotal
-            _pyd.surplusDeficit.data = (
-                _pyd.cashFlow.data + _pyd.assetWithdraw.data
-            )  # - _deficit
-
-            # _pyd.cashFlow -= _contribution_total
-            # _pyd.surplusDeficit -= _contribution_total
-
+            # this is where we figure out the SS Taxes based on our total income for the year
             if _pyd.ssIncomeTotal.data > 0:
                 if self.InTodaysDollars:
                     _num = _pyd.projectionYear.data - _year
@@ -747,49 +735,26 @@ class Projections(QRunnable):
 
             # _surplusWithdraw = 0
             if self.UseSurplusAccount:
-                _surplusAccount.add_interest()
+                _surplusAccount.calc_interest(self._inflation)
                 # should we calculate this years interest after deposits/withdraws or before?
                 # does it really matter?
 
                 if _pyd.surplusDeficit.data < 0:
-                    _pyd.surplusWithdraw.data, _pyd.surplusDeficit.data = (
-                        _surplusAccount.withdraw(abs(_pyd.surplusDeficit.data))
-                    )
-                    _pyd.assetWithdraw.data += _pyd.surplusWithdraw.data
+                    if _surplusAccount.balance >= _pyd.surplusDeficit.data:
+                        _surplusAccount.withdraw(_pyd.surplusDeficit.data)
+                        _pyd.surplusDeficit.data = 0
+                    # _pyd.surplusWithdraw.data, _pyd.surplusDeficit.data = (
+                    #    _surplusAccount.withdraw(abs(_pyd.surplusDeficit.data))
+                    # )
+                    # _pyd.assetWithdraw.data += _pyd.surplusWithdraw.data
                 else:
                     _surplusAccount.deposit(_pyd.surplusDeficit.data)
-                    _pyd.surplusWithdraw.data = 0
+                    # _pyd.surplusWithdraw.data = 0
 
-                """
-                if _surplusBalance > 0:  #only add in interest if balance is positive..  #todo when balance is negative.
-                   _surplusBalance = int(
-                      _surplusBalance * (1.0 + self.SurplusAccountInterestRate / 100.0)
-                   )
-                   if _pyd.surplusDeficit < 0:  # we have a deficit, so let us take it from the surplus account
-                      if (
-                        _surplusBalance >= abs(_pyd.surplusDeficit)
-                      ):  # we have enough to take care of the full deficit
-                        _surplusWithdraw = abs(_pyd.surplusDeficit)
-                        _surplusBalance -= _surplusWithdraw
-                        _pyd.surplusDeficit = 0
-                        _pyd.surplusBalance = _surplusBalance
-                      else:
-                        _surplusWithdraw = _surplusBalance
-                        _pyd.surplusDeficit -= _surplusWithdraw
-                        # _surplusWithdraw = _surplusBalance
-                        _pyd.surplusBalance = _surplusBalance = _pyd.surplusDeficit
-                        _pyd.surplusWithdraw= _surplusWithdraw
-                    #else:
-                 
-                
-                if _pyd.surplusDeficit > 0:  # we have no deficit, and possibly a surplus...
-                   _surplusBalance += _pyd.surplusDeficit
-                   _pyd.surplusWithdraw=_surplusWithdraw = 0
-                   _pyd.surplusBalance = _surplusBalance
-                
-                """
                 _pyd.surplusBalance.data = _surplusAccount.balance
-                _pyd.assetTotal.data += _pyd.surplusBalance.data
+                # _pyd.assetTotal.data += _pyd.surplusBalance.data
+
+            # print(_pyd.taxableIncome, _pyd.federalMarginalTaxRate)
 
             # federal poverty level...
             _fpl = FederalPovertyLevel(2 if _spouseIsAlive else 1)
@@ -834,19 +799,25 @@ class Projections(QRunnable):
                 _pyd.taxableIncomeTotal.data
             )
 
-            # print(_pyd.taxableIncome, _pyd.federalMarginalTaxRate)
-
             # asset withdraw rate  (AWR)
             if self.UseSurplusAccount:
                 _pyd.AW.data = -_pyd.cashFlow.data
             else:
                 _pyd.AW.data = _pyd.assetWithdraw.data
 
-            if _pyd.assetTotal.data == 0:
+            if _pyd.assetTotalBalance.data == 0:
                 _pyd.AWR.data = 0.0
             else:
-                _pyd.AWR.data = 100.0 * _pyd.AW.data / _pyd.assetTotal.data
+                _pyd.AWR.data = 100.0 * _pyd.AW.data / _pyd.assetTotalBalance.data
 
             _projection_data.append(_pyd)
 
         self.signals.result.emit(_projection_data)
+
+    def _retrieve_asset_object(self, owner: AccountOwnerType, accountType: AccountType):
+        for _src in self._Assets:
+            if _src.Owner == owner and _src.Type == accountType:
+                return _src
+
+        # cannot find Account.. returning None
+        return None
