@@ -27,8 +27,8 @@ class Expense:
 
         self._annual_balance = 0
 
-    def set_COLA_Flag(self, flag: bool):
-        self._COLA_Flag = flag
+    # def set_COLA_Flag(self, flag: bool):
+    #    self._COLA_Flag = flag
 
     def get_COLA_Flag(self):
         return self._COLA_Flag

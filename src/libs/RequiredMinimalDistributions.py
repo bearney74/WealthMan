@@ -128,9 +128,7 @@ class RMDCalcs:
             return 0, 0.0, 0
 
         _boy_balance = self._iraAccount.beginning_of_year_balance()
-        # _rmd_pct = _clientRMD.calc(_last_day_of_year)
-        # _pyd.clientRMDPercent.data = _rmd_pct
-        self._withdraw_amount = (int(rmd_percent / 100.0 * _boy_balance),)
+        self.withdraw_amount = int(rmd_percent / 100.0 * _boy_balance)
 
         return self.withdraw_amount, rmd_percent, _boy_balance
 
