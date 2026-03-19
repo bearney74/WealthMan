@@ -60,6 +60,24 @@ class FederalTaxTest(unittest.TestCase):
                 "Taxable Income=$%s, expected taxes=$%s" % (_amount, _taxes),
             )
 
+    def effective_tax_rate(self):
+        _tax = FederalTax(
+            FileStatus=FederalTaxStatusType.MARRIED_FILING_JOINTLY, Year=Year
+        )
+
+        self.assertEqual(0.0, _tax.effective_tax_rate(taxes=0, total_income=0))
+        self.assertEqual(
+            25.0, _tax.effective_tax_rate(taxes=25_000, total_income=100_000)
+        )
+
+    def test_marginal_tax_rate(self):
+        _tax = FederalTax(
+            FileStatus=FederalTaxStatusType.MARRIED_FILING_JOINTLY, Year=Year
+        )
+        self.assertEqual(_tax.marginal_tax_rate(10_000), 0.0)
+
+        self.assertEqual(_tax.marginal_tax_rate(40_000), 10.0)
+
 
 if __name__ == "__main__":
     unittest.main()

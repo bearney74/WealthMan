@@ -79,21 +79,24 @@ class FederalTax(ImportHelper):
         return _dict
 
     # long term capital gains..
-    def calc_ltcg_taxes(self, capital_gains: int) -> int:
-        _total = 0
-        for _rate, _dict in self.LongTermCapitalGains.items():
-            _begin = _dict["Begin"]
-            if _begin is None:
-                _begin = 0
-            _end = _dict["End"]
+    # fix me!
+    # I believe this logic is incorrect.  I believe taxable income is also a variable..
+    # do some research to figure out how to do this right...
+    # def calc_ltcg_taxes(self, capital_gains: int) -> int:
+    #    _total = 0
+    #    for _rate, _dict in self.LongTermCapitalGains.items():
+    #        _begin = _dict["Begin"]
+    #        if _begin is None:
+    #            _begin = 0
+    #        _end = _dict["End"]
 
-            if capital_gains >= _begin:
-                if _end is None or capital_gains <= _end:
-                    _total += (capital_gains - _begin) * _rate / 100.0
-                elif capital_gains > _end:
-                    _total += (_end - _begin) * _rate / 100.0
+    #        if capital_gains >= _begin:
+    #            if _end is None or capital_gains <= _end:
+    #                _total += (capital_gains - _begin) * _rate / 100.0
+    #            elif capital_gains > _end:
+    #                _total += (_end - _begin) * _rate / 100.0
 
-        return int(_total)
+    #    return int(_total)
 
     def calc_taxes(self, taxable_income: int) -> int:
         _total = 0
