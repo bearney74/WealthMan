@@ -77,9 +77,15 @@ class MiscInfoTab(QWidget):
         d.avgInflationRate = self._inflation_rate.get_float()
         d.avgInflationRateStdDev = self._inflation_stdDev.get_float()
 
+        d.pctStocks = self._pctStocks.get_float()
+        d.pctBonds = self._pctBonds.get_float()
+
     def import_data(self, d: DataVariables):
         self._number_of_runs.setText(d.numberOfRuns)
         self._ror.setText(d.avgROR)
         self._ror_stdDev.setText(d.avgRORStdDev)
         self._inflation_rate.setText(d.avgInflationRate)
         self._inflation_stdDev.setText(d.avgInflationRateStdDev)
+
+        self._pctStocks.setText(d.pctStocks)
+        self._pctBonds.setText(d.pctBonds)

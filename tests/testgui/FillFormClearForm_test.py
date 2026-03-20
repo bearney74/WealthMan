@@ -14,13 +14,16 @@ class FillFormClearForm(TestCaseQt):
         TestCaseQt.setUp(self)
 
         self.form = Main()
-        self.BasicInfoTab = self.form.InputsTab.BasicInfoTab
-        self.AssetInfoTab = self.form.InputsTab.AssetInfoTab
-        self.IncomeInfoTab = self.form.InputsTab.IncomeInfoTab
-        self.GlobalVariablesTab = self.form.InputsTab.GlobalVariablesTab
+        # self.InputsTab=self.form.InputsTab
+        # self.BasicInfoTab = self.form.InputsTab.BasicInfoTab
+        # self.AssetInfoTab = self.form.InputsTab.AssetInfoTab
+        # self.IncomeInfoTab = self.form.InputsTab.IncomeInfoTab
+        # self.GlobalVariablesTab = self.form.InputsTab.GlobalVariablesTab
+        # self.MiscInfoTab = self.form.InputsTab.MiscInfoTab
 
     def tearDown(self):
         TestCaseQt.tearDown(self)
+        self.qapp.exit()
 
     def _testString(self, variable, s):
         variable.setText(s)
@@ -59,10 +62,12 @@ class FillFormClearForm(TestCaseQt):
         self.assertEqual(variable.isChecked(), value)
 
     def test_BasicInfoTab_client(self):
-        _client = self.BasicInfoTab._clientinfo
-        _spouse = self.BasicInfoTab._spouseinfo
+        _bit = self.form.InputsTab.BasicInfoTab
 
-        _status = self.BasicInfoTab._clientinfo._status
+        _client = _bit._clientinfo
+        _spouse = _bit._spouseinfo
+
+        _status = _bit._clientinfo._status
 
         self._testString(_client._name, "Hairy Johnson")
         self._testString(_client._name, "")
@@ -81,7 +86,7 @@ class FillFormClearForm(TestCaseQt):
         self.assertEqual(_status.get(), RelationStatusType.MARRIED)
 
     def test_BasicInfoTab_spouse(self):
-        _spouse = self.BasicInfoTab._spouseinfo
+        _spouse = self.form.InputsTab.BasicInfoTab._spouseinfo
 
         self._testString(_spouse._name, "Hairy Johnson")
         self._testString(_spouse._name, "")
@@ -93,9 +98,11 @@ class FillFormClearForm(TestCaseQt):
         self._testAge(_spouse._lifespan_age, "")
 
     def test_IncomeTab_SocialSecurity(self):
-        _clientSS = self.IncomeInfoTab.clientSS
+        _incometab = self.form.InputsTab.IncomeInfoTab
 
-        for _widget in (self.IncomeInfoTab.clientSS, self.IncomeInfoTab.spouseSS):
+        # _clientSS = _incometab.clientSS
+
+        for _widget in (_incometab.clientSS, _incometab.spouseSS):
             self._testMoney(_widget.Amount, "1234")
             self._testMoney(_widget.Amount, "")
 
@@ -103,7 +110,7 @@ class FillFormClearForm(TestCaseQt):
             self._testAge(_widget.BeginAge, "")
 
         # pension data....
-        _incometab = self.IncomeInfoTab
+        # _incometab = self.IncomeInfoTab
         self.assertEqual(_incometab.pension1Owner.currentText(), "Client")
 
         self._testMoney(_incometab.pension1Amount, "1234")
@@ -142,8 +149,24 @@ class FillFormClearForm(TestCaseQt):
 
         # need to add income sources...
 
+    def test_ExpenseTab(self):
+        _expensetab = self.form.InputsTab.ExpenseInfoTab
+        # todo
+        # add some test for the expense tab
+
+    def test_Assets(self):
+        _assettab = self.form.InputsTab.AssetInfoTab
+        # todo
+        # add some tests for the assets tab
+
+    def test_Transfers(self):
+        _transfertab = self.form.InputsTab.TransferInfoTab
+        # todo
+        # add some tests for the transfer tab
+
     def test_GlobalVariablesTab(self):
-        _gvt = self.GlobalVariablesTab
+        _gvt = self.form.InputsTab.GlobalVariablesTab
+
         self._testAge(_gvt._forecast_years, "33")
         self._testAge(_gvt._forecast_years, "")
 
@@ -172,6 +195,29 @@ class FillFormClearForm(TestCaseQt):
 
         self._testPercent(_gvt._SurplusAccountInterestRate, "2.9")
         self._testPercent(_gvt._SurplusAccountInterestRate, "")
+
+    def test_MiscTab(self):
+        _misc = self.form.InputsTab.MiscInfoTab
+
+        # test defaults
+        self.assertEqual(_misc._ror.get_float(), 11.85)
+        self.assertEqual(_misc._ror_stdDev.get_float(), 19.40)
+
+        self.assertEqual(_misc._inflation_rate.get_float(), 3.11)
+        self.assertEqual(_misc._inflation_stdDev.get_float(), 3.90)
+
+        self._testPercent(_misc._ror, "9.8")
+        self._testPercent(_misc._ror, "")
+
+        self._testPercent(_misc._inflation_rate, "2.5")
+        self._testPercent(_misc._inflation_stdDev, "")
+
+        # historial Analysis variables
+        self._testPercent(_misc._pctStocks, "9.8")
+        self._testPercent(_misc._pctStocks, "")
+
+        self._testPercent(_misc._pctBonds, "2.5")
+        self._testPercent(_misc._pctBonds, "")
 
 
 if __name__ == "__main__":

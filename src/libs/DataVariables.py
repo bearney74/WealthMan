@@ -189,6 +189,10 @@ class DataVariables:
     avgInflationRate: float = None
     avgInflationRateStdDev: float = None
 
+    # Historial Analysis
+    pctStocks: float = None
+    pctBonds: float = None
+
     # historical analysis variables
     # fix me  (allow for multiple allocations based on periods of time???)
     # pctStocks
@@ -294,6 +298,9 @@ class DataVariablesSchema(Schema):
     avgRORStdDev = fields.Float(allow_none=True)
     avgInflationRate = fields.Float(allow_none=True)
     avgInflationRateStdDev = fields.Float(allow_none=True)
+
+    pctStocks = fields.Float(allow_none=True)
+    pctBonds = fields.Float(allow_none=True)
 
     @post_load
     def make_instance(self, data, **kwargs):

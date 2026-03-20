@@ -197,12 +197,12 @@ class TestCaseQt(unittest.TestCase):
             )
 
         if len(widgets) > allowedLeakingWidgets:
+            # import weakref
             # for _widget in widgets:
-            #    _ref = weakref.ref(_widget)
-            #    _widget = None
-            #    self.qWaitForDestroy(_ref)
+            #   _ref = weakref.ref(_widget)
+            #   _widget = None
+            #   self.qWaitForDestroy(_ref)
             # TODO: fix me...
-            # raise RuntimeError("Test ended with widgets alive: %s" % str(widgets))
             # raise RuntimeError("Test ended with widgets alive: %s" % str(widgets))
             pass
 

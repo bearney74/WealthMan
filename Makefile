@@ -2,6 +2,8 @@ ruff:
 	ruff check
 	ruff format
 
+test: unittests
+
 unittest: unittests
 
 unittests:
