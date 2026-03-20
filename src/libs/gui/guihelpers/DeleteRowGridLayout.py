@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QGridLayout, QLabel, QPushButton, QLineEdit
+from PyQt6.QtWidgets import QGridLayout, QLabel, QPushButton, QLineEdit, QWidgetItem
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtCore import QSize
 
@@ -18,12 +18,7 @@ class DeleteRowGridLayout(QGridLayout):
     def set_header(self, header):
         _col = 0
         for item in header:
-            if "\n" in item:
-                _label = QLabel(item, wordWrap=True)
-            else:
-                _label = QLabel(item)
-
-            self.addWidget(_label, 0, _col)
+            self.addWidget(QLabel(item, wordWrap="\n" in item), 0, _col)
             _col += 1
 
         # add delete column to header
@@ -47,8 +42,10 @@ class DeleteRowGridLayout(QGridLayout):
     def _delete_row(self, row_id):
         for _i in range(0, self.columnCount()):
             _item = self.itemAtPosition(row_id, _i)
-            self.removeWidget(_item.widget())
-            # self.removeItem(_item)
+            if isinstance(_item, QWidgetItem):
+                self.removeWidget(_item.widget())
+            elif _item is not None:
+                self.removeItem(_item)  # not sure if this ever gets called
             del _item
 
     def get_data(self):
@@ -78,6 +75,7 @@ class DeleteRowGridLayout(QGridLayout):
         return _flag, _data
 
     def clear(self):
+        # header row is at 0, (so start deleting at row 1)
         for _i in range(1, self.rowCount()):
             self._delete_row(_i)
 

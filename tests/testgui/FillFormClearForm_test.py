@@ -4,8 +4,11 @@ import sys
 
 sys.path.append("src")
 
-from libs.EnumTypes import RelationStatusType
+from PyQt6.QtWidgets import QWidgetItem, QPushButton
+from libs.DataVariables import DataVariables
+from libs.EnumTypes import RelationStatusType, PersonType
 from main import Main
+
 from tests.TestCaseQt import TestCaseQt
 
 
@@ -14,12 +17,6 @@ class FillFormClearForm(TestCaseQt):
         TestCaseQt.setUp(self)
 
         self.form = Main()
-        # self.InputsTab=self.form.InputsTab
-        # self.BasicInfoTab = self.form.InputsTab.BasicInfoTab
-        # self.AssetInfoTab = self.form.InputsTab.AssetInfoTab
-        # self.IncomeInfoTab = self.form.InputsTab.IncomeInfoTab
-        # self.GlobalVariablesTab = self.form.InputsTab.GlobalVariablesTab
-        # self.MiscInfoTab = self.form.InputsTab.MiscInfoTab
 
     def tearDown(self):
         TestCaseQt.tearDown(self)
@@ -100,8 +97,6 @@ class FillFormClearForm(TestCaseQt):
     def test_IncomeTab_SocialSecurity(self):
         _incometab = self.form.InputsTab.IncomeInfoTab
 
-        # _clientSS = _incometab.clientSS
-
         for _widget in (_incometab.clientSS, _incometab.spouseSS):
             self._testMoney(_widget.Amount, "1234")
             self._testMoney(_widget.Amount, "")
@@ -110,7 +105,6 @@ class FillFormClearForm(TestCaseQt):
             self._testAge(_widget.BeginAge, "")
 
         # pension data....
-        # _incometab = self.IncomeInfoTab
         self.assertEqual(_incometab.pension1Owner.currentText(), "Client")
 
         self._testMoney(_incometab.pension1Amount, "1234")
@@ -151,8 +145,48 @@ class FillFormClearForm(TestCaseQt):
 
     def test_ExpenseTab(self):
         _expensetab = self.form.InputsTab.ExpenseInfoTab
-        # todo
-        # add some test for the expense tab
+
+        self.assertEqual(
+            _expensetab.gridLayout.rowCount(), 1
+        )  # there is a header row..
+
+        _expensetab._add_expense_button.click()
+
+        self.assertEqual(_expensetab.gridLayout.rowCount(), 2)
+
+        # row #3
+        # _data=["my data", 123, None, PersonType.CLIENT, 25, 30]
+        _expensetab._add_row("my data", 123, "", PersonType.CLIENT, 25, 30)
+        self.assertEqual(_expensetab.gridLayout.rowCount(), 3)
+
+        dv = DataVariables()
+        _expensetab.export_data(dv)
+
+        self.assertEqual(2, len(dv.expenses))
+        _rec = dv.expenses[1]
+
+        self.assertEqual("my data", _rec.descr)
+        self.assertEqual(123, _rec.amount)
+        self.assertIsNone(_rec.COLA)
+        self.assertEqual(PersonType.CLIENT, _rec.owner)
+        self.assertEqual(25, _rec.begin_age)
+        self.assertEqual(30, _rec.end_age)
+
+        # click on a rows delete button to see if it will delete the data..
+        _delete_button = _expensetab.gridLayout.itemAtPosition(2, 6)
+        assert isinstance(_delete_button, QWidgetItem)
+        assert isinstance(_delete_button.widget(), QPushButton)
+        # self.assertIsNotNone(_delete_button.widget())
+        _delete_button.widget().click()
+
+        dv1 = DataVariables()
+        _data1 = _expensetab.export_data(dv1)
+        self.assertEqual(1, len(dv1.expenses))
+
+        _expensetab.clear_form()
+        dv2 = DataVariables()
+        _data1 = _expensetab.export_data(dv2)
+        self.assertEqual(1, len(dv1.expenses))  # header should still exist..
 
     def test_Assets(self):
         _assettab = self.form.InputsTab.AssetInfoTab
