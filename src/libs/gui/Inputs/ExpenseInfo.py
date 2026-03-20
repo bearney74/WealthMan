@@ -30,7 +30,7 @@ class ExpenseInfoTab(QWidget):
         _layout.addWidget(self._add_expense_button)
 
         # Table will fit the screen horizontally
-        self.gridLayout = DeleteRowGridLayout()  # QGridLayout()
+        self.gridLayout = DeleteRowGridLayout(self)  # QGridLayout()
         self.gridLayout.set_header(
             [
                 "Description",

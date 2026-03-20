@@ -29,7 +29,7 @@ class TransferInfoTab(QWidget):
         _layout.addWidget(self._add_transfer_button)
 
         # Table will fit the screen horizontally
-        self.gridLayout = DeleteRowGridLayout()  # QGridLayout()
+        self.gridLayout = DeleteRowGridLayout(self)  # QGridLayout()
         self.gridLayout.set_header(
             [
                 "Transfer Name",

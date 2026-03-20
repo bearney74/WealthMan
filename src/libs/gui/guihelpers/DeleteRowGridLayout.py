@@ -1,19 +1,17 @@
-from PyQt6.QtWidgets import QGridLayout, QLabel, QPushButton, QLineEdit, QWidgetItem
-from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtWidgets import QGridLayout, QLabel, QPushButton, QWidgetItem, QStyle
+from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import QSize
-
-from libs.resources import qt_assets
-
-# make ruff happy..
-dir(qt_assets)
 
 
 class DeleteRowGridLayout(QGridLayout):
-    def __init__(self):
+    def __init__(self, parent):
         super(DeleteRowGridLayout, self).__init__()
+        self.parent = parent
         self._number_of_rows = 0
 
-        self._icon = QIcon(QPixmap(":images/delete.png"))
+        _pixmapi = QStyle.StandardPixmap.SP_DialogDiscardButton
+        self._icon = QIcon(self.parent.style().standardIcon(_pixmapi))
+        # self._icon = QIcon(QPixmap(":images/delete.png"))
 
     def set_header(self, header):
         _col = 0
@@ -78,34 +76,3 @@ class DeleteRowGridLayout(QGridLayout):
         # header row is at 0, (so start deleting at row 1)
         for _i in range(1, self.rowCount()):
             self._delete_row(_i)
-
-
-if __name__ == "__main__":
-    import sys
-    from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
-    from PyQt6.QtCore import Qt
-
-    class MainWindow(QWidget):
-        def __init__(self):
-            super().__init__()
-            self.setWindowTitle("QGridLayout Example")
-
-            _layout = QVBoxLayout()
-            _layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-
-            grid = DeleteRowGridLayout()
-            grid.set_header(["Name", "Item", "Edit"])
-
-            # Adding widgets to specific (row, column)
-            for _i in range(0, 5):
-                grid.add_row(
-                    [QLabel("my name %s" % _i), QLabel("my Item %s" % _i), QLineEdit()]
-                )
-
-            _layout.addLayout(grid)
-            self.setLayout(_layout)
-
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec())

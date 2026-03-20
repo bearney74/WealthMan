@@ -18,7 +18,7 @@ class MyTestApp(QMainWindow):
         super().__init__()
 
         # Table will fit the screen horizontally
-        self.gridLayout = DeleteRowGridLayout()  # QGridLayout()
+        self.gridLayout = DeleteRowGridLayout(self)  # QGridLayout()
         self.gridLayout.set_header(
             [
                 "Description",
