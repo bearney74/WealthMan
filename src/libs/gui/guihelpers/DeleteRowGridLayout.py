@@ -69,7 +69,7 @@ class DeleteRowGridLayout(QGridLayout):
 
     def rowDeleteButton(self, row_id):
         _item = self.itemAtPosition(row_id, self.columnCount() - 1)
-        print(_item)
+
         assert isinstance(_item, QWidgetItem)
         assert isinstance(_item.widget(), QPushButton)
 

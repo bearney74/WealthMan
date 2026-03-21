@@ -2,7 +2,7 @@ from datetime import datetime, date
 from enum import Enum, StrEnum
 
 from PyQt6.QtWidgets import QLineEdit, QWidget, QComboBox, QHBoxLayout, QLabel
-from PyQt6.QtGui import QIntValidator, QDoubleValidator, QValidator
+from PyQt6.QtGui import QIntValidator, QDoubleValidator
 
 from ...EnumTypes import (
     AccountOwnerType,
@@ -68,32 +68,6 @@ class IntegerEntry(Entry):
         return None
 
 
-class IntRangeValidator(QIntValidator):
-    def __init__(self, bottom, top, parent=None):
-        super(IntRangeValidator, self).__init__(bottom, top, parent)
-        # self.parent=parent
-
-        self.min = bottom
-        self.max = top
-
-    def validate(self, string, pos):
-        try:
-            _int = int(string)
-            _ok = True
-        except ValueError:
-            _ok = False
-
-        if pos < len("%s" % self.min) and pos < len("%s" % self.max):
-            self.parent.setStyleSheet("color: red")
-            return (QValidator.State.Intermediate, string, pos)
-
-        if _ok and _int >= self.min and _int <= self.max:
-            self.parent.setStyleSheet("color: black")
-            return (QValidator.State.Acceptable, string, pos)
-
-        return (QValidator.State.Invalid, string, pos)
-
-
 class IntegerRangeEntry(IntegerEntry):
     def __init__(self, parent=None, min=0, max=99, limit_size=30):
         super(IntegerRangeEntry, self).__init__(parent=parent)
@@ -107,7 +81,6 @@ class AgeEntry(IntegerEntry):
         super(AgeEntry, self).__init__(parent=parent)
 
         self.setFixedWidth(30)
-        # self.setValidator(IntRangeValidator(bottom=min, top=max, parent=self))
         self.setValidator(QIntValidator(bottom=min, top=max, parent=self))
 
 
@@ -116,7 +89,7 @@ class YearEntry(IntegerEntry):
         super(YearEntry, self).__init__(parent=parent)
 
         self.setFixedWidth(60)
-        self.setValidator(IntRangeValidator(bottom=min, top=max, parent=self))
+        self.setValidator(QIntValidator(bottom=min, top=max, parent=self))
 
 
 class MoneyEntry(IntegerEntry):
