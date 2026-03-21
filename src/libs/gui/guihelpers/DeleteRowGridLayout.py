@@ -22,7 +22,7 @@ class DeleteRowGridLayout(QGridLayout):
         # add delete column to header
         self.addWidget(QLabel("Delete"), 0, _col)
 
-    def add_row(self, data):
+    def add_row(self, data) -> int:
         self._number_of_rows += 1
         for _i, _item in enumerate(data):
             self.addWidget(_item, self._number_of_rows, _i)
@@ -37,6 +37,8 @@ class DeleteRowGridLayout(QGridLayout):
         _button.setIcon(self._icon)
         _button.setIconSize(QSize(32, 32))
 
+        return self._number_of_rows
+
     def _delete_row(self, row_id):
         for _i in range(0, self.columnCount()):
             _item = self.itemAtPosition(row_id, _i)
@@ -49,12 +51,29 @@ class DeleteRowGridLayout(QGridLayout):
     def get_data(self):
         """return all rows that have not been deleted"""
         _data = []
-        for _i in range(1, self.rowCount()):  # start with 1 to skip header row.
+        for _i in range(1, super().rowCount()):  # start with 1 to skip header row.
             _delete_flag, _row_data = self._get_row_data(_i)
             if not _delete_flag:  # this row was not deleted..
                 _data.append(_row_data)
 
         return _data
+
+    def rowCount(self):
+        _valid_rows = 0
+        for _i in range(1, super().rowCount()):  # start with 1 to skip header row.
+            _delete_flag, _row_data = self._get_row_data(_i)
+            if not _delete_flag:  # this row was not deleted..
+                _valid_rows += 1
+
+        return _valid_rows
+
+    def rowDeleteButton(self, row_id):
+        _item = self.itemAtPosition(row_id, self.columnCount() - 1)
+        print(_item)
+        assert isinstance(_item, QWidgetItem)
+        assert isinstance(_item.widget(), QPushButton)
+
+        return _item.widget()
 
     def _get_row_data(self, row_id):
         _data = []
@@ -74,5 +93,5 @@ class DeleteRowGridLayout(QGridLayout):
 
     def clear(self):
         # header row is at 0, (so start deleting at row 1)
-        for _i in range(1, self.rowCount()):
+        for _i in range(1, super().rowCount()):
             self._delete_row(_i)

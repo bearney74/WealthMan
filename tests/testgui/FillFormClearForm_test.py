@@ -58,7 +58,20 @@ class FillFormClearForm(TestCaseQt):
         variable.setChecked(value)
         self.assertEqual(variable.isChecked(), value)
 
-    def test_BasicInfoTab_client(self):
+    def test_tabs(self):
+        # just put all the tests under one tab so that we don't open
+        # bunch of applications (it appears that each "test function"
+        # creates a new instance of the application
+        self._test_BasicInfoTab()
+        self._test_BasicInfoTab_spouse()
+        self._test_IncomeTab_SocialSecurity()
+        self._test_ExpenseTab()
+        self._test_Assets()
+        self._test_Transfers()
+        self._test_GlobalVariablesTab()
+        self._test_MiscTab()
+
+    def _test_BasicInfoTab(self):
         _bit = self.form.InputsTab.BasicInfoTab
 
         _client = _bit._clientinfo
@@ -82,7 +95,7 @@ class FillFormClearForm(TestCaseQt):
         )  # setCurrentText(RelationStatus.Married.name)
         self.assertEqual(_status.get(), RelationStatusType.MARRIED)
 
-    def test_BasicInfoTab_spouse(self):
+    def _test_BasicInfoTab_spouse(self):
         _spouse = self.form.InputsTab.BasicInfoTab._spouseinfo
 
         self._testString(_spouse._name, "Hairy Johnson")
@@ -94,7 +107,7 @@ class FillFormClearForm(TestCaseQt):
         self._testAge(_spouse._lifespan_age, "69")
         self._testAge(_spouse._lifespan_age, "")
 
-    def test_IncomeTab_SocialSecurity(self):
+    def _test_IncomeTab_SocialSecurity(self):
         _incometab = self.form.InputsTab.IncomeInfoTab
 
         for _widget in (_incometab.clientSS, _incometab.spouseSS):
@@ -143,21 +156,21 @@ class FillFormClearForm(TestCaseQt):
 
         # need to add income sources...
 
-    def test_ExpenseTab(self):
+    def _test_ExpenseTab(self):
         _expensetab = self.form.InputsTab.ExpenseInfoTab
 
         self.assertEqual(
-            _expensetab.gridLayout.rowCount(), 1
+            _expensetab.gridLayout.rowCount(), 0
         )  # there is a header row..
 
         _expensetab._add_expense_button.click()
 
-        self.assertEqual(_expensetab.gridLayout.rowCount(), 2)
+        self.assertEqual(_expensetab.gridLayout.rowCount(), 1)
 
         # row #3
         # _data=["my data", 123, None, PersonType.CLIENT, 25, 30]
         _expensetab._add_row("my data", 123, "", PersonType.CLIENT, 25, 30)
-        self.assertEqual(_expensetab.gridLayout.rowCount(), 3)
+        self.assertEqual(_expensetab.gridLayout.rowCount(), 2)
 
         dv = DataVariables()
         _expensetab.export_data(dv)
@@ -188,17 +201,17 @@ class FillFormClearForm(TestCaseQt):
         _data1 = _expensetab.export_data(dv2)
         self.assertEqual(1, len(dv1.expenses))  # header should still exist..
 
-    def test_Assets(self):
+    def _test_Assets(self):
         _assettab = self.form.InputsTab.AssetInfoTab
         # todo
         # add some tests for the assets tab
 
-    def test_Transfers(self):
+    def _test_Transfers(self):
         _transfertab = self.form.InputsTab.TransferInfoTab
         # todo
         # add some tests for the transfer tab
 
-    def test_GlobalVariablesTab(self):
+    def _test_GlobalVariablesTab(self):
         _gvt = self.form.InputsTab.GlobalVariablesTab
 
         self._testAge(_gvt._forecast_years, "33")
@@ -230,7 +243,7 @@ class FillFormClearForm(TestCaseQt):
         self._testPercent(_gvt._SurplusAccountInterestRate, "2.9")
         self._testPercent(_gvt._SurplusAccountInterestRate, "")
 
-    def test_MiscTab(self):
+    def _test_MiscTab(self):
         _misc = self.form.InputsTab.MiscInfoTab
 
         # test defaults

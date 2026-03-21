@@ -19,10 +19,6 @@ class SingleMarried(TestCaseQt):
         # self.app=QApplication(sys.argv)
         # self.app.processEvents()
         self.form = Main()
-        self.BasicInfoTab = self.form.InputsTab.BasicInfoTab
-        self.AssetInfoTab = self.form.InputsTab.AssetInfoTab
-        self.IncomeInfoTab = self.form.InputsTab.IncomeInfoTab
-        self.GlobalVariablesTab = self.form.InputsTab.GlobalVariablesTab
 
     def tearDown(self):
         TestCaseQt.tearDown(self)
@@ -31,26 +27,32 @@ class SingleMarried(TestCaseQt):
         # del self.qapp
 
     def test_main(self):
-        _status = self.BasicInfoTab._clientinfo._status
+        _InputsTab = self.form.InputsTab
+        _BasicInfoTab = self.form.InputsTab.BasicInfoTab
+        _AssetInfoTab = self.form.InputsTab.AssetInfoTab
+        _IncomeInfoTab = self.form.InputsTab.IncomeInfoTab
+        _GlobalVariablesTab = self.form.InputsTab.GlobalVariablesTab
+
+        _status = self.form.InputsTab.BasicInfoTab._clientinfo._status
 
         self.assertEqual(_status.get(), RelationStatusType.SINGLE)
 
         # make sure that spouse widgets are disabled since We choose single
-        self.form.InputsTab.tabs.setCurrentIndex(0)  # select Basic Tab
-        self.assertFalse(self.BasicInfoTab._spouseinfo.isEnabled())
-        self.form.InputsTab.tabs.setCurrentIndex(3)  # select Basic Tab
-        self.assertFalse(self.AssetInfoTab._spouseinfo.isEnabled())
+        _InputsTab.tabs.setCurrentIndex(0)  # select Basic Tab
+        self.assertFalse(_BasicInfoTab._spouseinfo.isEnabled())
+        _InputsTab.tabs.setCurrentIndex(3)  # select Basic Tab
+        self.assertFalse(_AssetInfoTab._spouseinfo.isEnabled())
 
         # check IncomeInfo Tab
-        self.form.InputsTab.tabs.setCurrentIndex(1)  # select Income Tab..
-        self.assertFalse(self.IncomeInfoTab.spouseSS.isEnabled())
-        self.assertFalse(self.IncomeInfoTab.pension1OwnerLabel.isEnabled())
-        self.assertFalse(self.IncomeInfoTab.pension1Owner.isEnabled())
-        self.assertFalse(self.IncomeInfoTab.pension2OwnerLabel.isEnabled())
-        self.assertFalse(self.IncomeInfoTab.pension2Owner.isEnabled())
+        _InputsTab.tabs.setCurrentIndex(1)  # select Income Tab..
+        self.assertFalse(_IncomeInfoTab.spouseSS.isEnabled())
+        self.assertFalse(_IncomeInfoTab.pension1OwnerLabel.isEnabled())
+        self.assertFalse(_IncomeInfoTab.pension1Owner.isEnabled())
+        self.assertFalse(_IncomeInfoTab.pension2OwnerLabel.isEnabled())
+        self.assertFalse(_IncomeInfoTab.pension2Owner.isEnabled())
 
-        self.form.InputsTab.tabs.setCurrentIndex(5)  # select Global tab
-        self.assertFalse(self.GlobalVariablesTab._FilingStatusOnceWidowed.isEnabled())
+        _InputsTab.tabs.setCurrentIndex(5)  # select Global tab
+        self.assertFalse(_GlobalVariablesTab._FilingStatusOnceWidowed.isEnabled())
 
         # change status to Married...
         # _status.setCurrentText(RelationStatusType.Married.name)
@@ -58,21 +60,21 @@ class SingleMarried(TestCaseQt):
         self.assertEqual(_status.get(), RelationStatusType.MARRIED)
 
         # make sure that spouse widgets are enabled since We choose married
-        self.form.InputsTab.tabs.setCurrentIndex(0)  # select Basic Tab
-        self.assertTrue(self.BasicInfoTab._spouseinfo.isEnabled())
+        _InputsTab.tabs.setCurrentIndex(0)  # select Basic Tab
+        self.assertTrue(_BasicInfoTab._spouseinfo.isEnabled())
 
-        self.form.InputsTab.tabs.setCurrentIndex(3)  # select Asset
-        self.assertTrue(self.AssetInfoTab._spouseinfo.isEnabled())
+        _InputsTab.tabs.setCurrentIndex(3)  # select Asset
+        self.assertTrue(_AssetInfoTab._spouseinfo.isEnabled())
 
-        self.form.InputsTab.tabs.setCurrentIndex(1)  # select Income Tab..
-        self.assertTrue(self.IncomeInfoTab.spouseSS.isEnabled())
-        self.assertTrue(self.IncomeInfoTab.pension1OwnerLabel.isEnabled())
-        self.assertTrue(self.IncomeInfoTab.pension1Owner.isEnabled())
-        self.assertTrue(self.IncomeInfoTab.pension2OwnerLabel.isEnabled())
-        self.assertTrue(self.IncomeInfoTab.pension2Owner.isEnabled())
+        _InputsTab.tabs.setCurrentIndex(1)  # select Income Tab..
+        self.assertTrue(_IncomeInfoTab.spouseSS.isEnabled())
+        self.assertTrue(_IncomeInfoTab.pension1OwnerLabel.isEnabled())
+        self.assertTrue(_IncomeInfoTab.pension1Owner.isEnabled())
+        self.assertTrue(_IncomeInfoTab.pension2OwnerLabel.isEnabled())
+        self.assertTrue(_IncomeInfoTab.pension2Owner.isEnabled())
 
-        self.form.InputsTab.tabs.setCurrentIndex(5)  # select Global tab
-        self.assertTrue(self.GlobalVariablesTab._FilingStatusOnceWidowed.isEnabled())
+        _InputsTab.tabs.setCurrentIndex(5)  # select Global tab
+        self.assertTrue(_GlobalVariablesTab._FilingStatusOnceWidowed.isEnabled())
 
 
 if __name__ == "__main__":
