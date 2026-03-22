@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QSpacerItem, QSizePolicy
 
-from libs.gui.guihelpers.Entry import IntegerRangeEntry, FloatEntry, PercentEntry
+from libs.gui.guihelpers.Entry import IntegerEntry, FloatEntry, PercentEntry
 
 from libs.DataVariables import DataVariables
 
@@ -17,7 +17,9 @@ class MiscInfoTab(QWidget):
         formlayout.addRow(_title)
         # Monte Carlo Variables
 
-        self._number_of_runs = IntegerRangeEntry(parent, 100, 10_000, limit_size=50)
+        self._number_of_runs = IntegerEntry(
+            parent=parent, min=100, max=10_000, limit_size=50
+        )
         formlayout.addRow(QLabel("Number of Runs:"), self._number_of_runs)
 
         # avg rate of return

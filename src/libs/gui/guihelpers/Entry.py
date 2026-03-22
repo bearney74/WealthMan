@@ -46,50 +46,78 @@ class Entry(QLineEdit):
 
 
 class IntegerEntry(Entry):
-    def __init__(self, parent=None, limit_size: int = None):
+    def __init__(self, parent=None, min=None, max=None, limit_size: int = None):
         super(IntegerEntry, self).__init__(parent)
 
-        self.setValidator(QIntValidator(parent))
+        if limit_size is not None:
+            self.setFixedWidth(limit_size)
 
+        self.validator = QIntValidator(bottom=min, top=max, parent=parent)
+        self.setValidator(self.validator)
+
+        if min is None:
+            min = -100_000_000
+        self._min = min
+
+        if max is None:
+            max = 100_000_000
+        self._max = max
+
+        assert self._min < self._max
+
+    """
+    # is this necessary since we have check_value below?
     def is_valid(self):
         try:
             int(self.text())
             return True
         except ValueError:
             return False
+    """
+
+    def check_value(self, required=False):
+        _text = self.text()
+        if (
+            not required and _text.strip() == ""
+        ):  # a "" is a valid value for an optional field
+            return True
+
+        state, _, _ = self.validator.validate(_text, 0)
+
+        if state == QIntValidator.State.Acceptable:
+            # since IntValidator thinks this is an Acceptable value, lets turn it
+            # into an int and check that it is betwen our max and min values
+            try:
+                _value = int(_text)
+            except ValueError:
+                return False
+
+            return self._min <= _value <= self._max
+
+        # this value is not acceptable
+        return False
 
     def get_int(self, Default=None):
-        if self.text() is None or self.text().strip() == "":
+        _text = self.text()
+        if _text is None or _text.strip() == "":
             return Default
 
-        if self.is_valid():
-            return int(self.text())
+        try:
+            return int(_text)
+        except ValueError:
+            pass
 
         return None
 
 
-class IntegerRangeEntry(IntegerEntry):
-    def __init__(self, parent=None, min=0, max=99, limit_size=30):
-        super(IntegerRangeEntry, self).__init__(parent=parent)
-
-        self.setFixedWidth(limit_size)
-        self.setValidator(QIntValidator(bottom=min, top=max, parent=self))
-
-
 class AgeEntry(IntegerEntry):
     def __init__(self, parent=None, min=0, max=99):
-        super(AgeEntry, self).__init__(parent=parent)
-
-        self.setFixedWidth(30)
-        self.setValidator(QIntValidator(bottom=min, top=max, parent=self))
+        super(AgeEntry, self).__init__(parent=parent, min=min, max=max, limit_size=30)
 
 
 class YearEntry(IntegerEntry):
     def __init__(self, parent=None, min=1920, max=2099):
-        super(YearEntry, self).__init__(parent=parent)
-
-        self.setFixedWidth(60)
-        self.setValidator(QIntValidator(bottom=min, top=max, parent=self))
+        super(YearEntry, self).__init__(parent=parent, min=min, max=max, limit_size=60)
 
 
 class MoneyEntry(IntegerEntry):
@@ -190,7 +218,6 @@ class PercentEntry(FloatEntry):
 
 class EnumEntry(QWidget):
     def __init__(self, enum_type: StrEnum, parent=None, limit_size: int = None):
-        # def __init__(self, parent, enum_type: Enum):
         super(EnumEntry, self).__init__(parent)
 
         if limit_size is not None:

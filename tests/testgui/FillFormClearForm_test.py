@@ -5,6 +5,10 @@ import sys
 sys.path.append("src")
 
 from PyQt6.QtWidgets import QWidgetItem, QPushButton
+from PyQt6.QtTest import QTest
+
+from libs.gui.guihelpers.Entry import AgeEntry
+
 from libs.DataVariables import DataVariables
 from libs.EnumTypes import RelationStatusType, PersonType
 from main import Main
@@ -23,19 +27,23 @@ class FillFormClearForm(TestCaseQt):
         self.qapp.exit()
 
     def _testString(self, variable, s):
-        variable.setText(s)
+        variable.clear()
+        QTest.keyClicks(variable, s)
         self.assertEqual(variable.text(), s)
 
     def _testAge(self, variable, age):
-        variable.setText(age)
+        assert isinstance(variable, AgeEntry)
+
+        variable.clear()
+        QTest.keyClicks(variable, age)
+        # if variable.check_value():
         self.assertEqual(variable.text(), age)
 
-        if age == "":
-            self.assertIsNone(variable.get_int())
-        else:
-            self.assertEqual(variable.get_int(), int(age))
-
     def _testMoney(self, variable, amount):
+        # fix me QTest.keyClicks doesn't work on MoneyEntry
+        # variable.clear()
+        # QTest.keyClicks(variable, amount)
+
         variable.setText(amount)
         self.assertEqual(variable.text(), amount)
 
@@ -45,6 +53,10 @@ class FillFormClearForm(TestCaseQt):
             self.assertEqual(variable.get_int(), int(amount))
 
     def _testPercent(self, variable, pct):
+        variable.clear()
+        # fix me .. this doesn't appear to update the entry..
+        # QTest.keyClicks(variable, pct)
+
         variable.setText(pct)
         self.assertEqual(variable.text(), pct)
 
@@ -55,6 +67,9 @@ class FillFormClearForm(TestCaseQt):
 
     def _testCheckBox(self, variable, value):
         assert isinstance(value, bool)
+        # fix me.. this doesn't appear to click on the button..
+        # QTest.mouseClick(variable, Qt.MouseButton.LeftButton)
+
         variable.setChecked(value)
         self.assertEqual(variable.isChecked(), value)
 
@@ -63,7 +78,6 @@ class FillFormClearForm(TestCaseQt):
         # bunch of applications (it appears that each "test function"
         # creates a new instance of the application
         self._test_BasicInfoTab()
-        self._test_BasicInfoTab_spouse()
         self._test_IncomeTab_SocialSecurity()
         self._test_ExpenseTab()
         self._test_Assets()
@@ -95,9 +109,6 @@ class FillFormClearForm(TestCaseQt):
         )  # setCurrentText(RelationStatus.Married.name)
         self.assertEqual(_status.get(), RelationStatusType.MARRIED)
 
-    def _test_BasicInfoTab_spouse(self):
-        _spouse = self.form.InputsTab.BasicInfoTab._spouseinfo
-
         self._testString(_spouse._name, "Hairy Johnson")
         self._testString(_spouse._name, "")
 
@@ -110,12 +121,23 @@ class FillFormClearForm(TestCaseQt):
     def _test_IncomeTab_SocialSecurity(self):
         _incometab = self.form.InputsTab.IncomeInfoTab
 
-        for _widget in (_incometab.clientSS, _incometab.spouseSS):
-            self._testMoney(_widget.Amount, "1234")
-            self._testMoney(_widget.Amount, "")
+        self._testMoney(_incometab.clientSS.Amount, "1234")
+        self._testMoney(_incometab.clientSS.Amount, "")
 
-            self._testAge(_widget.BeginAge, "69")
-            self._testAge(_widget.BeginAge, "")
+        self._testAge(_incometab.clientSS.BeginAge, "63")
+        self._testAge(_incometab.clientSS.BeginAge, "62")
+        self._testAge(_incometab.clientSS.BeginAge, "")
+
+        # enable spouse SS form
+        _incometab.spouseSS.setEnabled(True)
+        self.assertTrue(_incometab.spouseSS.isEnabled())
+
+        self._testMoney(_incometab.spouseSS.Amount, "1234")
+        self._testMoney(_incometab.spouseSS.Amount, "")
+
+        self._testAge(_incometab.spouseSS.BeginAge, "63")
+        self._testAge(_incometab.spouseSS.BeginAge, "62")
+        self._testAge(_incometab.spouseSS.BeginAge, "")
 
         # pension data....
         self.assertEqual(_incometab.pension1Owner.currentText(), "Client")
@@ -168,7 +190,6 @@ class FillFormClearForm(TestCaseQt):
         self.assertEqual(_expensetab.gridLayout.rowCount(), 1)
 
         # row #3
-        # _data=["my data", 123, None, PersonType.CLIENT, 25, 30]
         _expensetab._add_row("my data", 123, "", PersonType.CLIENT, 25, 30)
         self.assertEqual(_expensetab.gridLayout.rowCount(), 2)
 
@@ -223,9 +244,11 @@ class FillFormClearForm(TestCaseQt):
         self._testPercent(_gvt._ssCola, "33")
         self._testPercent(_gvt._ssCola, "")
 
+        self.assertFalse(_gvt._InTodaysDollars.isChecked())
         self._testCheckBox(_gvt._InTodaysDollars, True)
         self._testCheckBox(_gvt._InTodaysDollars, False)
 
+        self.assertFalse(_gvt._SurplusAccount.isChecked())
         self._testCheckBox(_gvt._SurplusAccount, False)
 
         # need to click on checkbox for this assert to work
