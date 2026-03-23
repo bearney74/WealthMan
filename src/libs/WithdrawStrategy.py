@@ -7,6 +7,8 @@ logger = logging.getLogger(__name__)
 
 
 def WithdrawOrderType2List(withdrawOrder: WithdrawOrderType):
+
+    assert isinstance(withdrawOrder, WithdrawOrderType)
     """turns a WithdrawOrderType into a list of AccountTypes"""
     match withdrawOrder:
         case WithdrawOrderType.TAXDEFERRED_REGULAR_TAXFREE:
@@ -81,11 +83,7 @@ class WithdrawStrategy:
                 case AccountType.TAXFREE:
                     self._assets += _TAXFREE
 
-    def reconcile_required_withdraw(self, deficit: int):
-        _dict = {}
-        _dict[AccountType.TAXDEFERRED] = 0
-        _dict[AccountType.TAXFREE] = 0
-        _dict[AccountType.REGULAR] = 0
+    def reconcile_required_withdraw(self, deficit: int) -> int:
         for _asset in self._assets:
             if _asset.balance <= 0:
                 continue
@@ -105,23 +103,18 @@ class WithdrawStrategy:
             # for these since I am taking money out of the accounts.
             # this may simplify the logic below somewhat..
             if deficit <= _asset.balance:
-                _dict[_asset.Type] += deficit
                 _asset.withdraw(deficit)
-                # _asset.Balance -= deficit
                 logger.debug(
                     "taking %s from %s when client is %s, spouse is %s"
                     % (deficit, _asset.Name, self.clientAge, self.spouseAge)
                 )
-                return 0, _dict  # resulting deficit
+                return 0  # resulting deficit
             elif _asset.balance > 0:  # deficit is greater than balance
-                _dict[_asset.Type] += _asset.balance
                 deficit -= _asset.balance
-                # print(_asset.balance)
                 _asset.withdraw(_asset.balance)
-                # _asset.Balance = 0
                 logger.debug(
                     "taking total balance of %s from %s when client is %s, spouse is %s"
                     % (deficit, _asset.Name, self.clientAge, self.spouseAge)
                 )
 
-        return deficit, _dict
+        return deficit

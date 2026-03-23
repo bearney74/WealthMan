@@ -251,8 +251,8 @@ class Brokerage(Account):
         # self.taxable_income = 0
 
     def calc_interest(self, inflation):
-        self._income = int(self._balance * (self.InterestRate - inflation / 100.0))
+        self._interest = int(self._balance * ((self.InterestRate - inflation) / 100.0))
 
-        self._taxable_income = self._income
+        self._taxable_income = self._interest
 
-        return self._income
+        return self._interest

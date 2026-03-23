@@ -68,12 +68,9 @@ class WithdrawOrderTest(unittest.TestCase):
             False,
             [_trad, _roth, _brokerage],
         )
-        _deficit, _dict = _ws.reconcile_required_withdraw(100)
+        _deficit = _ws.reconcile_required_withdraw(100)
 
         self.assertEqual(_deficit, 0)
-        self.assertEqual(_dict[AccountType.TAXDEFERRED], 100)
-        self.assertEqual(_dict[AccountType.TAXFREE], 0)
-        self.assertEqual(_dict[AccountType.REGULAR], 0)
         self.assertEqual(_trad.balance, 900)
         self.assertEqual(_roth.balance, 500)
         self.assertEqual(_brokerage.balance, 500)
@@ -105,12 +102,9 @@ class WithdrawOrderTest(unittest.TestCase):
             [_trad, _roth],
         )
 
-        _deficit, _dict = _ws.reconcile_required_withdraw(5_000)
+        _deficit = _ws.reconcile_required_withdraw(5_000)
 
         self.assertEqual(_deficit, 4000)
-        self.assertEqual(_dict[AccountType.TAXDEFERRED], 1000)
-        self.assertEqual(_dict[AccountType.TAXFREE], 0)
-        self.assertEqual(_dict[AccountType.REGULAR], 0)
         self.assertEqual(_trad.balance, 0)
         self.assertEqual(_roth.balance, 0)
 

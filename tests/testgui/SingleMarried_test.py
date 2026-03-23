@@ -15,9 +15,6 @@ class SingleMarried(TestCaseQt):
     def setUp(self):
         TestCaseQt.setUp(self)
 
-        # self.app=QApplication.instance() or QApplication(sys.argv) #QApplication(["--platform offscreen"])
-        # self.app=QApplication(sys.argv)
-        # self.app.processEvents()
         self.form = Main()
 
     def tearDown(self):

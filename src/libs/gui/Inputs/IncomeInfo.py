@@ -37,7 +37,7 @@ class SocialSecurityWidget(QWidget):
         _label.setToolTip("Full Retirement Age Amount")
         _flayout.addRow(_label, self.Amount)
 
-        self.BeginAge = AgeEntry(parent=self, min=62, max=70)
+        self.BeginAge = AgeEntry(self, min=62, max=70)
         _label = QLabel("Begin Age:")
         _label.setToolTip("Age between 62 and 70")
         _flayout.addRow(_label, self.BeginAge)

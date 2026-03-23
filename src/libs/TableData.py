@@ -54,6 +54,9 @@ class TableData:
             for _dataItem in _record.expenseSources:
                 _list.append(_dataItem)
 
+            # also add this years taxes, since this is technically an expense for this year..
+            _list.append(_record.thisYearsFederalTaxes)
+
             _list.append(_record.expenseTotal)
 
             _data.append(_list)
@@ -83,11 +86,10 @@ class TableData:
             _list.append(_record.ssIncomeTotal)
             _list.append(_record.activeIncomeTotal)
 
+            _list.append(_record.assetRegularReturns)
             _list.append(_record.incomeTotal)
 
             _list.append(_record.assetTaxDeferredWithdraws)
-            _list.append(_record.assetRegularReturns)
-
             _list.append(_record.taxableIncomeTotal)
 
             _data.append(_list)
@@ -185,7 +187,7 @@ class TableData:
 
             _list.append(_record.federalTaxFilingStatus)
 
-            _list.append(_record.lastYearsFederalTaxes)
+            # _list.append(_record.lastYearsFederalTaxes)
             _list.append(_record.thisYearsFederalTaxes)
 
             _list.append(_record.longTermCapitalGainsTaxes)

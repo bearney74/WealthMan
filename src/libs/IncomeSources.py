@@ -68,6 +68,7 @@ class IncomeSource:
         if self._period.isa_valid_period(year):
             return self._calc_income(inflation)
 
+        self._income = 0
         return 0
 
     def _calc_income(self, inflation=0.0) -> int:
@@ -91,6 +92,7 @@ class SocialSecurity(IncomeSource):
         Owner: PersonType,
         BirthDate: date,
         BeginAge: int,
+        LifeSpanAge: int,
         COLA: float = 0.0,
     ):
         # table used to figure out the SS benefit based on Age benefits start...
@@ -118,7 +120,9 @@ class SocialSecurity(IncomeSource):
         assert BeginAge >= 62
 
         _amount = self.calc_benefit_amount_by_age(BeginAge)
-        _period = PeriodValidator(birthYear=BirthDate.year, beginAge=BeginAge)
+        _period = PeriodValidator(
+            birthYear=BirthDate.year, beginAge=BeginAge, endAge=LifeSpanAge
+        )
         super(SocialSecurity, self).__init__(
             Name=Name,
             IncomeType=IncomeSourceType.SOCIAL_SECURITY,
@@ -166,4 +170,3 @@ class SocialSecurity(IncomeSource):
 
         # fix me!
         return self.FRAAmount
-        raise AssertionError

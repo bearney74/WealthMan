@@ -22,6 +22,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
             Person=_p,
             BirthDate=_p.birthDate,
             BeginAge=62,
+            LifeSpanAge=70,
             Owner=PersonType.CLIENT,
         )
         self.assertEqual(_ss.calc_full_retirement_age(), 67)
@@ -33,6 +34,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
             Person=_p,
             BirthDate=_p.birthDate,
             BeginAge=62,
+            LifeSpanAge=90,
             Owner=PersonType.CLIENT,
         )
         self.assertEqual(_ss.calc_full_retirement_age(), 67)
@@ -45,6 +47,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
             Person=_p,
             BirthDate=_p.birthDate,
             BeginAge=62,
+            LifeSpanAge=90,
             Owner=PersonType.CLIENT,
         )
         self.assertEqual(_ss.calc_full_retirement_age(), 66)
@@ -75,6 +78,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
                 Owner=PersonType.CLIENT,
                 # Period=_pv
                 BeginAge=_age,
+                LifeSpanAge=90,
             )
 
             self.assertEqual(_ss.calc_benefit_amount_by_age(_age), _amount)
@@ -102,6 +106,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
                 Owner=PersonType.CLIENT,
                 # Period=_pv,
                 BeginAge=_age,
+                LifeSpanAge=90,
             )
 
             self.assertEqual(_ss1.calc_benefit_amount_by_age(_age), _amount)
@@ -115,6 +120,7 @@ class SocialSecurityFRA67Test(unittest.TestCase):
                     Owner=PersonType.CLIENT,
                     # Period=_pv,
                     BeginAge=61,
+                    LifeSpanAge=90,
                 )
 
 
