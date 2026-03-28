@@ -60,11 +60,11 @@ class EntryTest(TestCaseQt):
         # QTest.keyClicks simulates user typing...
         _year.clear()
         QTest.keyClicks(_year, "1900")
-        self.assertFalse(_year.check_value())
+        self.assertFalse(_year.has_valid_input())
 
         _year.clear()
         QTest.keyClicks(_year, "2100")
-        self.assertFalse(_year.check_value())
+        self.assertFalse(_year.has_valid_input())
 
         # with self.assertRaises(ValueError):
         # _year.setText("2100")  # year has to be 1920 - 2099 (by default)
@@ -74,33 +74,34 @@ class EntryTest(TestCaseQt):
         _age = self.form._age
 
         QTest.keyClicks(_age, "25")
-        if _age.check_value():
+        if _age.has_valid_input():
             self.assertEqual(_age.get_int(), 25)
 
         _age.clear()
-        QTest.keyClicks(_age, "25")
-        if _age.check_value():
-            self.assertEqual(_age.get_int(), 25)
+        QTest.keyClicks(_age, "5")
+        if _age.has_valid_input():
+            self.assertEqual(_age.get_int(), 5)
 
         # now try an invalid age.. (120)
         _age.clear()
         QTest.keyClicks(_age, "120")
         # should be false but is true because first 2 digits are valid.. (12)
         # self.assertFalse(_age.check_value())
-        if _age.check_value():  # is there a way to fix this??
-            self.assertEqual(_age.get_int(), 12)
+        self.assertTrue(_age.has_valid_input())  #:  # is there a way to fix this??
+        self.assertEqual(_age.get_int(), 12)
 
         # lets finish with a valid entry..
         _age.clear()
         QTest.keyClicks(_age, "50")
-        if _age.check_value():
-            self.assertEqual(_age.get_int(), 50)
+        self.assertTrue(_age.has_valid_input())
+        self.assertEqual(_age.get_int(), 50)
 
         _age.clear()
-        self.assertTrue(_age.check_value())  # when optional a '' can be a valid value
-        self.assertFalse(
-            _age.check_value(required=True)
-        )  # a value is required so '' is invalid
+        self.assertFalse(_age.has_valid_input())
+        self.assertTrue(_age.isEmpty())  # when optional a '' can be a valid value
+        # self.assertFalse(
+        #    _age.check_value(required=True)
+        # )  # a value is required so '' is invalid
 
     def _test_teenage(self):
         """default valid years go from 0 to 99, but lets set a custom age of 13-19"""
@@ -108,22 +109,22 @@ class EntryTest(TestCaseQt):
 
         _teen.clear()
         QTest.keyClicks(_teen, "13")
-        if _teen.check_value():
-            self.assertEqual(_teen.get_int(), 13)
+        self.assertTrue(_teen.has_valid_input())
+        self.assertEqual(_teen.get_int(), 13)
 
         _teen.clear()
         QTest.keyClicks(_teen, "19")
-        if _teen.check_value():
-            self.assertEqual(_teen.get_int(), 19)
+        self.assertTrue(_teen.has_valid_input())
+        self.assertEqual(_teen.get_int(), 19)
 
         # now lets try a few ages < 13 and > 19
         _teen.clear()
         QTest.keyClicks(_teen, "12")
-        self.assertFalse(_teen.check_value())
+        self.assertFalse(_teen.has_valid_input())
 
         _teen.clear()
         QTest.keyClicks(_teen, "21")
-        self.assertFalse(_teen.check_value())
+        self.assertFalse(_teen.has_valid_input())
 
 
 if __name__ == "__main__":

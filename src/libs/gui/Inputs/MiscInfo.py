@@ -24,28 +24,48 @@ class MiscInfoTab(QWidget):
 
         # avg rate of return
         self._ror = FloatEntry(
-            parent, min=0, max=20.0, num_decimal_places=2, limit_size=50
+            name="Rate of Returns",
+            parent=parent,
+            min=0,
+            max=20.0,
+            num_decimal_places=2,
+            limit_size=50,
         )
         self._ror.setText(11.85)  # set this each release 1928-2025 avg
         formlayout.addRow(QLabel("Rate of Returns:"), self._ror)
 
         # std dev
         self._ror_stdDev = FloatEntry(
-            parent, min=0, max=30.0, num_decimal_places=2, limit_size=50
+            name="RoR Std. Dev.",
+            parent=parent,
+            min=0,
+            max=30.0,
+            num_decimal_places=2,
+            limit_size=50,
         )
         self._ror_stdDev.setText(19.40)  # set this each release 1928-2025 avg
         formlayout.addRow(QLabel("RoR Std. Dev.:"), self._ror_stdDev)
 
         # avg inflation rate
         self._inflation_rate = FloatEntry(
-            parent, min=0, max=6.0, num_decimal_places=2, limit_size=50
+            name="Inflation Rate",
+            parent=parent,
+            min=0,
+            max=6.0,
+            num_decimal_places=2,
+            limit_size=50,
         )
         self._inflation_rate.setText(3.11)  # set this each release 1928-2025 avg
         formlayout.addRow(QLabel("Inflation Rate:"), self._inflation_rate)
 
         # std dev
         self._inflation_stdDev = FloatEntry(
-            parent, min=0, max=6.0, num_decimal_places=2, limit_size=50
+            name="Inflation Std. Dev.",
+            parent=parent,
+            min=0,
+            max=6.0,
+            num_decimal_places=2,
+            limit_size=50,
         )
         self._inflation_stdDev.setText(3.90)  # set this each release 1928-2025 avg
         formlayout.addRow(QLabel("Inflation Std. Dev.:"), self._inflation_stdDev)
@@ -61,10 +81,14 @@ class MiscInfoTab(QWidget):
         formlayout.addRow(QLabel("Total of Stocks and Bonds should be <= 100%"))
         formlayout.addRow(QLabel("If total is < 100%, the rest is assumed to be cash."))
 
-        self._pctStocks = PercentEntry(parent, min=0, max=100, num_decimal_places=0)
+        self._pctStocks = PercentEntry(
+            name="Percent Stocks", parent=parent, min=0, max=100, num_decimal_places=0
+        )
         formlayout.addRow(QLabel("Percent Stocks:"), self._pctStocks)
 
-        self._pctBonds = PercentEntry(parent, min=0, max=100, num_decimal_places=0)
+        self._pctBonds = PercentEntry(
+            name="Percent Bonds", parent=parent, min=0, max=100, num_decimal_places=0
+        )
         formlayout.addRow(QLabel("Percent Bonds:"), self._pctBonds)
 
         self.setLayout(formlayout)

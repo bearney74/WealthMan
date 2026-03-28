@@ -148,20 +148,20 @@ class TransferInfoTab(QWidget):
         _tgt_acct.setCurrentText(target)
         # self.gridLayout.addWidget(_tgt_acct, _len, 2)
 
-        _amount = MoneyEntry(self.parent)
+        _amount = MoneyEntry(name="Amount", parent=self.parent)
         _amount.setText(amount)
 
-        _COLA = PercentEntry(self.parent)
+        _COLA = PercentEntry(name="COLA", parent=self.parent)
         _COLA.setText(COLA)
 
         _person = PersonTypeEntry()
         _person.setEnabled(self.BasicInfoTab.client_is_married())
         _person.set(person)
 
-        _begin_age = AgeEntry(self.parent)
+        _begin_age = AgeEntry(name="Being Age", parent=self.parent)
         _begin_age.setText(begin_age)
 
-        _end_age = AgeEntry(self.parent)
+        _end_age = AgeEntry(name="End Age", parent=self.parent)
         _end_age.setText(end_age)
 
         self.gridLayout.add_row(

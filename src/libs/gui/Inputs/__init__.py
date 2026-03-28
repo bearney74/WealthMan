@@ -22,6 +22,7 @@ from .TransferInfo import TransferInfoTab
 from .MiscInfo import MiscInfoTab
 
 from ..guihelpers.Entry import EnumEntry
+# from ..guihelpers.Popup import ShowPopup
 
 
 class InputsTab(QMainWindow):
@@ -63,17 +64,14 @@ class InputsTab(QMainWindow):
     def onTabChange(self, i):
         _is_married = self.BasicInfoTab.client_is_married()
 
-        # _tabName = self.tabs.tabText(i)
         match self.tabs.tabText(i):
             case "Assets":
                 self.AssetInfoTab._spouseinfo.setEnabled(_is_married)
 
             case "Income":
                 self.IncomeInfoTab.spouseSS.setEnabled(_is_married)
-                self.IncomeInfoTab.pension1OwnerLabel.setEnabled(_is_married)
-                self.IncomeInfoTab.pension1Owner.setEnabled(_is_married)
-                self.IncomeInfoTab.pension2OwnerLabel.setEnabled(_is_married)
-                self.IncomeInfoTab.pension2Owner.setEnabled(_is_married)
+                self.IncomeInfoTab.pension1.Owner.setEnabled(_is_married)
+                self.IncomeInfoTab.pension2.Owner.setEnabled(_is_married)
 
                 for _i in range(1, self.IncomeInfoTab.gridLayout.count() // 6):
                     _item = self.IncomeInfoTab.gridLayout.itemAtPosition(_i, 3)
@@ -120,12 +118,12 @@ class InputsTab(QMainWindow):
         return _action
 
     def calculate_projection_action(self):
-        _action = QAction("Projection", self)
+        _action = QAction("Analysis", self)
         _pixmapi = QStyle.StandardPixmap.SP_FileDialogContentsView
         _action.setIcon(self.style().standardIcon(_pixmapi))
-        _action.setStatusTip("Create Data Projection")
-        _action.setToolTip("Create Data Projection")
-        _action.triggered.connect(lambda x: self.create_projection())
+        _action.setStatusTip("Perform Data Analysis")
+        _action.setToolTip("Perform Data Analysis")
+        _action.triggered.connect(lambda x: self.create_analysis())
         return _action
 
     def clear_forms(self):
@@ -137,7 +135,39 @@ class InputsTab(QMainWindow):
         self.GlobalVariablesTab.clear_form()
         self.MiscInfoTab.clear_form()
 
-    def create_projection(self):
+    def validate_input_forms(self):
+        if not self.BasicInfoTab.validate_form():
+            # create a popup stating there is a problem with the input data on the BasicInfoTab...
+            # print("create popup for Basic Info Tab")
+            # ShowPopup(self, "Invalid Input", "Please enter missing information on the basic info tab")
+            self.tabs.setCurrentWidget(self.BasicInfoTab)
+            return False
+
+        if not self.IncomeInfoTab.validate_form():
+            # create popup error message
+            # maybe auto select (display) IncomeInfoTab
+            # ShowPopup(self, "Invalid Input", "Please enter missing information on the income info tab")
+            self.tabs.setCurrentWidget(self.IncomeInfoTab)
+            return False
+
+        if not self.AssetInfoTab.validate_form():
+            self.tabs.setCurrentWidget(self.AssetInfoTab)
+            return False
+
+        if not self.GlobalVariablesTab.validate_form():
+            # print("create popup for Global Variables Tab")
+            self.tabs.setCurrentWidget(self.GlobalVariablesTab)
+            return False
+
+        # all forms appear to have reasonable values..
+        return True
+
+    def create_analysis(self):
+        if not self.validate_input_forms():
+            return
+
+        # if we got here the forms appear to be validated correctly..
+
         dv = DataVariables()
 
         self.BasicInfoTab.export_data(dv)

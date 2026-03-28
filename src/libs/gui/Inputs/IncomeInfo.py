@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QPushButton, QLabel, QLineEdit
+from PyQt6.QtWidgets import QWidget, QPushButton, QLabel  # , QLineEdit
 from PyQt6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
@@ -8,21 +8,26 @@ from PyQt6.QtWidgets import (
 
 from PyQt6.QtCore import Qt
 
+from libs.gui.guihelpers.FormValidator import FormValidator
 from libs.gui.guihelpers.Entry import (
     AgeEntry,
     MoneyEntry,
     PercentEntry,
     PersonTypeEntry,
+    StringEntry,
 )
+from libs.gui.guihelpers.Popup import ShowPopup
 
 from libs.DataVariables import DataVariables, IncomeRecord
 from libs.EnumTypes import PersonType, RelationStatusType
 
 
-class SocialSecurityWidget(QWidget):
+# class SocialSecurityWidget(QWidget):
+#    def __init__(self, parent, person_type):
+class SocialSecurityWidget(FormValidator):
     def __init__(self, parent, person_type):
         super(SocialSecurityWidget, self).__init__(parent)
-        self.parent = parent
+        # self.parent = parent
 
         assert isinstance(person_type, PersonType)
         self.person_type = person_type
@@ -32,12 +37,12 @@ class SocialSecurityWidget(QWidget):
         _flayout = QFormLayout()
         _layout.addWidget(QLabel("%s Social Security" % _type))
 
-        self.Amount = MoneyEntry()
+        self.Amount = MoneyEntry(name="FRA Amount")
         _label = QLabel("FRA Amount:")
         _label.setToolTip("Full Retirement Age Amount")
         _flayout.addRow(_label, self.Amount)
 
-        self.BeginAge = AgeEntry(self, min=62, max=70)
+        self.BeginAge = AgeEntry(name="Begin Age", parent=self, min=62, max=70)
         _label = QLabel("Begin Age:")
         _label.setToolTip("Age between 62 and 70")
         _flayout.addRow(_label, self.BeginAge)
@@ -45,9 +50,113 @@ class SocialSecurityWidget(QWidget):
 
         self.setLayout(_layout)
 
+        self.Amount.add_dependencies([self.BeginAge])
+        self.BeginAge.add_dependencies([self.Amount])
+
     def clear_form(self):
         self.Amount.setText("")
         self.BeginAge.setText("")
+
+    def validate_form(self) -> bool:
+        if not self.isEnabled():
+            return True
+
+        for _var in (self.Amount, self.BeginAge):
+            if not self.validateEntryWidget(_var):
+                return False
+
+        return True
+
+
+# class PensionWidget(QWidget):
+#    def __init__(self, parent):
+class PensionWidget(FormValidator):
+    def __init__(self, parent):
+        super(PensionWidget, self).__init__(parent)
+        # self.parent = parent
+
+        # _layout = QVBoxLayout()
+        _flayout = QFormLayout()
+
+        # _flayout1 = QFormLayout()
+        self.Name = StringEntry(limit_size=300)
+        # self.Name.setMaximumWidth(300)
+        _flayout.addRow(QLabel("Description"), self.Name)
+
+        self.Owner = PersonTypeEntry()
+        _flayout.addRow(QLabel("Owner:"), self.Owner)
+
+        self.Amount = MoneyEntry()
+        _flayout.addRow(QLabel("Annual Amount:"), self.Amount)
+
+        self.Cola = PercentEntry()
+        _flayout.addRow(QLabel("COLA:"), self.Cola)
+
+        self.SurvivorBenefits = PercentEntry(max=100.0)
+        _flayout.addRow(QLabel("Survivor\nBenefit:"), self.SurvivorBenefits)
+
+        self.BeginAge = AgeEntry()
+        _flayout.addRow(QLabel("Begin Age:"), self.BeginAge)
+
+        self.EndAge = AgeEntry()
+        _flayout.addRow(QLabel("End Age:"), self.EndAge)
+
+        self.setLayout(_flayout)
+        # self.setLayout(_layout)
+
+        # add dependencies (used for input validation)
+        self.Name.add_dependencies([self.Amount])
+        self.Amount.add_dependencies([self.Name])
+        self.Cola.add_dependencies([self.Name, self.Amount])
+        self.SurvivorBenefits.add_dependencies([self.Name, self.Amount])
+        self.BeginAge.add_dependencies([self.Name, self.Amount])
+        self.EndAge.add_dependencies([self.Name, self.Amount])
+
+    def clear_form(self):
+        self.Name.setText("")
+        self.Owner.set(PersonType.CLIENT)
+        self.Amount.setText("")
+        self.Cola.setText("")
+        self.SurvivorBenefits.setText("")
+        self.BeginAge.setText("")
+        self.EndAge.setText("")
+
+    def validate_form(self) -> bool:
+        for _var in (
+            self.Name,
+            self.Amount,
+            self.Cola,
+            self.SurvivorBenefits,
+            self.BeginAge,
+            self.EndAge,
+        ):
+            if not self.validateEntryWidget(_var):
+                return False
+
+        _begin_age = self.BeginAge.get_int()
+        _end_age = self.EndAge.get_int()
+
+        if _begin_age is not None and _end_age is not None:
+            if _end_age < _begin_age:
+                ShowPopup(
+                    self,
+                    "Invalid Input",
+                    "End Age (%s) should be greater than Begin Age (%s)"
+                    % (_end_age, _begin_age),
+                )
+                return False
+
+        return True
+
+    def validate_form_old(self) -> bool:
+        # check to see if any field contains valid input..
+        _name_flag = self.Name.has_valid_input(required=True)
+        _amount_flag = self.Amount.has_valid_input(required=True)
+        _ba_flag = self.BeginAge.has_valid_input()
+        _ea_flag = self.EndAge.has_valid_input()
+        _sb_flag = self.SurvivorBenefits.has_valid_input()
+
+        return _name_flag and _amount_flag and _ba_flag and _ea_flag
 
 
 class IncomeInfoTab(QWidget):
@@ -74,62 +183,15 @@ class IncomeInfoTab(QWidget):
 
         _layout.addWidget(QLabel("<b><u>Pensions</u></b>"))
 
-        _hlayout1 = QHBoxLayout()
-        _flayout1 = QFormLayout()
-        self.pension1Name = QLineEdit()
-        self.pension1Name.setMaximumWidth(300)
-        _flayout1.addRow(QLabel("Description"), self.pension1Name)
+        _hlayout2 = QHBoxLayout()
 
-        self.pension1OwnerLabel = QLabel("Owner:")
-        self.pension1Owner = PersonTypeEntry()
-        _flayout1.addRow(self.pension1OwnerLabel, self.pension1Owner)
+        self.pension1 = PensionWidget(self)
+        _hlayout2.addWidget(self.pension1)
 
-        self.pension1Amount = MoneyEntry()
-        _flayout1.addRow(QLabel("Annual Amount:"), self.pension1Amount)
+        self.pension2 = PensionWidget(self)
+        _hlayout2.addWidget(self.pension2)
 
-        self.pension1Cola = PercentEntry()
-        _flayout1.addRow(QLabel("COLA:"), self.pension1Cola)
-
-        self.pension1SurvivorBenefits = PercentEntry(max=100.0)
-        _flayout1.addRow(QLabel("Survivor\nBenefit:"), self.pension1SurvivorBenefits)
-
-        self.pension1BeginAge = AgeEntry()
-        _flayout1.addRow(QLabel("Begin Age:"), self.pension1BeginAge)
-
-        self.pension1EndAge = AgeEntry()
-        _flayout1.addRow(QLabel("End Age:"), self.pension1EndAge)
-
-        _hlayout1.addLayout(_flayout1)
-
-        _flayout2 = QFormLayout()
-        self.pension2Name = QLineEdit()
-        self.pension2Name.setMaximumWidth(300)
-        _flayout2.addRow(QLabel("Description"), self.pension2Name)
-
-        self.pension2OwnerLabel = QLabel("Owner:")
-        self.pension2Owner = PersonTypeEntry()
-        _flayout2.addRow(self.pension2OwnerLabel, self.pension2Owner)
-
-        self.pension2Amount = MoneyEntry()
-        _flayout2.addRow(QLabel("Annual Amount:"), self.pension2Amount)
-
-        self.pension2Cola = PercentEntry()
-        _flayout2.addRow(QLabel("COLA:"), self.pension2Cola)
-
-        self.pension2SurvivorBenefits = PercentEntry(max=100.0)
-        _flayout2.addRow(QLabel("Survivor\nBenefit:"), self.pension2SurvivorBenefits)
-
-        self.pension2BeginAge = AgeEntry()
-        _flayout2.addRow(QLabel("Begin Age:"), self.pension2BeginAge)
-
-        self.pension2EndAge = AgeEntry()
-        _flayout2.addRow(QLabel("End Age:"), self.pension2EndAge)
-
-        _hlayout1.addLayout(_flayout2)
-
-        _hlayout1.addStretch()
-
-        _layout.addLayout(_hlayout1)
+        _layout.addLayout(_hlayout2)
         _layout.addStretch(2)
 
         _layout.addWidget(
@@ -166,29 +228,32 @@ class IncomeInfoTab(QWidget):
         # _len = self.gridLayout.rowCount()
         _row = self.gridLayout.count() // 6
 
-        _descr = QLineEdit()
+        _descr = StringEntry()  # QLineEdit()
         _descr.setMaximumWidth(300)
         self.gridLayout.addWidget(_descr, _row, 0)
 
-        _amount = MoneyEntry(self.parent)
+        _amount = MoneyEntry(name="Amount", parent=self.parent)
         self.gridLayout.addWidget(_amount, _row, 1)
 
-        _percent = PercentEntry(self.parent)
+        _percent = PercentEntry(name="Percent", parent=self.parent)
         self.gridLayout.addWidget(_percent, _row, 2)
 
         _owner = PersonTypeEntry()
         self.gridLayout.addWidget(_owner, _row, 3)
         _owner.setEnabled(self.BasicInfoTab.client_is_married())
 
-        _begin_age = AgeEntry(self.parent)
+        _begin_age = AgeEntry(name="Begin Age", parent=self.parent)
         self.gridLayout.addWidget(_begin_age, _row, 4)
 
-        _end_age = AgeEntry(self.parent)
+        _end_age = AgeEntry(name="End Age", parent=self.parent)
         self.gridLayout.addWidget(_end_age, _row, 5)
 
     def clear_form(self):
         self.clientSS.clear_form()
         self.spouseSS.clear_form()
+
+        self.pension1.clear_form()
+        self.pension2.clear_form()
 
         _item = self.gridLayout.takeAt(0)
         while _item is not None:
@@ -202,6 +267,19 @@ class IncomeInfoTab(QWidget):
 
         assert self.gridLayout.count() == 0
 
+    def validate_form(self):
+        _ss_client = self.clientSS.validate_form()
+        print("ss client", _ss_client)
+        _ss_spouse = self.spouseSS.validate_form()
+        print("ss spouse", _ss_spouse)
+
+        _pension1 = self.pension1.validate_form()
+        print("pension1", _pension1)
+        _pension2 = self.pension2.validate_form()
+        print("pension2", _pension2)
+
+        return _ss_client and _ss_spouse and _pension1 and _pension2
+
     def export_data(self, dv: DataVariables):
         dv.clientSSAmount = self.clientSS.Amount.get_int()
         dv.clientSSBeginAge = self.clientSS.BeginAge.get_int()
@@ -209,29 +287,29 @@ class IncomeInfoTab(QWidget):
         dv.spouseSSAmount = self.spouseSS.Amount.get_int()
         dv.spouseSSBeginAge = self.spouseSS.BeginAge.get_int()
 
-        dv.pension1Name = self.pension1Name.text()
+        dv.pension1Name = self.pension1.Name.text()
         if not self.BasicInfoTab.client_is_married():
             dv.pension1Owner = PersonType.CLIENT
         else:
-            dv.pension1Owner = self.pension1Owner.get()
+            dv.pension1Owner = self.pension1.Owner.get()
 
-        dv.pension1Amount = self.pension1Amount.get_int()
-        dv.pension1Cola = self.pension1Cola.get_float()
-        dv.pension1SurvivorBenefits = self.pension1SurvivorBenefits.get_float()
-        dv.pension1BeginAge = self.pension1BeginAge.get_int()
-        dv.pension1EndAge = self.pension1EndAge.get_int()
+        dv.pension1Amount = self.pension1.Amount.get_int()
+        dv.pension1Cola = self.pension1.Cola.get_float()
+        dv.pension1SurvivorBenefits = self.pension1.SurvivorBenefits.get_float()
+        dv.pension1BeginAge = self.pension1.BeginAge.get_int()
+        dv.pension1EndAge = self.pension1.EndAge.get_int()
 
-        dv.pension2Name = self.pension2Name.text()
+        dv.pension2Name = self.pension2.Name.text()
         if not self.BasicInfoTab.client_is_married():
             dv.pension2Owner = PersonType.CLIENT
         else:
-            dv.pension2Owner = self.pension2Owner.get()
+            dv.pension2Owner = self.pension2.Owner.get()
 
-        dv.pension2Amount = self.pension2Amount.get_int()
-        dv.pension2Cola = self.pension2Cola.get_float()
-        dv.pension2SurvivorBenefits = self.pension2SurvivorBenefits.get_float()
-        dv.pension2BeginAge = self.pension2BeginAge.get_int()
-        dv.pension2EndAge = self.pension2EndAge.get_int()
+        dv.pension2Amount = self.pension2.Amount.get_int()
+        dv.pension2Cola = self.pension2.Cola.get_float()
+        dv.pension2SurvivorBenefits = self.pension2.SurvivorBenefits.get_float()
+        dv.pension2BeginAge = self.pension2.BeginAge.get_int()
+        dv.pension2EndAge = self.pension2.EndAge.get_int()
 
         dv.otherIncomes = []
         for _row in range(1, self.gridLayout.count() // 6):
@@ -264,19 +342,19 @@ class IncomeInfoTab(QWidget):
         self.spouseSS.Amount.setText(dv.spouseSSAmount)
         self.spouseSS.BeginAge.setText(dv.spouseSSBeginAge)
 
-        self.pension1Name.setText(dv.pension1Name)
-        self.pension1Amount.setText(dv.pension1Amount)
-        self.pension1Cola.setText(dv.pension1Cola)
-        self.pension1SurvivorBenefits.setText(dv.pension1SurvivorBenefits)
-        self.pension1BeginAge.setText(dv.pension1BeginAge)
-        self.pension1EndAge.setText(dv.pension1EndAge)
+        self.pension1.Name.setText(dv.pension1Name)
+        self.pension1.Amount.setText(dv.pension1Amount)
+        self.pension1.Cola.setText(dv.pension1Cola)
+        self.pension1.SurvivorBenefits.setText(dv.pension1SurvivorBenefits)
+        self.pension1.BeginAge.setText(dv.pension1BeginAge)
+        self.pension1.EndAge.setText(dv.pension1EndAge)
 
-        self.pension2Name.setText(dv.pension2Name)
-        self.pension2Amount.setText(dv.pension2Amount)
-        self.pension2Cola.setText(dv.pension2Cola)
-        self.pension2SurvivorBenefits.setText(dv.pension2SurvivorBenefits)
-        self.pension2BeginAge.setText(dv.pension2BeginAge)
-        self.pension2EndAge.setText(dv.pension2EndAge)
+        self.pension2.Name.setText(dv.pension2Name)
+        self.pension2.Amount.setText(dv.pension2Amount)
+        self.pension2.Cola.setText(dv.pension2Cola)
+        self.pension2.SurvivorBenefits.setText(dv.pension2SurvivorBenefits)
+        self.pension2.BeginAge.setText(dv.pension2BeginAge)
+        self.pension2.EndAge.setText(dv.pension2EndAge)
 
         for _record in dv.otherIncomes:
             self.add_row()

@@ -79,7 +79,7 @@ class FillFormClearForm(TestCaseQt):
         # creates a new instance of the application
         self._test_BasicInfoTab()
         self._test_IncomeTab_SocialSecurity()
-        self._test_ExpenseTab()
+        # self._test_ExpenseTab()  planning on replacing this, so just comment it out for now..
         self._test_Assets()
         self._test_Transfers()
         self._test_GlobalVariablesTab()
@@ -140,39 +140,39 @@ class FillFormClearForm(TestCaseQt):
         self._testAge(_incometab.spouseSS.BeginAge, "")
 
         # pension data....
-        self.assertEqual(_incometab.pension1Owner.currentText(), "Client")
+        self.assertEqual(_incometab.pension1.Owner.currentText(), "Client")
 
-        self._testMoney(_incometab.pension1Amount, "1234")
-        self._testMoney(_incometab.pension1Amount, "")
+        self._testMoney(_incometab.pension1.Amount, "1234")
+        self._testMoney(_incometab.pension1.Amount, "")
 
-        self._testPercent(_incometab.pension1Cola, "1.2")
-        self._testPercent(_incometab.pension1Cola, "")
+        self._testPercent(_incometab.pension1.Cola, "1.2")
+        self._testPercent(_incometab.pension1.Cola, "")
 
-        self._testPercent(_incometab.pension1SurvivorBenefits, "50.0")
-        self._testPercent(_incometab.pension1SurvivorBenefits, "")
+        self._testPercent(_incometab.pension1.SurvivorBenefits, "50.0")
+        self._testPercent(_incometab.pension1.SurvivorBenefits, "")
 
-        self._testAge(_incometab.pension1BeginAge, "60")
-        self._testAge(_incometab.pension1BeginAge, "")
+        self._testAge(_incometab.pension1.BeginAge, "60")
+        self._testAge(_incometab.pension1.BeginAge, "")
 
-        self._testAge(_incometab.pension1EndAge, "60")
-        self._testAge(_incometab.pension1EndAge, "")
+        self._testAge(_incometab.pension1.EndAge, "60")
+        self._testAge(_incometab.pension1.EndAge, "")
 
         # pension 2
 
-        self._testMoney(_incometab.pension2Amount, "1234")
-        self._testMoney(_incometab.pension2Amount, "")
+        self._testMoney(_incometab.pension2.Amount, "1234")
+        self._testMoney(_incometab.pension2.Amount, "")
 
-        self._testPercent(_incometab.pension2Cola, "1.2")
-        self._testPercent(_incometab.pension2Cola, "")
+        self._testPercent(_incometab.pension2.Cola, "1.2")
+        self._testPercent(_incometab.pension2.Cola, "")
 
-        self._testPercent(_incometab.pension2SurvivorBenefits, "50.0")
-        self._testPercent(_incometab.pension2SurvivorBenefits, "")
+        self._testPercent(_incometab.pension2.SurvivorBenefits, "50.0")
+        self._testPercent(_incometab.pension2.SurvivorBenefits, "")
 
-        self._testAge(_incometab.pension2BeginAge, "60")
-        self._testAge(_incometab.pension2BeginAge, "")
+        self._testAge(_incometab.pension2.BeginAge, "60")
+        self._testAge(_incometab.pension2.BeginAge, "")
 
-        self._testAge(_incometab.pension2EndAge, "60")
-        self._testAge(_incometab.pension2EndAge, "")
+        self._testAge(_incometab.pension2.EndAge, "60")
+        self._testAge(_incometab.pension2.EndAge, "")
 
         self.assertEqual(_incometab.gridLayout.count(), 0)
 

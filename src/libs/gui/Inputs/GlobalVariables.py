@@ -1,5 +1,6 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout, QCheckBox
+from PyQt6.QtWidgets import QLabel, QFormLayout, QCheckBox
 
+from libs.gui.guihelpers.FormValidator import FormValidator
 from libs.gui.guihelpers.Entry import (
     AgeEntry,
     PercentEntry,
@@ -11,22 +12,28 @@ from libs.gui.guihelpers.Entry import (
 from libs.DataVariables import DataVariables
 
 
-class GlobalVariablesTab(QWidget):
+class GlobalVariablesTab(FormValidator):
     def __init__(self, parent=None):
         super(GlobalVariablesTab, self).__init__(parent)
 
         formlayout = QFormLayout()
 
-        self._start_year = YearEntry()  # 4 digit integer
+        self._start_year = YearEntry(name="Start Year")  # 4 digit integer
         formlayout.addRow(QLabel("Start Year:"), self._start_year)
 
-        self._forecast_years = AgeEntry()  # 2 digit integer
+        self._forecast_years = AgeEntry(
+            name="Num Years to Forecast", min=1, max=50, required=True
+        )  # 2 digit integer
         formlayout.addRow(QLabel("Num Years to Forecast:"), self._forecast_years)
 
-        self._Inflation = PercentEntry(min=-10.0, max=10.0, num_decimal_places=1)
+        self._Inflation = PercentEntry(
+            name="Inflation", min=-10.0, max=10.0, num_decimal_places=1, required=True
+        )
         formlayout.addRow(QLabel("Inflation:"), self._Inflation)
 
-        self._ssCola = PercentEntry(min=-10.0, max=10.0, num_decimal_places=1)
+        self._ssCola = PercentEntry(
+            name="SS Cola", min=-10.0, max=10.0, num_decimal_places=1
+        )
         formlayout.addRow(QLabel("SS Cola:"), self._ssCola)
 
         self._WithdrawOrder = WithdrawOrderEntry(limit_size=250)
@@ -62,8 +69,29 @@ class GlobalVariablesTab(QWidget):
     def _enable_disable_surplus_interest(self, e):
         self._SurplusAccountInterestRate.setEnabled(self._SurplusAccount.isChecked())
 
-    def is_valid(self) -> bool:
-        return self._forecast_years.is_valid() and self._Inflation.is_valid()
+    # def is_valid(self) -> bool:
+    #    return self._forecast_years.is_valid() and self._Inflation.is_valid()
+
+    def validate_form(self) -> bool:
+        for _var in (self._forecast_years, self._Inflation):
+            if not self.validateEntryWidget(_var):
+                print(_var)
+                return False
+
+        return True
+
+        _sy_flag = self._start_year.is_valid()
+        _fy_flag = self._forecast_years.is_valid(True)
+        _i_flag = self._Inflation.is_valid(True)
+
+        # ssCola is required if SS form is filled out..
+        _ss_flag = self._ssCola.is_valid(True)
+
+        _sa_flag = True
+        if self._SurplusAccount.isChecked():
+            _sa_flag = self._SurplusAccountInterestRate.is_valid(required=True)
+
+        return _sy_flag and _fy_flag and _i_flag and _ss_flag and _sa_flag
 
     def clear_form(self):
         self._start_year.setText("")
@@ -108,3 +136,7 @@ class GlobalVariablesTab(QWidget):
         self._SurplusAccount.setChecked(d.SurplusAccount)
         self._SurplusAccountInterestRate.setText(d.SurplusAccountInterestRate)
         self._SurplusAccountInterestRate.setEnabled(d.SurplusAccount)
+
+        # update highlight based on if the input is valid or not..
+        for _widget in (self._forecast_years, self._Inflation):
+            _widget.set_highlight(not _widget.has_valid_input())

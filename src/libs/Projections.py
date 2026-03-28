@@ -320,6 +320,8 @@ class Projections(QRunnable):
         self._Expenses = []
         for _record in dv.expenses:
             _birthdate = dv.clientBirthDate
+            # make sure to check that expense owner is client if we select single (on basic info tab)
+            # instead of married after we populate expenses in reference to spouse info (ie, birthdate).
             if _record.owner == PersonType.SPOUSE:
                 _birthdate = dv.spouseBirthDate
 
@@ -607,11 +609,16 @@ class Projections(QRunnable):
             )
             _rmd_client.do_transfer_if_necessary()
 
-            _rmd_pct = _spouseRMD.calcPercent(_last_day_of_year)
-            _pyd.spouseRMD.data, _pyd.spouseRMDPercent.data, _spouse_boy_balance = (
-                _rmd_client.calcRequiredAmount(_rmd_pct)
-            )
-            _rmd_client.do_transfer_if_necessary()
+            if _spouseRMD is not None:
+                _rmd_pct = _spouseRMD.calcPercent(_last_day_of_year)
+                _pyd.spouseRMD.data, _pyd.spouseRMDPercent.data, _spouse_boy_balance = (
+                    _rmd_spouse.calcRequiredAmount(_rmd_pct)
+                )
+                _rmd_spouse.do_transfer_if_necessary()
+            else:
+                _pyd.spouseRMD.data = 0
+                _pyd.spouseRMDPercent.data = 0
+                _spouse_boy_balance = 0
 
             _pyd.totalRMD.data = _pyd.clientRMD.data + _pyd.spouseRMD.data
             if _client_boy_balance + _spouse_boy_balance == 0:
@@ -653,6 +660,17 @@ class Projections(QRunnable):
                 # print(_pyd.cashFlow.data)
                 _neededAssetWithdraw = abs(_pyd.cashFlow.data)
                 _deficit = _ws.reconcile_required_withdraw(_neededAssetWithdraw)
+
+                if _deficit < 0:
+                    # we need to take the deficit from somewhere ..
+                    if self.UseSurplusAccount:
+                        _surplusAccount.balance += _deficit
+                    else:
+                        # find regular account
+                        _regular = self._retrieve_asset_object(
+                            AccountOwnerType.CLIENT, AccountType.REGULAR
+                        )
+                        _regular.balance += _deficit
                 # if _deficit > 0:  # we have a deficit.. what do we do?? where do we subtract this from?
 
             for _src in self._Assets:
@@ -774,7 +792,7 @@ class Projections(QRunnable):
             if self.UseSurplusAccount:
                 _pyd.AW.data = -_pyd.cashFlow.data
             else:
-                _pyd.AW.data = _pyd.assetWithdraw.data
+                _pyd.AW.data = _pyd.assetTotalWithdraws.data
 
             if _pyd.assetTotalBalance.data == 0:
                 _pyd.AWR.data = 0.0

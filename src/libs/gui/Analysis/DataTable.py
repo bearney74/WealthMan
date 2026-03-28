@@ -45,7 +45,7 @@ class DataTableTabBase(QWidget):
         self.table = QTableWidget()
         self.table.setItemDelegate(InitialDelegate(self.table))
         self.table.setItemDelegateForColumn(0, QStyledItemDelegate(self.table))
-        self.table.setItemDelegateForColumn(1, QStyledItemDelegate(self.table))
+        # self.table.setItemDelegateForColumn(1, QStyledItemDelegate(self.table))
 
         _toolbar = QToolBar("DataTable Toolbar")
         _toolbar.addAction(self.get_csv_action())
@@ -105,6 +105,7 @@ class DataTableTabBase(QWidget):
         _hheader.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         # print("done stretching...")
         self.table.setUpdatesEnabled(True)
+        # self.table.setSortingEnabled(True)  # since values are strings.. this doesn't work well.
         self.table.show()
 
     def get_csv_action(self):

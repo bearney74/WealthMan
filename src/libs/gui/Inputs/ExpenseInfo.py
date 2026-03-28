@@ -52,15 +52,15 @@ class ExpenseInfoTab(QWidget):
         _descr = QLineEdit()
         _descr.setMaximumWidth(400)
 
-        _amount = MoneyEntry(self.parent)
+        _amount = MoneyEntry(name="Amount", parent=self.parent)
 
         _COLA = PercentEntry(self.parent)
 
         _person = PersonTypeEntry()
         _person.setEnabled(self.BasicInfoTab.client_is_married())
 
-        _begin_age = AgeEntry(self.parent)
-        _end_age = AgeEntry(self.parent)
+        _begin_age = AgeEntry(name="Begin Age", parent=self.parent)
+        _end_age = AgeEntry(name="End Age", parent=self.parent)
 
         self.gridLayout.add_row([_descr, _amount, _COLA, _person, _begin_age, _end_age])
 
@@ -69,20 +69,20 @@ class ExpenseInfoTab(QWidget):
         _descr.setText(descr)
         _descr.setMaximumWidth(400)
 
-        _amount = MoneyEntry(self.parent)
+        _amount = MoneyEntry(name="Amount", parent=self.parent)
         _amount.setText(amount)
 
-        _COLA = PercentEntry(self.parent)
+        _COLA = PercentEntry(name="COLA", parent=self.parent)
         _COLA.setText(COLA)
 
         _person = PersonTypeEntry()
         _person.setEnabled(self.BasicInfoTab.client_is_married())
         _person.set(person)
 
-        _begin_age = AgeEntry(self.parent)
+        _begin_age = AgeEntry(name="Begin Age", parent=self.parent)
         _begin_age.setText(begin_age)
 
-        _end_age = AgeEntry(self.parent)
+        _end_age = AgeEntry(name="End Age", parent=self.parent)
         _end_age.setText(end_age)
 
         self.gridLayout.add_row([_descr, _amount, _COLA, _person, _begin_age, _end_age])

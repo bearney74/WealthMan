@@ -1,12 +1,14 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QFormLayout
+from PyQt6.QtWidgets import QLabel, QFormLayout
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
 
 from libs.gui.guihelpers.Entry import MoneyEntry, PercentEntry, AgeEntry
+from libs.gui.guihelpers.FormValidator import FormValidator
+from libs.gui.guihelpers.Popup import ShowPopup
 
 from libs.DataVariables import DataVariables
 
 
-class AssetInfoTab(QWidget):
+class AssetInfoTab(FormValidator):
     def __init__(self, parent, BasicInfoTab):
         super(AssetInfoTab, self).__init__(parent)
 
@@ -26,10 +28,10 @@ class AssetInfoTab(QWidget):
 
         _flayout = QFormLayout()
         # _layout.addWidget(QLabel("Regular(Taxable):"))
-        self.RegularBalance = MoneyEntry()
+        self.RegularBalance = MoneyEntry(name="Regular Balance")
         _flayout.addRow(QLabel("Regular Balance:"), self.RegularBalance)
 
-        self.RegularCola = PercentEntry()
+        self.RegularCola = PercentEntry(name="Regular Cola")
         _flayout.addRow("Regular COLA:", self.RegularCola)
 
         self.RegularContribution = AssetContributionForm(self.parent)
@@ -41,6 +43,22 @@ class AssetInfoTab(QWidget):
 
         _layout.addStretch(2)
         self.setLayout(_layout)
+
+        self.RegularCola.add_dependencies([self.RegularBalance])
+
+    def validate_form(self) -> bool:
+        if not self._clientinfo.validate_form():
+            return False
+
+        if not self._spouseinfo.validate_form():
+            return False
+
+        for _var in (self.RegularCola,):
+            if not self.validateEntryWidget(_var):
+                print(_var)
+                return False
+
+        return True
 
     def clear_form(self):
         self._clientinfo.clear_form()
@@ -162,13 +180,14 @@ class AssetInfoTab(QWidget):
             )
 
 
-class AssetContributionForm(QWidget):
+# class AssetContributionForm(QWidget):
+class AssetContributionForm(FormValidator):
     def __init__(self, parent):
         super(AssetContributionForm, self).__init__(parent)
 
         _layout = QHBoxLayout()
 
-        self.Contribution = MoneyEntry()
+        self.Contribution = MoneyEntry("Contribution")
         _layout.addWidget(self.Contribution)
 
         _layout.addWidget(QLabel("Begin Age:"))
@@ -182,13 +201,49 @@ class AssetContributionForm(QWidget):
 
         self.setLayout(_layout)
 
+        self.BeginAge.add_dependencies([self.Contribution])
+        self.EndAge.add_dependencies([self.Contribution])
+        self.Contribution.add_dependencies([self.EndAge])
+
+    def add_dependencies(self, widgets):
+        self.Contribution.add_dependencies(widgets)
+
+    def validate_form(self):
+        for _var in (self.Contribution, self.BeginAge, self.EndAge):
+            if not self.validateEntryWidget(_var):
+                return False
+
+        _begin_age = self.BeginAge.get_int()
+        _end_age = self.EndAge.get_int()
+
+        if _begin_age is not None and _end_age is not None:
+            if _end_age < _begin_age:
+                ShowPopup(
+                    self,
+                    "Invalid Input",
+                    "End Age (%s) should be greater than Begin Age (%s)"
+                    % (_end_age, _begin_age),
+                )
+                return False
+
+        return True
+
+    # def _valid_input(self, required=True):
+    #    _bage=self.BeginAge.get_int()
+    #    _eage=self.EndAge.get_int()
+
+    #    if _bage is not None or _eage is not None:
+    #        return self.Contribution.is_valid(required=True)
+
+    #    return True
+
     def clear_form(self):
         self.Contribution.setText("")
         self.BeginAge.setText("")
         self.EndAge.setText("")
 
 
-class AssetInfoForm(QWidget):
+class AssetInfoForm(FormValidator):
     def __init__(self, parent, person_type):
         super(AssetInfoForm, self).__init__(parent)
 
@@ -215,10 +270,10 @@ class AssetInfoForm(QWidget):
 
         # _hayout1=QHBoxLayout()
         _flayout1 = QFormLayout()
-        self.RothIRABalance = MoneyEntry()
+        self.RothIRABalance = MoneyEntry(name="Roth IRA Balance")
         _flayout1.addRow(QLabel("Roth IRA Balance:"), self.RothIRABalance)
 
-        self.RothIRACola = PercentEntry()
+        self.RothIRACola = PercentEntry(name="Roth IRA COLA")
         _flayout1.addRow(QLabel("Roth IRA COLA:"), self.RothIRACola)
 
         # self.RothIRAContribution = MoneyEntry()
@@ -233,6 +288,49 @@ class AssetInfoForm(QWidget):
         _vlayout.addStretch()
 
         self.setLayout(_vlayout)
+
+        self.IRACola.add_dependencies([self.IRABalance])
+        self.IRAContribution.add_dependencies([self.IRABalance])
+
+        self.RothIRACola.add_dependencies([self.RothIRABalance])
+        self.RothIRAContribution.add_dependencies([self.RothIRABalance])
+
+    def validate_form(self):
+        for _var in (self.RothIRACola,):
+            if not self.validateEntryWidget(_var):
+                print(_var)
+                return False
+
+        if not self.RothIRAContribution.validate_form():
+            return False
+
+        return True
+
+        if self.IRACola._valid_input(required=True):
+            if not self.IRABalance.is_valid(required=True):
+                ShowPopup(
+                    self, "Invalid Input", "Please enter in a Traditional IRA Balance"
+                )
+                return False
+
+        if self.IRAContribution._valid_input(required=True):
+            if not self.IRABalance.is_valid(required=True):
+                ShowPopup(
+                    self, "Invalid Input", "Please enter in a Traditional IRA Balance"
+                )
+                return False
+
+        if self.RothIRACola._valid_input(required=True):
+            if not self.RothIRABalance.is_valid(required=True):
+                ShowPopup(self, "Invalid Input", "Please enter in a Roth IRA Balance")
+                return False
+
+        if self.RothIRAContribution._valid_input(required=True):
+            if not self.RothIRABalance.is_valid(required=True):
+                ShowPopup(self, "Invalid Input", "Please enter in a Roth IRA Balance")
+                return False
+
+        return True
 
     def clear_form(self):
         self.IRABalance.setText("")

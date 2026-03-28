@@ -43,12 +43,13 @@ class Account:
         assert isinstance(Owner, AccountOwnerType)
         self.Owner = Owner
 
-        assert isinstance(Balance, int) or Balance is None
         if Balance is None:
-            self._balance = 0
-        else:
-            self._balance = Balance
+            Balance = 0
+        assert isinstance(Balance, int)
+        self._balance = Balance
 
+        if InterestRate is None:
+            InterestRate = 0.0
         assert isinstance(InterestRate, float)
         self.InterestRate = InterestRate
 

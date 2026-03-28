@@ -71,7 +71,9 @@ class HistoricalAnalysisTab(QWidget):
         # ask for asset allocation
         glayout = QGridLayout()
 
-        self._pctStocks = PercentEntry(parent, min=0, max=100, num_decimal_places=0)
+        self._pctStocks = PercentEntry(
+            name="Percent Stocks", parent=parent, min=0, max=100, num_decimal_places=0
+        )
         _label = QLabel("Percent Stocks:")
         _label.setFixedWidth(100)
         glayout.addWidget(_label, 0, 0)
@@ -83,7 +85,9 @@ class HistoricalAnalysisTab(QWidget):
         self._bt_copy_from_input.clicked.connect(self._copy_from_input)
         glayout.addWidget(self._bt_copy_from_input, 0, 2)
 
-        self._pctBonds = PercentEntry(parent, min=0, max=100, num_decimal_places=0)
+        self._pctBonds = PercentEntry(
+            name="Percent Bonds", parent=parent, min=0, max=100, num_decimal_places=0
+        )
         _label = QLabel("Percent Bonds:")
         _label.setFixedWidth(100)
         glayout.addWidget(_label, 1, 0)

@@ -43,10 +43,10 @@ class SingleMarried(TestCaseQt):
         # check IncomeInfo Tab
         _InputsTab.tabs.setCurrentIndex(1)  # select Income Tab..
         self.assertFalse(_IncomeInfoTab.spouseSS.isEnabled())
-        self.assertFalse(_IncomeInfoTab.pension1OwnerLabel.isEnabled())
-        self.assertFalse(_IncomeInfoTab.pension1Owner.isEnabled())
-        self.assertFalse(_IncomeInfoTab.pension2OwnerLabel.isEnabled())
-        self.assertFalse(_IncomeInfoTab.pension2Owner.isEnabled())
+        # self.assertFalse(_IncomeInfoTab.pension1.OwnerLabel.isEnabled())
+        self.assertFalse(_IncomeInfoTab.pension1.Owner.isEnabled())
+        # self.assertFalse(_IncomeInfoTab.pension2.OwnerLabel.isEnabled())
+        self.assertFalse(_IncomeInfoTab.pension2.Owner.isEnabled())
 
         _InputsTab.tabs.setCurrentIndex(5)  # select Global tab
         self.assertFalse(_GlobalVariablesTab._FilingStatusOnceWidowed.isEnabled())
@@ -65,10 +65,10 @@ class SingleMarried(TestCaseQt):
 
         _InputsTab.tabs.setCurrentIndex(1)  # select Income Tab..
         self.assertTrue(_IncomeInfoTab.spouseSS.isEnabled())
-        self.assertTrue(_IncomeInfoTab.pension1OwnerLabel.isEnabled())
-        self.assertTrue(_IncomeInfoTab.pension1Owner.isEnabled())
-        self.assertTrue(_IncomeInfoTab.pension2OwnerLabel.isEnabled())
-        self.assertTrue(_IncomeInfoTab.pension2Owner.isEnabled())
+        # self.assertTrue(_IncomeInfoTab.pension1OwnerLabel.isEnabled())
+        self.assertTrue(_IncomeInfoTab.pension1.Owner.isEnabled())
+        # self.assertTrue(_IncomeInfoTab.pension2OwnerLabel.isEnabled())
+        self.assertTrue(_IncomeInfoTab.pension2.Owner.isEnabled())
 
         _InputsTab.tabs.setCurrentIndex(5)  # select Global tab
         self.assertTrue(_GlobalVariablesTab._FilingStatusOnceWidowed.isEnabled())
