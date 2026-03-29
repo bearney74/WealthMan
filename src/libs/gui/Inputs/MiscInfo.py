@@ -93,7 +93,13 @@ class MiscInfoTab(QWidget):
 
         self.setLayout(formlayout)
 
+    def validate_form(self) -> bool:
+        # for now just return True..  I believe I will have the monte carlo and historical analysis
+        # pages do validation when you click on the execute button on those pages"""
+        return True
+
     def clear_form(self):
+        # to do..
         pass
 
     def export_data(self, d: DataVariables):

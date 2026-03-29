@@ -21,9 +21,6 @@ from .ExpenseInfo import ExpenseInfoTab
 from .TransferInfo import TransferInfoTab
 from .MiscInfo import MiscInfoTab
 
-from ..guihelpers.Entry import EnumEntry
-# from ..guihelpers.Popup import ShowPopup
-
 
 class InputsTab(QMainWindow):
     def __init__(self, parent=None):
@@ -67,26 +64,13 @@ class InputsTab(QMainWindow):
         match self.tabs.tabText(i):
             case "Assets":
                 self.AssetInfoTab._spouseinfo.setEnabled(_is_married)
-
             case "Income":
                 self.IncomeInfoTab.spouseSS.setEnabled(_is_married)
                 self.IncomeInfoTab.pension1.Owner.setEnabled(_is_married)
                 self.IncomeInfoTab.pension2.Owner.setEnabled(_is_married)
-
-                for _i in range(1, self.IncomeInfoTab.gridLayout.count() // 6):
-                    _item = self.IncomeInfoTab.gridLayout.itemAtPosition(_i, 3)
-                    if isinstance(
-                        _item.widget(), EnumEntry
-                    ):  # this is probably a person/owner
-                        _item.widget().setEnabled(_is_married)
-
+                self.IncomeInfoTab.table.setEnabledOwner(_is_married)
             case "Expenses":
-                for _i in range(1, self.ExpenseInfoTab.gridLayout.count() // 6):
-                    _item = self.ExpenseInfoTab.gridLayout.itemAtPosition(_i, 3)
-                    if isinstance(
-                        _item.widget(), EnumEntry
-                    ):  # this is probably a person/owner
-                        _item.widget().setEnabled(_is_married)
+                self.ExpenseInfoTab.table.setEnabledOwner(_is_married)
             case "Transfers":
                 pass
             case "Global Variables":
@@ -150,13 +134,26 @@ class InputsTab(QMainWindow):
             self.tabs.setCurrentWidget(self.IncomeInfoTab)
             return False
 
+        if not self.ExpenseInfoTab.validate_form():
+            self.tabs.setCurrentWidget(self.ExpenseInfoTab)
+            return False
+
         if not self.AssetInfoTab.validate_form():
             self.tabs.setCurrentWidget(self.AssetInfoTab)
+            return False
+
+        if not self.TransferInfoTab.validate_form():
+            self.tabs.setCurrentWidget(self.TransferInfoTab)
             return False
 
         if not self.GlobalVariablesTab.validate_form():
             # print("create popup for Global Variables Tab")
             self.tabs.setCurrentWidget(self.GlobalVariablesTab)
+            return False
+
+        if not self.MiscInfoTab.validate_form():
+            # print("create popup for Global Variables Tab")
+            self.tabs.setCurrentWidget(self.MiscInfoTab)
             return False
 
         # all forms appear to have reasonable values..

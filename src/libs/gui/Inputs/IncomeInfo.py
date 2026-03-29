@@ -1,13 +1,13 @@
-from PyQt6.QtWidgets import QWidget, QPushButton, QLabel  # , QLineEdit
+from PyQt6.QtWidgets import QWidget, QLabel
 from PyQt6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QFormLayout,
-    QGridLayout,
 )
 
 from PyQt6.QtCore import Qt
 
+from libs.gui.guihelpers.CustomTableWidgets import IncomeSourceTableWidget
 from libs.gui.guihelpers.FormValidator import FormValidator
 from libs.gui.guihelpers.Entry import (
     AgeEntry,
@@ -19,15 +19,12 @@ from libs.gui.guihelpers.Entry import (
 from libs.gui.guihelpers.Popup import ShowPopup
 
 from libs.DataVariables import DataVariables, IncomeRecord
-from libs.EnumTypes import PersonType, RelationStatusType
+from libs.EnumTypes import PersonType
 
 
-# class SocialSecurityWidget(QWidget):
-#    def __init__(self, parent, person_type):
 class SocialSecurityWidget(FormValidator):
     def __init__(self, parent, person_type):
         super(SocialSecurityWidget, self).__init__(parent)
-        # self.parent = parent
 
         assert isinstance(person_type, PersonType)
         self.person_type = person_type
@@ -68,19 +65,13 @@ class SocialSecurityWidget(FormValidator):
         return True
 
 
-# class PensionWidget(QWidget):
-#    def __init__(self, parent):
 class PensionWidget(FormValidator):
     def __init__(self, parent):
         super(PensionWidget, self).__init__(parent)
-        # self.parent = parent
 
-        # _layout = QVBoxLayout()
         _flayout = QFormLayout()
 
-        # _flayout1 = QFormLayout()
         self.Name = StringEntry(limit_size=300)
-        # self.Name.setMaximumWidth(300)
         _flayout.addRow(QLabel("Description"), self.Name)
 
         self.Owner = PersonTypeEntry()
@@ -102,7 +93,6 @@ class PensionWidget(FormValidator):
         _flayout.addRow(QLabel("End Age:"), self.EndAge)
 
         self.setLayout(_flayout)
-        # self.setLayout(_layout)
 
         # add dependencies (used for input validation)
         self.Name.add_dependencies([self.Amount])
@@ -148,16 +138,6 @@ class PensionWidget(FormValidator):
 
         return True
 
-    def validate_form_old(self) -> bool:
-        # check to see if any field contains valid input..
-        _name_flag = self.Name.has_valid_input(required=True)
-        _amount_flag = self.Amount.has_valid_input(required=True)
-        _ba_flag = self.BeginAge.has_valid_input()
-        _ea_flag = self.EndAge.has_valid_input()
-        _sb_flag = self.SurvivorBenefits.has_valid_input()
-
-        return _name_flag and _amount_flag and _ba_flag and _ea_flag
-
 
 class IncomeInfoTab(QWidget):
     def __init__(self, parent, BasicInfoTab):
@@ -197,56 +177,13 @@ class IncomeInfoTab(QWidget):
         _layout.addWidget(
             QLabel("<b><u>Other Income Sources: (Full/Part time work)</u></b>")
         )
-        self._add_income_button = QPushButton("Add Income", self)
-        self._add_income_button.setFixedSize(90, 30)
-        self._add_income_button.clicked.connect(self.add_row)
-        _layout.addWidget(self._add_income_button)
 
-        # Table will fit the screen horizontally
+        self.table = IncomeSourceTableWidget(parent=self)
+        self.table.addRow()
 
-        self.gridLayout = QGridLayout()
-        _hlayout = QHBoxLayout()
-        _hlayout.addLayout(self.gridLayout)
-        _hlayout.addStretch()
-        _layout.addLayout(_hlayout)
+        _layout.addWidget(self.table)
         _layout.addStretch(3)
         self.setLayout(_layout)
-
-    def add_row(self):
-        if self.gridLayout.count() == 0:
-            self.gridLayout.addWidget(QLabel("Description"), 0, 0)
-            self.gridLayout.addWidget(QLabel("Annual Amount"), 0, 1)
-            _temp = QLabel("COLA", wordWrap=True)
-            self.gridLayout.addWidget(_temp, 0, 2)
-
-            self.gridLayout.addWidget(QLabel("Person"), 0, 3)
-            self.gridLayout.addWidget(QLabel("Begin Age"), 0, 4)
-            self.gridLayout.addWidget(QLabel("End Age"), 0, 5)
-
-        # do not use rowCount.. it only increases in value
-        # even after you delete some elements (ie, rows)
-        # _len = self.gridLayout.rowCount()
-        _row = self.gridLayout.count() // 6
-
-        _descr = StringEntry()  # QLineEdit()
-        _descr.setMaximumWidth(300)
-        self.gridLayout.addWidget(_descr, _row, 0)
-
-        _amount = MoneyEntry(name="Amount", parent=self.parent)
-        self.gridLayout.addWidget(_amount, _row, 1)
-
-        _percent = PercentEntry(name="Percent", parent=self.parent)
-        self.gridLayout.addWidget(_percent, _row, 2)
-
-        _owner = PersonTypeEntry()
-        self.gridLayout.addWidget(_owner, _row, 3)
-        _owner.setEnabled(self.BasicInfoTab.client_is_married())
-
-        _begin_age = AgeEntry(name="Begin Age", parent=self.parent)
-        self.gridLayout.addWidget(_begin_age, _row, 4)
-
-        _end_age = AgeEntry(name="End Age", parent=self.parent)
-        self.gridLayout.addWidget(_end_age, _row, 5)
 
     def clear_form(self):
         self.clientSS.clear_form()
@@ -255,30 +192,18 @@ class IncomeInfoTab(QWidget):
         self.pension1.clear_form()
         self.pension2.clear_form()
 
-        _item = self.gridLayout.takeAt(0)
-        while _item is not None:
-            _item.widget().deleteLater()
-            self.gridLayout.removeWidget(_item.widget())
-            self.gridLayout.removeItem(_item)
-            del _item
-            _item = self.gridLayout.takeAt(0)
-
-        self.gridLayout.invalidate()
-
-        assert self.gridLayout.count() == 0
+        self.table.clear()
 
     def validate_form(self):
         _ss_client = self.clientSS.validate_form()
-        print("ss client", _ss_client)
         _ss_spouse = self.spouseSS.validate_form()
-        print("ss spouse", _ss_spouse)
 
         _pension1 = self.pension1.validate_form()
-        print("pension1", _pension1)
         _pension2 = self.pension2.validate_form()
-        print("pension2", _pension2)
 
-        return _ss_client and _ss_spouse and _pension1 and _pension2
+        _table = self.table.validate_form()
+
+        return _ss_client and _ss_spouse and _pension1 and _pension2 and _table
 
     def export_data(self, dv: DataVariables):
         dv.clientSSAmount = self.clientSS.Amount.get_int()
@@ -312,25 +237,14 @@ class IncomeInfoTab(QWidget):
         dv.pension2EndAge = self.pension2.EndAge.get_int()
 
         dv.otherIncomes = []
-        for _row in range(1, self.gridLayout.count() // 6):
-            _item = self.gridLayout.itemAtPosition(_row, 0)
-            _descr = _item.widget().text()
-
-            _item = self.gridLayout.itemAtPosition(_row, 1)
-            _amount = _item.widget().get_int()
-
-            _item = self.gridLayout.itemAtPosition(_row, 2)
-            _cola = _item.widget().get_float()
-
-            _item = self.gridLayout.itemAtPosition(_row, 3)
-            _owner = _item.widget().get()  # .currentText()
-
-            _item = self.gridLayout.itemAtPosition(_row, 4)
-            _begin_age = _item.widget().get_int()
-
-            _item = self.gridLayout.itemAtPosition(_row, 5)
-            _end_age = _item.widget().get_int()
-
+        for (
+            _descr,
+            _amount,
+            _cola,
+            _owner,
+            _begin_age,
+            _end_age,
+        ) in self.table.getData():
             dv.otherIncomes.append(
                 IncomeRecord(_descr, _amount, _cola, _owner, _begin_age, _end_age)
             )
@@ -357,25 +271,13 @@ class IncomeInfoTab(QWidget):
         self.pension2.EndAge.setText(dv.pension2EndAge)
 
         for _record in dv.otherIncomes:
-            self.add_row()
-
-            _row = self.gridLayout.count() // 6 - 1  # need last row number
-
-            _item = self.gridLayout.itemAtPosition(_row, 0)
-            _item.widget().setText(_record.descr)
-
-            _item = self.gridLayout.itemAtPosition(_row, 1)
-            _item.widget().setText(_record.amount)
-
-            _item = self.gridLayout.itemAtPosition(_row, 2)
-            _item.widget().setText(_record.COLA)
-
-            _item = self.gridLayout.itemAtPosition(_row, 3)
-            _item.widget().setEnabled(dv.relationStatus == RelationStatusType.MARRIED)
-            _item.widget().set(_record.owner)
-
-            _item = self.gridLayout.itemAtPosition(_row, 4)
-            _item.widget().setText(_record.begin_age)
-
-            _item = self.gridLayout.itemAtPosition(_row, 5)
-            _item.widget().setText(_record.end_age)
+            self.table.addRow(
+                [
+                    _record.descr,
+                    _record.amount,
+                    _record.COLA,
+                    _record.owner,
+                    _record.begin_age,
+                    _record.end_age,
+                ]
+            )

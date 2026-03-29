@@ -1,17 +1,7 @@
-from PyQt6.QtWidgets import QWidget, QPushButton, QLineEdit
-from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout
-
+from PyQt6.QtWidgets import QWidget, QVBoxLayout
 from PyQt6.QtCore import Qt
 
-from libs.gui.guihelpers.Entry import (
-    AgeEntry,
-    MoneyEntry,
-    PercentEntry,
-    PersonTypeEntry,
-)
-
-from libs.gui.guihelpers.DeleteRowGridLayout import DeleteRowGridLayout
-
+from libs.gui.guihelpers.CustomTableWidgets import ExpenseSourceTableWidget
 from libs.DataVariables import DataVariables, ExpenseRecord
 
 
@@ -24,94 +14,41 @@ class ExpenseInfoTab(QWidget):
 
         _layout = QVBoxLayout()
         _layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self._add_expense_button = QPushButton("Add Expense", self)
-        self._add_expense_button.setFixedSize(90, 30)
-        self._add_expense_button.clicked.connect(self._add_new_row)
-        _layout.addWidget(self._add_expense_button)
 
-        # Table will fit the screen horizontally
-        self.gridLayout = DeleteRowGridLayout(self)  # QGridLayout()
-        self.gridLayout.set_header(
-            [
-                "Description",
-                "Annual Amount",
-                "Annual\nPercent\nIncrease",
-                "Person",
-                "Begin Age",
-                "End Age",
-            ]
-        )
-        _hlayout = QHBoxLayout()
-        _hlayout.addLayout(self.gridLayout)
-        _hlayout.addStretch()
-        _layout.addLayout(_hlayout)
+        self.table = ExpenseSourceTableWidget(self)
+        self.table.addRow()
+
+        _layout.addWidget(self.table)
         _layout.addStretch(3)
         self.setLayout(_layout)
 
-    def _add_new_row(self):
-        _descr = QLineEdit()
-        _descr.setMaximumWidth(400)
-
-        _amount = MoneyEntry(name="Amount", parent=self.parent)
-
-        _COLA = PercentEntry(self.parent)
-
-        _person = PersonTypeEntry()
-        _person.setEnabled(self.BasicInfoTab.client_is_married())
-
-        _begin_age = AgeEntry(name="Begin Age", parent=self.parent)
-        _end_age = AgeEntry(name="End Age", parent=self.parent)
-
-        self.gridLayout.add_row([_descr, _amount, _COLA, _person, _begin_age, _end_age])
-
-    def _add_row(self, descr, amount, COLA, person, begin_age, end_age):
-        _descr = QLineEdit()
-        _descr.setText(descr)
-        _descr.setMaximumWidth(400)
-
-        _amount = MoneyEntry(name="Amount", parent=self.parent)
-        _amount.setText(amount)
-
-        _COLA = PercentEntry(name="COLA", parent=self.parent)
-        _COLA.setText(COLA)
-
-        _person = PersonTypeEntry()
-        _person.setEnabled(self.BasicInfoTab.client_is_married())
-        _person.set(person)
-
-        _begin_age = AgeEntry(name="Begin Age", parent=self.parent)
-        _begin_age.setText(begin_age)
-
-        _end_age = AgeEntry(name="End Age", parent=self.parent)
-        _end_age.setText(end_age)
-
-        self.gridLayout.add_row([_descr, _amount, _COLA, _person, _begin_age, _end_age])
+    def validate_form(self) -> bool:
+        return self.table.validate_form()
 
     def clear_form(self):
-        self.gridLayout.clear()
+        self.table.clear()
 
     def export_data(self, d: DataVariables):
         for (
-            _descr_w,
-            _amount_w,
-            _cola_w,
-            _person_w,
-            _begin_age_w,
-            _end_age_w,
-        ) in self.gridLayout.get_data():
-            _descr = _descr_w.text()
-            _amount = _amount_w.get_int()
-            _cola = _cola_w.get_float()
-            _person = _person_w.get()
-            _begin_age = _begin_age_w.get_int()
-            _end_age = _end_age_w.get_int()
-
+            _descr,
+            _amount,
+            _cola,
+            _person,
+            _begin_age,
+            _end_age,
+        ) in self.table.getData():
             d.expenses.append(
                 ExpenseRecord(_descr, _amount, _cola, _person, _begin_age, _end_age)
             )
 
     def import_data(self, d: DataVariables):
+        self.table.setRowCount(0)
+        self.table.setHeader()  # add header back since setRowCount removes the header..
+
         for _r in d.expenses:
-            self._add_row(
-                _r.descr, _r.amount, _r.COLA, _r.owner, _r.begin_age, _r.end_age
+            self.table.addRow(
+                [_r.descr, _r.amount, _r.COLA, _r.owner, _r.begin_age, _r.end_age]
             )
+
+        # add an extra row for user input (this row will be blank)..
+        self.table.addRow()

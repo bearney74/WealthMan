@@ -3,7 +3,7 @@ from enum import Enum, StrEnum
 
 from PyQt6.QtWidgets import QLineEdit, QWidget, QComboBox, QHBoxLayout, QLabel
 from PyQt6.QtGui import QIntValidator, QDoubleValidator
-# from PyQt6 import QtCore
+from PyQt6.QtCore import Qt
 
 from ...EnumTypes import (
     AccountOwnerType,
@@ -519,6 +519,48 @@ class EnumEntry(QWidget):
 
     def clear(self):
         self._widget.setCurrentIndex(0)
+
+
+class AccountEntry(QComboBox):
+    def __init__(self, name: str = None, parent=None, limit_size: int = None):
+        super(AccountEntry, self).__init__(parent)
+        self.parent = parent
+
+        if limit_size is not None:
+            self.setFixedWidth(limit_size)
+
+        self.setObjectName(name)
+
+        # print(enum_type)
+        # assert isinstance(enum_type, StrEnum)
+
+        _accounts = [
+            "Client Trad IRA",
+            "Client Roth IRA",
+            "Spouse Trad IRA",
+            "Spouse Roth IRA",
+            "Regular Taxable",
+        ]
+
+        self.addItems(_accounts)
+
+    def enableSpouseAccount(self, enable: bool = True):
+        for _i in range(self.count()):
+            if self.itemText(_i).contains("Spouse"):
+                self.setItemData(_i, enable, Qt.ItemDataRole.ItemIsEnabled)
+
+    def isEmpty(self):
+        """mostly for compatibility with other Entry objects.. Not really useful for ComboBox"""
+        return self.count() > 0
+
+    def set(self, text: str) -> None:
+        self.setCurrentText(text)
+
+    def get(self) -> str:
+        return self.currentText()
+
+    def clear(self):
+        self.setCurrentIndex(0)
 
 
 class RelationStatusTypeEntry(EnumEntry):

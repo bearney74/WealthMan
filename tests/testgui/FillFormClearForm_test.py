@@ -174,7 +174,10 @@ class FillFormClearForm(TestCaseQt):
         self._testAge(_incometab.pension2.EndAge, "60")
         self._testAge(_incometab.pension2.EndAge, "")
 
-        self.assertEqual(_incometab.gridLayout.count(), 0)
+        # check that we have no extra income sources. (except for the blank row)
+        self.assertEqual(_incometab.table.rowCount(), 1)
+        _data = _incometab.table.getData()
+        self.assertEqual(len(_data), 0)
 
         # need to add income sources...
 
