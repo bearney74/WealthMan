@@ -66,12 +66,14 @@ class InputsTab(QMainWindow):
                 self.AssetInfoTab._spouseinfo.setEnabled(_is_married)
             case "Income":
                 self.IncomeInfoTab.spouseSS.setEnabled(_is_married)
-                self.IncomeInfoTab.pension1.Owner.setEnabled(_is_married)
-                self.IncomeInfoTab.pension2.Owner.setEnabled(_is_married)
-                self.IncomeInfoTab.table.setEnabledOwner(_is_married)
+                self.IncomeInfoTab.pension1.Owner.enableSpouse(_is_married)
+                self.IncomeInfoTab.pension2.Owner.enableSpouse(_is_married)
+
+                self.IncomeInfoTab.table.enableSpouse(_is_married)
             case "Expenses":
-                self.ExpenseInfoTab.table.setEnabledOwner(_is_married)
+                self.ExpenseInfoTab.table.enableSpouse(_is_married)
             case "Transfers":
+                self.TransferInfoTab.table.enableSpouse(_is_married)
                 pass
             case "Global Variables":
                 self.GlobalVariablesTab._FilingStatusOnceWidowed.setEnabled(_is_married)

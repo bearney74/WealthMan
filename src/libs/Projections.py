@@ -509,10 +509,10 @@ class Projections(QRunnable):
         _spouse_ira = self._retrieve_asset_object(
             AccountOwnerType.SPOUSE, AccountType.TAXDEFERRED
         )
-        if _spouse_ira is None:
-            print("Error! Spouse IRA Account not found...")
-
-        _rmd_spouse = RMDCalcs(_spouse_ira, _surplusAccount)
+        if _spouse_ira is not None:
+            _rmd_spouse = RMDCalcs(_spouse_ira, _surplusAccount)
+        # else:
+        #    print("Error! Spouse IRA Account not found...")
 
         for _year in range(self._begin_year, self._end_year + 1):
             _number_of_years = _year - self._begin_year

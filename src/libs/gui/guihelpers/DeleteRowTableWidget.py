@@ -116,7 +116,7 @@ class StringEntryCell(StringEntry):
         self.parent = parent
 
     def focusOutEvent(self, event):
-        print("StringEntryCell:focusOutEvent")
+        # print("StringEntryCell:focusOutEvent")
         super().focusOutEvent(event)
 
         self.parent.addRowCheck(not self.isEmpty())
@@ -155,10 +155,7 @@ class DeleteRowTableWidget(QTableWidget):
         content to the last row.
         """
 
-        # print("addRowCheck")
-        # print(self.currentRow(), self.rowCount()-1)
         if contains_data and self.currentRow() == self.rowCount() - 1:
-            # print("add row")
             self.addRow()
 
     def focusOutEvent(self, event):
@@ -178,13 +175,8 @@ class DeleteRowTableWidget(QTableWidget):
                             if _widget.isEmpty() and _widget not in _list:
                                 _list.append(_widget)
 
-        # print(_list)
         for _widget in _list:
             _widget.set_highlight(True)
-            # print("highlight:", _widget)
-            # else:
-            #  _widget.set_highlight(False)
-            #  print("no highlight", _widget)
 
     def _addRow(self, row, data):
         if len(data) == self.numColumns:
@@ -220,21 +212,16 @@ class DeleteRowTableWidget(QTableWidget):
 
     def getRowData(self, rowID):
         _data = []
-        # _type=[]
         for _col in range(self.columnCount()):
             _item = self.cellWidget(rowID, _col)
             if isinstance(_item, IntegerEntry):
                 _data.append(_item.get_int())
-                # _type.append(IntegerEntry)
             elif isinstance(_item, FloatEntry):
                 _data.append(_item.get_float())
-                # _type.append(FloatEntry)
             elif isinstance(_item, StringEntry):
                 _data.append(_item.text())
-                # _type.append(StringEntry)
             elif isinstance(_item, EnumEntry):
                 _data.append(_item.get())
-                # _type.append(EnumEntry)
             elif isinstance(_item, QComboBox):
                 _data.append(_item.currentText())
 

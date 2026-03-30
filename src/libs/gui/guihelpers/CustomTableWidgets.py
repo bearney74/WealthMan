@@ -19,7 +19,7 @@ class IncomeSourceTableWidget(DeleteRowTableWidget):
         self.setColumnWidth(0, 300)
         self.setColumnWidth(self.numColumns, 50)  # resize remove row
 
-        self._person_enabled: bool = (
+        self._spouse_enabled: bool = (
             False  # enable/disable PersonTypeEntry (ie, combobox)
         )
 
@@ -41,13 +41,12 @@ class IncomeSourceTableWidget(DeleteRowTableWidget):
 
         assert len(data) in (0, self.numColumns)
 
-        # print("insertRow:", _row)
         self.insertRow(_row)
         _descr = StringEntryCell(parent=self, name="Description")
         _amount = MoneyEntryCell(parent=self, name="Annual Amount")
         _cola = PercentEntryCell(parent=self, name="COLA")
         _person = PersonTypeEntry(parent=self)
-        _person.setEnabled(self._person_enabled)
+        _person.enableSpouse(self._spouse_enabled)
         _begin_age = AgeEntryCell(parent=self, name="Begin Age")
         _end_age = AgeEntryCell(parent=self, name="End Age")
 
@@ -70,12 +69,15 @@ class IncomeSourceTableWidget(DeleteRowTableWidget):
         # add remove row button to the last column
         self._addRow(_row, data)
 
-    def setEnabledOwner(self, enable: bool) -> None:
-        self._person_enabled = enable
+    def enableSpouse(self, enable: bool) -> None:
+        self._spouse_enabled = enable
         for _row in range(self.rowCount()):
             _persontype = self.cellWidget(_row, 3)
             assert isinstance(_persontype, PersonTypeEntry)
-            _persontype.setEnabled(enable)
+            _persontype.enableSpouse(enable)
+
+            if "Spouse" == _persontype.currentText():
+                _persontype.setCurrentText("Client")
 
     def validate_form(self) -> bool:
         """put logic here to check for inconsistent data..
@@ -137,7 +139,7 @@ class TransferSourceTableWidget(DeleteRowTableWidget):
 
         self.setColumnWidth(8, 50)  # resize remove row
 
-        self._person_enabled: bool = (
+        self._spouse_enabled: bool = (
             False  # enable/disable PersonTypeEntry (ie, combobox)
         )
 
@@ -161,33 +163,17 @@ class TransferSourceTableWidget(DeleteRowTableWidget):
 
         assert len(data) in (0, self.numColumns)
 
-        # print("insertRow:", _row)
+        # insert a blank row that we can populate
         self.insertRow(_row)
 
-        # _accounts = ["Client Trad IRA", "Client Roth IRA"]
-        # fix me..
-        # if self.BasicInfoTab.client_is_married():
-        # _accounts += ["Spouse Trad IRA", "Spouse Roth IRA"]
-
-        # _accounts += ["Regular Taxable"]
-
-        # put Select Box here for Source Account
         _src_acct = AccountEntry(parent=self, name="Source Account")
-        # _src_acct = QComboBox()
-        # _src_acct.addItems(_accounts)
-        # self.gridLayout.addWidget(_src_acct, _len, 1)
-
-        # put Select Box here for Target Account
         _tgt_acct = AccountEntry(parent=self, name="Target Account")
-        # _tgt_acct = QComboBox()
-        # _tgt_acct.addItems(_accounts)
-        # self.gridLayout.addWidget(_tgt_acct, _len, 2)
 
         _descr = StringEntryCell(parent=self, name="Description")
         _amount = MoneyEntryCell(parent=self, name="Annual Amount")
         _cola = PercentEntryCell(parent=self, name="COLA")
         _person = PersonTypeEntry(parent=self)
-        _person.setEnabled(self._person_enabled)
+        _person.enableSpouse(self._spouse_enabled)
         _begin_age = AgeEntryCell(parent=self, name="Begin Age")
         _end_age = AgeEntryCell(parent=self, name="End Age")
 
@@ -212,21 +198,34 @@ class TransferSourceTableWidget(DeleteRowTableWidget):
         # add remove row button to the last column
         self._addRow(_row, data)
 
-    def setEnabledOwner(self, enable: bool) -> None:
-        self._person_enabled = enable
+    def enableSpouse(self, enable: bool) -> None:
+        """for each row, enable/disable the items in the comboboxes that
+        refer to the spouse
+        """
+        self._spouse_enabled = enable
         for _row in range(self.rowCount()):
             _persontype = self.cellWidget(_row, 5)
             assert isinstance(_persontype, PersonTypeEntry)
-            _persontype.setEnabled(enable)
+            _persontype.enableSpouse(enable)
+
+            if "Spouse" == _persontype.currentText():
+                _persontype.setCurrentText("Client")
+
+            _src_acct = self.cellWidget(_row, 1)
+            _src_acct.enableSpouseAccount(enable)
+
+            _tgt_acct = self.cellWidget(_row, 2)
+            _tgt_acct.enableSpouseAccount(enable)
 
     def validate_form(self) -> bool:
         """put logic here to check for inconsistent data..
         for example, a begin age should be lower than a lifespan age
         """
 
+        # check that source and target accounts are not the same.
         for _row in range(self.rowCount() - 1):
-            _src_widget = self.WidgetCell(_row, 1)
-            _tgt_widget = self.WidgetCell(_row, 2)
+            _src_widget = self.cellWidget(_row, 1)
+            _tgt_widget = self.cellWidget(_row, 2)
 
             _src = _src_widget.get()
             _tgt = _tgt_widget.get()
@@ -240,9 +239,10 @@ class TransferSourceTableWidget(DeleteRowTableWidget):
 
                 return False
 
+        # for each row, check that begin age is less than end age.
         for _row in range(self.rowCount() - 1):
-            _bage_widget = self.WidgetCell(_row, 6)
-            _eage_widget = self.WidgetCell(_row, 7)
+            _bage_widget = self.cellWidget(_row, 6)
+            _eage_widget = self.cellWidget(_row, 7)
 
             _begin_age = _bage_widget.get_int()
             _end_age = _eage_widget.get_int()

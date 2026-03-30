@@ -531,9 +531,6 @@ class AccountEntry(QComboBox):
 
         self.setObjectName(name)
 
-        # print(enum_type)
-        # assert isinstance(enum_type, StrEnum)
-
         _accounts = [
             "Client Trad IRA",
             "Client Roth IRA",
@@ -545,9 +542,17 @@ class AccountEntry(QComboBox):
         self.addItems(_accounts)
 
     def enableSpouseAccount(self, enable: bool = True):
+        _model = self.model()
         for _i in range(self.count()):
-            if self.itemText(_i).contains("Spouse"):
-                self.setItemData(_i, enable, Qt.ItemDataRole.ItemIsEnabled)
+            if "Spouse" in self.itemText(_i):
+                _item = _model.item(_i)
+                if enable:
+                    _item.setFlags(_item.flags() | Qt.ItemFlag.ItemIsEnabled)
+                else:
+                    _item.setFlags(_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+
+        if not enable and "Spouse" in self.currentText():
+            self.setCurrentIndex(0)  # assuming client will always be first items.
 
     def isEmpty(self):
         """mostly for compatibility with other Entry objects.. Not really useful for ComboBox"""
@@ -588,6 +593,20 @@ class PersonTypeEntry(EnumEntry):
             parent=parent,
             limit_size=100 if limit_size is None else limit_size,
         )
+
+    def enableSpouse(self, enable: bool):
+        # print("enableSpouse", enable)
+        if not enable and "Spouse" == self._widget.currentText():
+            self._widget.setCurrentText("Client")
+
+        _model = self._widget.model()
+        for _i in range(self._widget.count()):
+            if "Spouse" in self._widget.itemText(_i):
+                _item = _model.item(_i)
+                if enable:
+                    _item.setFlags(_item.flags() | Qt.ItemFlag.ItemIsEnabled)
+                else:
+                    _item.setFlags(_item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
 
 
 class WithdrawOrderEntry(EnumEntry):
