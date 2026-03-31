@@ -30,10 +30,6 @@ class MonteCarloTab(QWidget):
         layout.addWidget(self._chart)
         self.setLayout(layout)
 
-        # self._assets_total=0
-        # self._asset_contributions=[]
-        # self._expenses=[]
-
     def _run_simulation(self):
         """calculate total assets as well as expenses and asset contributions for each year"""
 
@@ -98,7 +94,8 @@ class MonteCarloTab(QWidget):
         # if _number_of_runs >= 1000:
 
         _years = [_i for _i in range(len(_balances[0]))]
-        self._chart.setTitle("Monte Carlo Simulation (%s)" % _subtitle)
+        self._chart.setTitle("Monte Carlo Simulation")
+        self._chart.setSubTitle(_subtitle)
         self._chart.setXLabel("Year")
         self._chart.setYLabel("Dollars", units="$")
         self._chart.setXRange(0, len(_years), padding=0)

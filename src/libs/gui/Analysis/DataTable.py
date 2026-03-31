@@ -57,15 +57,9 @@ class DataTableTabBase(QWidget):
 
     # Create table
     def createTable(self, header, vheader, data):
-        # _header, _vheader, _data = self.parent.tableData.get_data_sheet()
-        # _header, _data = self.parent.tableData.get_data_sheet()
 
         self.table.setUpdatesEnabled(False)
-        # self.table.hide()
-        if len(data) != self.table.columnCount():
-            self.table.clear()
-        else:
-            self.table.clearContents()  # just clear the data not the headers... (setting headers is slow after first time)
+        self.table.setRowCount(0)  # best way to clear a table fast....
 
         self.table.setRowCount(len(data))
         self.table.setColumnCount(len(data[0]))

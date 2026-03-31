@@ -11,17 +11,18 @@ class ChartBase(pg.PlotWidget):
         super().__init__(parent, **kwargs)
 
     def setTitle(self, title):
-        self.plotItem.setTitle(title, size="20pt")
+        self.plotItem.setTitle(title, size="15pt")
 
     def setSubTitle(self, subtitle):
-        pass
+        _style = {"font-size": "13pt"}
+        self.setLabel("top", subtitle, **_style)
 
     def setXLabel(self, text, units=""):
-        _style = {"font-size": "15pt"}
+        _style = {"font-size": "13pt"}
         self.setLabel("bottom", text, units=units, **_style)
 
     def setYLabel(self, text, units=""):
-        _style = {"font-size": "15pt"}
+        _style = {"font-size": "13pt"}
         self.setLabel("left", text, units=units, **_style)
 
     # def plot(self, x, y, **kwargs):

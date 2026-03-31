@@ -291,9 +291,12 @@ class HistoricalAnalysisTab(QWidget):
         if False:
             print(len(_years))
             print(len(_balances[0]))
+
         self.chartTab._chart.setTitle(
-            "Historical Analysis (%s to %s)" % (_begin_year, _end_year)
+            "Historical Analysis (%s - %s)" % (_begin_year, _end_year)
         )
+        self.chartTab._chart.setSubTitle("In Todays Dollar")
+
         self.chartTab._chart.setXLabel("Years")
         self.chartTab._chart.setYLabel("Dollars", units="$")
         self.chartTab._chart.addLegend()
