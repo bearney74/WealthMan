@@ -68,16 +68,8 @@ class InputsTab(QMainWindow):
                 self.IncomeInfoTab.spouseSS.setEnabled(_is_married)
                 self.IncomeInfoTab.pension1.Owner.enableSpouse(_is_married)
                 self.IncomeInfoTab.pension2.Owner.enableSpouse(_is_married)
-
-                self.IncomeInfoTab.table.enableSpouse(_is_married)
-            case "Expenses":
-                self.ExpenseInfoTab.table.enableSpouse(_is_married)
-            case "Transfers":
-                self.TransferInfoTab.table.enableSpouse(_is_married)
-                pass
             case "Global Variables":
                 self.GlobalVariablesTab._FilingStatusOnceWidowed.setEnabled(_is_married)
-        # self._previous_tab_name = _tabName
 
     def clear_forms_action(self):
         _action = QAction("Clear forms", self)

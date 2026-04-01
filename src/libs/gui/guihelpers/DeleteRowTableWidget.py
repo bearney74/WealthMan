@@ -182,13 +182,11 @@ class DeleteRowTableWidget(QTableWidget):
         if len(data) == self.numColumns:
             for _col, _element in enumerate(data):
                 _item = self.cellWidget(row, _col)
-                # print(type(_item), isinstance(_item, EnumEntry))
                 if isinstance(_item, Entry):
                     _item.setText(_element)
                     if isinstance(_item, (IntegerEntry, FloatEntry)):
                         _item.setAlignment(Qt.AlignmentFlag.AlignRight)
                 elif isinstance(_item, EnumEntry):
-                    # print("_addRow", _item)
                     _item.set(_element)
                 elif isinstance(_item, QComboBox):
                     _item.setCurrentText(_element)

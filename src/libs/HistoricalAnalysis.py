@@ -6,7 +6,11 @@ from .Projections import DataItem
 
 class PeriodData:
     def __init__(self, beginYear: int, endYear: int):
+        assert isinstance(beginYear, int)
+        assert isinstance(endYear, int)
+        assert beginYear <= endYear
         self.Period = DataItem("Period", "{}", "%s-%s" % (beginYear, endYear))
+
         self.EndingBalance = DataItem("Ending Balance")
         self.Success = DataItem("Successful Period", "{}", True)
         self.BankruptYear = DataItem("Bankrupt Year", "{:}", None)
@@ -16,6 +20,7 @@ class DetailedPeriodData:
     def __init__(self, beginYear: int, endYear: int, currentYear: int):
         assert isinstance(beginYear, int)
         assert isinstance(endYear, int)
+        assert beginYear <= endYear
         self.period = DataItem("Period", "{}", "%s-%s" % (beginYear, endYear))
 
         assert isinstance(currentYear, int)
@@ -81,12 +86,11 @@ class AllocationPeriod:
 class AnnualReturnData:
     def __init__(self, Year, Stocks, Bonds, Cash, Inflation):
         self.Year = int(Year)
-        self.Stocks = 1.0 + float(Stocks) / 100.0
-        self.Bonds = 1.0 + float(Bonds) / 100.0
-        self.Cash = 1.0 + float(Cash) / 100.0
-        self.Inflation = (
-            float(Inflation) / 100.0
-        )  # sometimes we add this (expenses) sometimes subtract (balance)
+
+        self.Stocks = float(Stocks) / 100.0
+        self.Bonds = float(Bonds) / 100.0
+        self.Cash = float(Cash) / 100.0
+        self.Inflation = float(Inflation) / 100.0
 
 
 class HistoricalData:
@@ -190,9 +194,9 @@ class HistoricalAnalysis:
             )
             _accInflation = _accInflation * (1.0 - _record.Inflation)
 
-            _pd.StockReturns.data = (_record.Stocks - 1.0) * 100.0
-            _pd.BondReturns.data = (_record.Bonds - 1.0) * 100.0
-            _pd.CashReturns.data = (_record.Cash - 1.0) * 100.0
+            _pd.StockReturns.data = _record.Stocks * 100.0
+            _pd.BondReturns.data = _record.Bonds * 100.0
+            _pd.CashReturns.data = _record.Cash * 100.0
 
             _pd.InflationRate.data = 100.0 * _record.Inflation
             _pd.FixedIncome.data = self._incomes_fixed[_pos]
@@ -210,9 +214,9 @@ class HistoricalAnalysis:
             )
 
             self._balance += _pd.NetIncome.data
-            # print(self.balance, _return)
-            # find correct allocation
             _pd.BalancePostNetIncome.data = self._balance
+
+            # find correct allocation
             _ap = self.get_allocation_period(_pos)
             if _ap is None:
                 print("AP is None pos=%s" % _pos)
@@ -233,23 +237,24 @@ class HistoricalAnalysis:
                 # _pd.PctCash.data = 100.0 * _ap.pctCash
 
                 _pd.StocksBalance.data = int(
-                    self._balance * _ap.pctStocks * _pd.RORStocks.data / 100.0
+                    self._balance * _ap.pctStocks * (1.0 + _pd.RORStocks.data / 100.0)
                 )
                 _pd.BondsBalance.data = int(
-                    self._balance * _ap.pctBonds * _pd.RORBonds.data / 100.0
+                    self._balance * _ap.pctBonds * (1.0 + _pd.RORBonds.data / 100.0)
                 )
                 _pd.CashBalance.data = int(
-                    self._balance * _ap.pctCash * _pd.RORCash.data / 100.0
+                    self._balance * _ap.pctCash * (1.0 + _pd.RORCash.data / 100.0)
                 )
 
-                _balance = (
+                self._balance = (
                     _pd.StocksBalance.data
                     + _pd.BondsBalance.data
                     + _pd.CashBalance.data
                 )
-                _pd.Inflation.data = int(self._balance * _record.Inflation)
-                self._balance = _balance - _pd.Inflation.data
-                _pd.PostBalance.data = self._balance
+
+            _pd.Inflation.data = int(self._balance * _record.Inflation)
+            self._balance -= _pd.Inflation.data
+            _pd.PostBalance.data = self._balance
 
             _pds.append(_pd)
             if self._balance <= 0:

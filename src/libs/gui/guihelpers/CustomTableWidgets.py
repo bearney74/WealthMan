@@ -198,6 +198,17 @@ class TransferSourceTableWidget(DeleteRowTableWidget):
         # add remove row button to the last column
         self._addRow(_row, data)
 
+    def getData(self):
+        _data = []
+        for _row in range(self.rowCount()):
+            _result = self.getRowData(_row)
+
+            # some fields will contain values
+            if _result[0] != "" and _result[3] is not None:
+                _data.append(_result)
+
+        return _data
+
     def enableSpouse(self, enable: bool) -> None:
         """for each row, enable/disable the items in the comboboxes that
         refer to the spouse

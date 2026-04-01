@@ -70,10 +70,10 @@ class HistoricalAnalysisTest(unittest.TestCase):
         _ard = AnnualReturnData(2005, 8.8, 4.0, 0, 3.2)
 
         self.assertEqual(_ard.Year, 2005)
-        self.assertEqual(_ard.Stocks, 1.088)
-        self.assertEqual(_ard.Bonds, 1.04)
-        self.assertEqual(_ard.Cash, 1.0)
-        self.assertEqual(_ard.Inflation, 0.032)
+        self.assertAlmostEqual(_ard.Stocks, 0.088)
+        self.assertAlmostEqual(_ard.Bonds, 0.04)
+        self.assertAlmostEqual(_ard.Cash, 0.0)
+        self.assertAlmostEqual(_ard.Inflation, 0.032)
 
     def test_HistoricalData(self):
         _hd = HistoricalData()
@@ -84,18 +84,18 @@ class HistoricalAnalysisTest(unittest.TestCase):
         # 1928 data
         self.assertEqual(_data[0].Year, 1928)
         self.assertTrue(isinstance(_data[0], AnnualReturnData))
-        self.assertEqual(_data[0].Stocks, 1.4381)
-        self.assertEqual(_data[0].Bonds, 1.0084)
-        self.assertEqual(_data[0].Cash, 1.0)
-        self.assertEqual(_data[0].Inflation, -0.0116)
+        self.assertAlmostEqual(_data[0].Stocks, 0.4381)
+        self.assertAlmostEqual(_data[0].Bonds, 0.0084)
+        self.assertAlmostEqual(_data[0].Cash, 0.0)
+        self.assertAlmostEqual(_data[0].Inflation, -0.0116)
 
         # 2025 data
         self.assertEqual(_data[-1].Year, 2025)
         self.assertTrue(isinstance(_data[-1], AnnualReturnData))
-        self.assertEqual(_data[-1].Stocks, 1.1772)
-        self.assertEqual(_data[-1].Bonds, 1.078)
-        self.assertEqual(_data[-1].Cash, 1.0)
-        self.assertEqual(_data[-1].Inflation, 0.0274)
+        self.assertAlmostEqual(_data[-1].Stocks, 0.1772)
+        self.assertAlmostEqual(_data[-1].Bonds, 0.078)
+        self.assertAlmostEqual(_data[-1].Cash, 0.0)
+        self.assertAlmostEqual(_data[-1].Inflation, 0.0274)
 
 
 if __name__ == "__main__":

@@ -185,11 +185,8 @@ class HistoricalAnalysisTab(QWidget):
         for _step, _pyd in enumerate(self.parent.projectionData):
             # _contributions = _pyd.assetContributionTotal.data
 
-            # use incomeSources to get regular income (job, SS, pensions, etc)
-            _expense_total = _pyd.expenseTotal.data - _pyd.activeIncomeTotal.data
+            _expense_total = _pyd.expenseTotal.data
 
-            if _expense_total < 0.0:  # sometimes we may have a surplus of income...
-                _expense_total = 0.0
             # _asset_contributions.append(_contributions)
             _expenses.append(_expense_total)
 

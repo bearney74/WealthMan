@@ -30,7 +30,7 @@ class MonteCarloSimulator:
         self._expenses = expenses
 
         self._bankrupt = False
-        self._bankrupt_step = None  # the iterator in which we went bankrupt.
+        self._bankrupt_step = None  # the iterator ("step") in which we went bankrupt.
 
         assert isinstance(avgReturnGen, StdDevRandomNumberGenerator)
         self._avg_return_generator = avgReturnGen
@@ -54,26 +54,20 @@ class MonteCarloSimulator:
 
     def process(self):
         self._balances = []
-        self._returns = []
-        self._inflations = []
         self._bankrupt = False
 
-        # import csv
-        # _csv=csv.writer(open("mcs.csv", "w"))
-        # _csv.writerow(["balance", "expense", "avg return", "inflation", "expense1", "ror", "balance_after"])
-        _purchase_power = 1.0  # start at 1.0
         for _step, _expense in enumerate(self._expenses):
             # get average return
             _avg_return = self._avg_return_generator.get_rate()
             _inflation_rate = self._avg_inflation_rate_generator.get_rate()
 
-            # _data=[self._balance, _expense, _avg_return, _inflation_rate]
-            # subtract the expense from the balance (after applying the inflation factor)
-            _inflated_expense = _expense * (1.0 + _inflation_rate)
-            self._balance -= _inflated_expense
+            # subtract the expense from the balance
+            # no need to adjust expenses by inflation since we are keeping
+            # the balance in todays dollars
+            self._balance -= _expense
 
-            # check if we have a positive balance or not
             _ror = _avg_return - _inflation_rate
+            # check if we have a positive balance or not
             if self._balance > 0:
                 # if we have a positive balance, adjust by average return
                 self._balance *= 1.0 + _ror
@@ -84,21 +78,11 @@ class MonteCarloSimulator:
                 if self._bankrupt_step is None:
                     self._bankrupt_step = _step
 
-            # _data += [_inflated_expense, _ror, self._balance]
-            # _csv.writerow(_data)
             # add this balance for record keeping if we want it..
             self._balances.append(self._balance)
-            self._returns.append(_avg_return)
-            self._inflations.append(_inflation_rate)
 
     def get_balances(self):
         return self._balances
-
-    def get_returns(self):
-        return self._returns
-
-    def get_inflations(self):
-        return self._inflations
 
 
 def stats(data: list[int]):
@@ -114,9 +98,6 @@ def stats(data: list[int]):
 
 
 if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-    import numpy as np
-
     ## needed inputs are:
     # total expenses for each year.
     # starting balance
@@ -126,7 +107,7 @@ if __name__ == "__main__":
     # avg s&P500 returns from 1928 - 2025 is 11.85
     # st dev (s&P500) from 1928 - 2025 is 19.40
     # avg inflation for 1928 - 2025 = 3.11
-    # std dev (s&P500) from 1928 - 2025 = 3.90
+    # std dev (inflation) from 1928 - 2025 = 3.90
     def run_simulator(number_of_runs, balance, expenses):
         _success = 0
         _failure_step = []
@@ -148,34 +129,6 @@ if __name__ == "__main__":
             else:  # keep track of which step we ran out of money??
                 _failure_step.append(_sim.bankrupt_step())
 
-        # _percent_success= 100.0 * _success/float(number_of_runs)
-        # _failure_stats=stats(_failure_step)
-        # return _percent_success, _failure_stats
-
         return _balances
 
-    def create_fanchart(results):
-        result = np.array(results).T
-        # print(result)
-        x = np.arange(result.shape[0])
-        # x=list(range(len(results[0])))
-        # for the median use `np.median` and change the legend below
-        median = np.median(result, axis=1)
-        offsets = (10, 20, 30, 40)
-        fig, ax = plt.subplots()
-        ax.plot(median, color="black", lw=2)
-        for offset in offsets:
-            low = np.percentile(result, 50 - offset, axis=1)
-            high = np.percentile(result, 50 + offset, axis=1)
-            # since `offset` will never be bigger than 50, do 55-offset so that
-            # even for the whole range of the graph the fanchart is visible
-            alpha = (55 - offset) / 100
-            ax.fill_between(x, low, high, color="blue", alpha=alpha)
-        ax.legend(["Median"] + [f"Pct{2 * o}" for o in offsets])
-        ax.axhline(y=0, color="gray", linestyle="dashed")  # dashed line at 0
-        return fig, ax
-
     _results = run_simulator(1, 1000, [40] * 35)
-
-    # fig, ax = create_fanchart(_results)
-    # plt.show()

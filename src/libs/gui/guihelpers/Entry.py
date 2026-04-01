@@ -503,10 +503,10 @@ class EnumEntry(QWidget):
         return [member.value for member in enum]
 
     def set(self, item: Enum) -> None:
+        # print(type(item), item)
         if isinstance(item, StrEnum):
             self._widget.setCurrentText(item.value)
         elif isinstance(item, str):
-            # print(item)
             self._widget.setCurrentText(item)
         else:
             print(

@@ -120,9 +120,13 @@ class PersonBasicInfo(FormValidator):
         self._lifespan_age.add_dependencies([self._name])
 
     def selectionchange(self, i):
-        self.parent._spouseinfo.setEnabled(
-            self._status.enumValue() == RelationStatusType.MARRIED
-        )
+        _is_married = self._status.enumValue() == RelationStatusType.MARRIED
+
+        self.parent._spouseinfo.setEnabled(_is_married)
+
+        self.parent.parent.IncomeInfoTab.table.enableSpouse(_is_married)
+        self.parent.parent.ExpenseInfoTab.table.enableSpouse(_is_married)
+        self.parent.parent.TransferInfoTab.table.enableSpouse(_is_married)
 
     def setEnabled(self, flag: bool):
         super().setEnabled(flag)
