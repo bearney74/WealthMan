@@ -487,7 +487,8 @@ class Projections(QRunnable):
             _surplusAccount = SurplusAccount(0, self.SurplusAccountInterestRate)
         else:  # use brokerage as surplus account
             _surplusAccount = self._retrieve_asset_object(
-                AccountOwnerType.CLIENT, AccountType.REGULAR
+                AccountOwnerType.BOTH,  # yes, even if the client is single...
+                AccountType.REGULAR,
             )
 
         if _surplusAccount is None:
@@ -663,15 +664,7 @@ class Projections(QRunnable):
 
                 if _deficit < 0:
                     # we need to take the deficit from somewhere ..
-                    if self.UseSurplusAccount:
-                        _surplusAccount.balance += _deficit
-                    else:
-                        # find regular account
-                        _regular = self._retrieve_asset_object(
-                            AccountOwnerType.CLIENT, AccountType.REGULAR
-                        )
-                        _regular.balance += _deficit
-                # if _deficit > 0:  # we have a deficit.. what do we do?? where do we subtract this from?
+                    _surplusAccount.balance += _deficit
 
             for _src in self._Assets:
                 _src.calc_interest(self._inflation)
@@ -757,7 +750,7 @@ class Projections(QRunnable):
 
             # federal taxes
             # fix me!
-            _ft = FederalTax(_pyd.federalTaxFilingStatus.data, 2024)
+            _ft = FederalTax(_pyd.federalTaxFilingStatus.data)
             # _taxable_income = (
             #    _income_total - _ss_income_total + _pyd.ssTaxableIncome
             # )  # + _surplusWithdraw
@@ -770,6 +763,7 @@ class Projections(QRunnable):
             )
 
             # fix me!  I don't think long term capital gains is calculated this way..
+            # I believe it is calculated on top of your income..
             # _pyd.longTermCapitalGainsTaxes.data = _ft.calc_ltcg_taxes(
             #    _withdraw_dict[AccountType.REGULAR] + _pyd.surplusWithdraw.data
             # )

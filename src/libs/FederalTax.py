@@ -6,9 +6,9 @@ from .ImportHelper import ImportHelper
 
 
 class FederalTax(ImportHelper):
-    def __init__(self, FileStatus: FederalTaxStatusType, Year: int):
+    def __init__(self, FileStatus: FederalTaxStatusType):
         self.FileStatus = FileStatus
-        self.Year = Year
+        self.Year = None
 
         self.Brackets = None
         self.StandardDeduction = None
@@ -31,7 +31,7 @@ class FederalTax(ImportHelper):
         self._root = _xml.getroot()
 
         assert self._root.tag == "xml"
-        assert self._root.attrib["Year"] == "%s" % self.Year
+        self.Year = self._root.attrib["Year"]
 
         assert self._root.attrib["Data"] == "Federal Tax Brackets"
 

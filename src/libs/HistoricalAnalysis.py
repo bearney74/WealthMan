@@ -96,7 +96,12 @@ class AnnualReturnData:
 class HistoricalData:
     def __init__(self):
         self._data = []
+        self.firstYear = 9999
+        self.lastYear = 0
 
+        self._read_file()
+
+    def _read_file(self):
         _filename = "data/asset_return_rates.csv"
         if not os.path.exists(_filename):
             _filename = "src/libs/data/asset_return_rates.csv"
@@ -113,6 +118,8 @@ class HistoricalData:
                 _bond,
                 _inflation,
             ) in _csv:
+                self.firstYear = min(self.firstYear, int(_year))
+                self.lastYear = max(self.lastYear, int(_year))
                 _cash = 0.0  # cash has a return rate of 0
                 _dict[int(_year)] = AnnualReturnData(
                     _year, _sp500, _bond, _cash, _inflation
@@ -140,6 +147,7 @@ class HistoricalData:
 class HistoricalAnalysis:
     def __init__(
         self,
+        historicalData,
         begin_year,
         end_year,
         incomes_fixed,
@@ -164,8 +172,7 @@ class HistoricalAnalysis:
         self._accountAllocations = accountAllocations
         self._defaultReturnRate = DefaultReturnRate
 
-        _hd = HistoricalData()
-        self._data = _hd.get_data(begin_year, end_year)
+        self._data = historicalData.get_data(begin_year, end_year)
 
         assert (
             len(incomes_fixed)
@@ -294,7 +301,9 @@ if __name__ == "__main__":
             incomes_with_COLA.append(0)
             expenses.append(4)
 
+        _historicalData = HistoricalData()
         _rs = HistoricalAnalysis(
+            _historicalData,
             begin_year,
             end_year,
             incomes_fixed,
