@@ -23,39 +23,41 @@ class ChartTab(QWidget):
 
         self.variables.currentIndexChanged.connect(self._selectionchange)
 
+        self._data = None
+        self._variable_map = {}
+
+    def initialize(self):
+        if self._data is None:
+            self._data = self.parent.tableData.get_chart_data()
+
+            for _name, _dataItem in self._data[0].items():
+                if isinstance(_dataItem, DataItem):
+                    self._variable_map[_dataItem.header] = _name
+
     def setCategories(self):
         self.variables.clear()
-        _data = self.parent.tableData.get_chart_data()
-        _categories = []
-        for _key, _dataItem in _data[0].items():
-            if _key != "federalTaxFilingStatus":
-                _categories.append(_dataItem.header)
 
-        self.variables.addItems(_categories)
+        self.variables.addItems(list(self._variable_map.keys()))
         self.variables.setCurrentText("Total Assets")
 
     def _selectionchange(self, i):
         _ndx = self.variables.currentIndex()
         _category = self.variables.currentText()
-        _data = self.parent.tableData.get_chart_data()
 
         # figure out the variable name from the "user friendly" category variable..
-        _variable_name = None
-        for _var_name, _dataItem in _data[0].items():
-            if isinstance(_dataItem, DataItem):
-                if _category == _dataItem.header:
-                    _variable_name = _var_name
+        _variable_name = self._variable_map[_category]
 
         if _variable_name is not None:
             _x = []
             _y = []
-            for _record in _data:
+            for _record in self._data:
                 _x.append(_record["projectionYear"].data)
                 _y.append(_record[_variable_name].data)
 
             self.chart.setTitle(_category)
             self.chart.setXLabel("Year")
             self.chart.setYLabel("Dollars", units="$")
+            self.chart.setRightYLabel("Dollars", units="$")
 
             # fix me currently subtitles don't work well
             if self.parent.tableData.InTodaysDollars:

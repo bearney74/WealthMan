@@ -67,6 +67,8 @@ class AnalysisTab(QWidget):
         self.AssetDataTableTab.createTable()
         self.TaxDataTableTab.createTable()
         self.DataTableTab.createTable()
+
+        self.ChartTab.initialize()
         self.ChartTab.setCategories()
 
         self.parent.statusbar.showMessage("Done updating Analysis GUI", 2000)
@@ -77,5 +79,3 @@ class AnalysisTab(QWidget):
         match _tabName:
             case "Custom Charts":
                 self.CustomChartTab.AssetTotals()
-            # case "Monte Carlo":
-            #    self.MonteCarloTab.CalcInputs()

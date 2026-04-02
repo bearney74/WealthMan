@@ -93,6 +93,7 @@ class CustomChartTab(QWidget):
         self.stackchart.setTitle("Asset Totals")
         self.stackchart.setXLabel("Year")
         self.stackchart.setYLabel("Dollars", units="$")
+        self.stackchart.setRightYLabel("Dollars", units="$")
         self.stackchart.addLegend()
         if self.parent.tableData.InTodaysDollars:
             self.stackchart.setSubTitle("In Today's Dollars")
@@ -130,6 +131,8 @@ class CustomChartTab(QWidget):
         self.stackchart.setTitle(title)
         self.stackchart.setXLabel("Year")
         self.stackchart.setYLabel("Dollars", units="$")
+        self.stackchart.setRightYLabel("Dollars", units="$")
+
         self.stackchart.addLegend()
         if self.parent.tableData.InTodaysDollars:
             self.stackchart.setSubTitle("In Today's Dollars")
@@ -160,6 +163,7 @@ class CustomChartTab(QWidget):
         self.multiplelineschart.setTitle("Income Vs Expenses")
         self.multiplelineschart.setXLabel("Year")
         self.multiplelineschart.setYLabel("Dollars", units="$")
+        self.multiplelineschart.setRightYLabel("Dollars", units="$")
         self.multiplelineschart.addLegend()
         if self.parent.tableData.InTodaysDollars:
             self.multiplelineschart.setSubTitle("In Today's Dollars")

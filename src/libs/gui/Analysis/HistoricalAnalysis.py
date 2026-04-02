@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 
-from libs.HistoricalAnalysis import HistoricalAnalysis, AllocationPeriod
+from libs.HistoricalAnalysis import HistoricalAnalysis, AllocationPeriod, HistoricalData
 from libs.Projections import DataItem
 from libs.gui.guihelpers.Entry import PercentEntry
 
@@ -129,6 +129,9 @@ class HistoricalAnalysisTab(QWidget):
         layout.addWidget(self.tabs)
         self.setLayout(layout)
 
+        # read yearly inflation rate, and rate of returns for stocks and bonds..
+        self._historicalData = HistoricalData()
+
     def _copy_to_input(self):
         self.parent.parent.InputsTab.MiscInfoTab._pctStocks.set(
             self._pctStocks.get_float(0)
@@ -157,6 +160,7 @@ class HistoricalAnalysisTab(QWidget):
     ):
 
         _rs = HistoricalAnalysis(
+            self._historicalData,
             begin_year,
             end_year,
             incomes_fixed,
@@ -251,9 +255,8 @@ class HistoricalAnalysisTab(QWidget):
         _forecast_years = self.dataVariables.forecastYears
 
         _balances = []
-        # fix me.. hardcoding end year for now..
-        _begin_year = 1928
-        _end_year = 2025
+        _begin_year = self._historicalData.firstYear
+        _end_year = self._historicalData.lastYear
 
         _total = 0
         _count = 0
@@ -296,6 +299,8 @@ class HistoricalAnalysisTab(QWidget):
 
         self.chartTab._chart.setXLabel("Years")
         self.chartTab._chart.setYLabel("Dollars", units="$")
+        self.chartTab._chart.setRightYLabel("Dollars", units="$")
+
         self.chartTab._chart.addLegend()
         self.chartTab._chart.plot_data(_years, _balances, _names, median=True)
         self.chartTab._chart.show(True)

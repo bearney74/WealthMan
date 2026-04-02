@@ -89,6 +89,7 @@ class MonteCarloTab(QWidget):
         self._chart.setSubTitle("%4.1f%% Success Rate" % _success_rate)
         self._chart.setXLabel("Year")
         self._chart.setYLabel("Dollars", units="$")
+        self._chart.setRightYLabel("Dollars", units="$")
         self._chart.setXRange(0, len(_years), padding=0)
 
         self._chart.plot_data(_years, _balances)

@@ -25,6 +25,10 @@ class ChartBase(pg.PlotWidget):
         _style = {"font-size": "13pt"}
         self.setLabel("left", text, units=units, **_style)
 
+    def setRightYLabel(self, text, units=""):
+        _style = {"font-size": "13pt"}
+        self.setLabel("right", text, units=units, **_style)
+
     # def plot(self, x, y, **kwargs):
     #    self.plotItem.plot(x, y, kwargs)
 
@@ -53,6 +57,7 @@ class MultiLineChart(ChartBase):
 
     def plot_data(self, x, y, names, pen=None, median=False):
         self.clear()
+
         if isinstance(y[0], list):
             # _max=len(names)
             if len(y) > 10:
@@ -82,6 +87,7 @@ class StackChart(ChartBase):
 
     def plot_data(self, x, y, names):
         self.clear()
+
         stacked_y = np.cumsum(y, axis=0)
 
         if isinstance(y[0], list):
@@ -105,8 +111,6 @@ class MonteCarloChart(ChartBase):
     def plot_data(self, x, y):
         self.clear()
         # put an y axis on the right side of the chart.
-        _style = {"font-size": "15pt"}
-        self.setLabel("right", "Dollars", units="$", **_style)
 
         result = np.array(y).T
         x = np.arange(result.shape[0])
