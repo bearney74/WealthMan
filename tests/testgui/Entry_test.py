@@ -6,7 +6,7 @@ sys.path.append("src")
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
 from PyQt6.QtTest import QTest
 
-from libs.gui.guihelpers.Entry import YearEntry, AgeEntry
+from libs.gui.guihelpers.Entry import YearEntry, AgeEntry, MoneyEntry
 
 from tests.TestCaseQt import TestCaseQt
 
@@ -29,6 +29,9 @@ class MyTestApp(QMainWindow):
         self._teenage = AgeEntry(min=13, max=19)
         _layout.addWidget(self._teenage)
 
+        self._money = MoneyEntry()
+        _layout.addWidget(self._money)
+
         container = QWidget()
         container.setLayout(_layout)
         self.setCentralWidget(container)
@@ -48,6 +51,7 @@ class EntryTest(TestCaseQt):
         self._test_year()
         self._test_age()
         self._test_teenage()
+        self._test_money()
 
     def _test_year(self):
         _year = self.form._year
@@ -125,6 +129,22 @@ class EntryTest(TestCaseQt):
         _teen.clear()
         QTest.keyClicks(_teen, "21")
         self.assertFalse(_teen.has_valid_input())
+
+    def _test_money(self):
+        _money = self.form._money
+
+        _money.clear()
+        QTest.keyClicks(_money, "13")
+
+        self.assertEqual(_money.text(), "13")
+        self.assertEqual(_money.get_int(), 13)
+        self.assertEqual(_money.rawText(), "$13")
+
+        _money.clear()
+        QTest.keyClicks(_money, "9876")
+        self.assertEqual(_money.text(), "9876")
+        self.assertEqual(_money.get_int(), 9876)
+        self.assertEqual(_money.rawText(), "$9,876")
 
 
 if __name__ == "__main__":

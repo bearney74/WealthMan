@@ -1,5 +1,6 @@
 from datetime import datetime, date
 from enum import Enum, StrEnum
+import re
 
 from PyQt6.QtWidgets import QLineEdit, QWidget, QComboBox, QHBoxLayout, QLabel
 from PyQt6.QtGui import QIntValidator, QDoubleValidator
@@ -313,38 +314,31 @@ class MoneyEntry(IntegerEntry):
         )
         # self.setFixedWidth(80)
 
-        self.__comma_enabled = True
-        self.textEdited.connect(self.__textEdited)
+        self._comma_enabled = True
+        self.textEdited.connect(self._textEdited)
 
-    def __textEdited(self, text):
-        if self.__comma_enabled:
+    def _textEdited(self, text):
+        if self._comma_enabled:
             self.setCommaToText()
 
-    def setComma(self, f: bool):
-        self.__comma_enabled = f
+    def setComma(self, flag: bool):
+        self._comma_enabled = flag
         self.setCommaToText()
 
     def setCommaToText(self):
         text = IntegerEntry.text(self)
-        cur_pos = self.cursorPosition()
+        _len_before = len(text)
+        _cur_pos = self.cursorPosition()
         if text:
-            if self.__comma_enabled:
-                text = text.replace("$", "")
-                # if text.startswith("$"):
-                #    text = text[1:]
-                text = text.replace(",", "")
-                if text.find(".") == -1:
-                    if text == "":
-                        IntegerEntry.setText(self, "")
-                    else:
-                        IntegerEntry.setText(self, "${:,}".format(int(text)))
-                else:
-                    pre_dot, post_dot = text.split(".")
-                    text = "${:,}".format(int(pre_dot)) + "." + post_dot
-                    IntegerEntry.setText(self, text)
-                self.setCursorPosition(cur_pos + 1)
+            text = re.sub(r"[^0-9]", "", text)  # we are only interested in numbers
+            if text == "":
+                IntegerEntry.setText(self, "")
+            elif self._comma_enabled:
+                _text = "${:,}".format(int(text))
+                IntegerEntry.setText(self, _text)
+                self.setCursorPosition(_cur_pos - _len_before + len(_text))
             else:
-                self.setText(text.replace(",", ""))
+                IntegerEntry.setText(self, "${:}".format(int(text)))
 
     def setText(self, text):
         IntegerEntry.setText(self, text)
@@ -352,9 +346,10 @@ class MoneyEntry(IntegerEntry):
 
     def text(self):
         _text = IntegerEntry.text(self)
-        if _text.startswith("$"):
-            _text = _text[1:]
-        return _text.replace(",", "")
+        return re.sub(r"[^0-9]", "", _text)
+
+    def rawText(self):  # mainly used in testing...
+        return IntegerEntry.text(self)
 
 
 class FloatEntry(Entry):

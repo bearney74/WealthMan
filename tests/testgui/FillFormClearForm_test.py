@@ -7,7 +7,7 @@ sys.path.append("src")
 from PyQt6.QtWidgets import QWidgetItem, QPushButton
 from PyQt6.QtTest import QTest
 
-from libs.gui.guihelpers.Entry import AgeEntry
+from libs.gui.guihelpers.Entry import AgeEntry, MoneyEntry, FloatEntry, StringEntry
 
 from libs.DataVariables import DataVariables
 from libs.EnumTypes import RelationStatusType, PersonType
@@ -27,6 +27,7 @@ class FillFormClearForm(TestCaseQt):
         self.qapp.exit()
 
     def _testString(self, variable, s):
+        assert isinstance(variable, StringEntry)
         variable.clear()
         QTest.keyClicks(variable, s)
         self.assertEqual(variable.text(), s)
@@ -36,15 +37,12 @@ class FillFormClearForm(TestCaseQt):
 
         variable.clear()
         QTest.keyClicks(variable, age)
-        # if variable.check_value():
         self.assertEqual(variable.text(), age)
 
     def _testMoney(self, variable, amount):
-        # fix me QTest.keyClicks doesn't work on MoneyEntry
-        # variable.clear()
-        # QTest.keyClicks(variable, amount)
-
-        variable.setText(amount)
+        assert isinstance(variable, MoneyEntry)
+        variable.clear()
+        QTest.keyClicks(variable, amount)
         self.assertEqual(variable.text(), amount)
 
         if amount == "":
@@ -53,11 +51,9 @@ class FillFormClearForm(TestCaseQt):
             self.assertEqual(variable.get_int(), int(amount))
 
     def _testPercent(self, variable, pct):
+        assert isinstance(variable, FloatEntry)
         variable.clear()
-        # fix me .. this doesn't appear to update the entry..
-        # QTest.keyClicks(variable, pct)
-
-        variable.setText(pct)
+        QTest.keyClicks(variable, pct)
         self.assertEqual(variable.text(), pct)
 
         if pct == "":
@@ -266,6 +262,7 @@ class FillFormClearForm(TestCaseQt):
         _gvt._SurplusAccount.click()
         self.assertFalse(_gvt._SurplusAccountInterestRate.isEnabled())
 
+        _gvt._SurplusAccount.click()
         self._testPercent(_gvt._SurplusAccountInterestRate, "2.9")
         self._testPercent(_gvt._SurplusAccountInterestRate, "")
 
@@ -286,10 +283,10 @@ class FillFormClearForm(TestCaseQt):
         self._testPercent(_misc._inflation_stdDev, "")
 
         # historial Analysis variables
-        self._testPercent(_misc._pctStocks, "9.8")
+        self._testPercent(_misc._pctStocks, "85")
         self._testPercent(_misc._pctStocks, "")
 
-        self._testPercent(_misc._pctBonds, "2.5")
+        self._testPercent(_misc._pctBonds, "15")
         self._testPercent(_misc._pctBonds, "")
 
 
