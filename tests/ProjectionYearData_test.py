@@ -18,8 +18,8 @@ class ProjectionYearDataTest(unittest.TestCase):
         self.assertEqual(_p.ssTaxRate.header, "SS Tax Rate")
         self.assertEqual(_p.expenseTotal.header, "Expense Total")
 
-        self.assertEqual(_p.cashFlow.header, "Cash Flow")
-        self.assertEqual(_p.surplusDeficit.header, "Surplus Deficit")
+        self.assertEqual(_p.netIncome.header, "Net Income")
+        # self.assertEqual(_p.surplusDeficit.header, "Surplus Deficit")
         self.assertEqual(_p.thisYearsFederalTaxes.header, "This Years Federal Taxes")
         # self.assertEqual(self..header, "")
 

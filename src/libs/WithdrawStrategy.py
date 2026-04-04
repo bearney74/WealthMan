@@ -92,10 +92,10 @@ class WithdrawStrategy:
                 # for now we assume that we cannot access these accounts if owner < 59 years of age
                 match _asset.Owner:
                     case AccountOwnerType.CLIENT:
-                        if self.clientAge < 59:
+                        if self.clientAge < 60:
                             continue
                     case AccountOwnerType.SPOUSE:
-                        if self.spouseAge < 59:
+                        if self.spouseAge < 60:
                             continue
 
             # if we get here, we can take some money from the account..

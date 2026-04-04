@@ -262,7 +262,7 @@ class HistoricalAnalysisTab(QWidget):
         _count = 0
         _detailed_period_data = []
         _period_datas = []
-        for _start_year in range(_begin_year, _end_year - _forecast_years):
+        for _start_year in range(_begin_year, _end_year - _forecast_years - 1):
             _end_year = _start_year + _forecast_years
             _success, _balance, _perioddata, _pd = self._run_single_period(
                 _start_year,
@@ -300,8 +300,9 @@ class HistoricalAnalysisTab(QWidget):
         self.chartTab._chart.setXLabel("Years")
         self.chartTab._chart.setYLabel("Dollars", units="$")
         self.chartTab._chart.setRightYLabel("Dollars", units="$")
-
+        self.chartTab._chart.setXRange(0, len(_years) -1, padding=0)
         self.chartTab._chart.addLegend()
+
         self.chartTab._chart.plot_data(_years, _balances, _names, median=True)
         self.chartTab._chart.show(True)
 

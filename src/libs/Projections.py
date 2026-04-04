@@ -84,6 +84,13 @@ class DataItem:
         return self._format.format(self._data)
 
 
+class PercentDataItem(DataItem):
+    def __init__(self, header: str, format="{:.1f}%", default_data: float = None):
+        super(PercentDataItem, self).__init__(
+            header, format=format, default_data=default_data
+        )
+
+
 class ProjectionYearData:
     def __init__(self, year: int):
         """This is a single years projection data"""
@@ -96,41 +103,42 @@ class ProjectionYearData:
         self.spouseIsAlive: bool = None
 
         self.incomeSources = []
-        self.taxableIncomeTotal: DataItem = DataItem("Total Taxable Income")
         self.incomeTotal: DataItem = DataItem("Income Total")
         self.activeIncomeTotal: DataItem = DataItem("Active Income Total")
-        self.FPL: DataItem = DataItem("FPL", "{:.1f}%", 0.0)  # float = 0.0
 
         self.ssIncomeTotal: DataItem = DataItem("SS Income Total")  # int = 0
         self.ssTaxableIncome: DataItem = DataItem("SS Taxable Income")  # int = 0
-        self.ssTaxRate: DataItem = DataItem("SS Tax Rate", "{:.1f}%")
+        self.ssTaxRate: DataItem = PercentDataItem("SS Tax Rate")
+        self.taxableIncomeTotal: DataItem = DataItem("Total Taxable Income")
 
         self.expenseSources = []
         self.expenseTotal: DataItem = DataItem("Expense Total")  # int = 0
 
-        self.cashFlow: DataItem = DataItem("Cash Flow")
-        self.surplusDeficit: DataItem = DataItem("Surplus Deficit")
+        self.netIncome: DataItem = DataItem("Net Income")
         self.federalTaxFilingStatus: DataItem = DataItem(
             "Federal Tax Filing Status", "{.value}", None
         )
         self.thisYearsFederalTaxes: DataItem = DataItem("This Years Federal Taxes")
+        self.lastYearsFederalTaxes: DataItem = DataItem("Last Years Federal Taxes")
 
-        self.federalEffectiveTaxRate: DataItem = DataItem(
-            "Federal Effective Tax Rate", "{:.1f}%"
+        self.federalEffectiveTaxRate: DataItem = PercentDataItem(
+            "Federal Effective Tax Rate"
         )
-        self.federalMarginalTaxRate: DataItem = DataItem(
-            "Federal Marginal Tax Rate", "{:.1f}%"
+        self.federalMarginalTaxRate: DataItem = PercentDataItem(
+            "Federal Marginal Tax Rate"
         )
 
-        self.longTermCapitalGainsTaxes: DataItem = DataItem("LTCG Taxes")  # int = 0
-
-        # cash flow is just incometotal-expenseTotal - federaltaxes
+        # self.longTermCapitalGainsTaxes: DataItem = DataItem("LTCG Taxes")  # int = 0
 
         self.assetTotalBalance = DataItem("Total Asset Balance")
         self.assetTotalDeposits = DataItem("Total Asset Deposits")
         self.assetTotalWithdraws = DataItem("Total Asset Withdraws")
         self.assetTotalReturns = DataItem("Total Asset Returns")
         self.assetTotalContributions = DataItem("Total Asset Contributions")
+        self.assetTotalNetDeposits = DataItem(
+            "Total Asset Net Deposits"
+        )  # deposits - withdraws
+        self.assetTotalCashFlow = DataItem("Total Asset Cash Flow")
 
         self.assetTaxDeferredWithdraws = DataItem(
             "Total Tax Deferred Withdraws"
@@ -150,22 +158,23 @@ class ProjectionYearData:
 
         # required Minimal distributions
         self.clientRMD: DataItem = DataItem("Client RMDs")  # int = 0
-        self.clientRMDPercent: DataItem = DataItem("% Client RMDs", "{:.1f}%")
+        self.clientRMDPercent: DataItem = PercentDataItem("% Client RMDs")
 
         self.spouseRMD: DataItem = DataItem("Spouse RMDs")  # int = 0
-        self.spouseRMDPercent: DataItem = DataItem("% Spouse RMDs", "{:.1f}%")
+        self.spouseRMDPercent: DataItem = PercentDataItem("% Spouse RMDs")
 
         self.totalRMD: DataItem = DataItem("Total RMDs")  # int = 0
-        self.totalRMDPercent: DataItem = DataItem("% Total RMDs", "{:.1f}%")
+        self.totalRMDPercent: DataItem = PercentDataItem("% Total RMDs")
 
         # surplus account
-        self.surplusBalance: DataItem = DataItem("Surplus Account")  # int = 0
-        self.surplusWithdraw: DataItem = DataItem("Surplus Withdraw")  # int = 0
+        self.surplusBalance: DataItem = DataItem("Surplus Acct. Balance")  # int = 0
+        self.surplusWithdraw: DataItem = DataItem("Surplus Acct. Withdraw")  # int = 0
 
+        self.FPL: DataItem = PercentDataItem("FPL", default_data=0.0)
         self.AW: DataItem = DataItem(
             "Total Asset Drawdown"
         )  # TAD = Total Asset Drawdown
-        self.AWR: DataItem = DataItem("Asset DrawDown Rate", "{:.1f}%")  # float = 0
+        self.AWR: DataItem = PercentDataItem("Asset DrawDown Rate")
 
 
 class Projections(QRunnable):
@@ -191,6 +200,8 @@ class Projections(QRunnable):
         self._begin_year = (
             dv.start_year if dv.start_year is not None else datetime.now().year
         )
+
+        self._end_year = self._begin_year + dv.forecastYears
 
         self._withdrawOrder = dv.withdrawOrder
 
@@ -474,7 +485,6 @@ class Projections(QRunnable):
                 )
             )
 
-        self._end_year = self._begin_year + dv.forecastYears
         self._federal_tax_status = dv.federalFilingStatus
         self._federal_tax_status_once_widowed = dv.federalFilingStatusOnceWidowed
 
@@ -482,14 +492,14 @@ class Projections(QRunnable):
     def run(self):
         _projection_data = []
 
+        _regularAccount = self._retrieve_asset_object(
+            AccountOwnerType.BOTH, AccountType.REGULAR
+        )
         # _surplusAccount=None
         if self.UseSurplusAccount:
             _surplusAccount = SurplusAccount(0, self.SurplusAccountInterestRate)
         else:  # use brokerage as surplus account
-            _surplusAccount = self._retrieve_asset_object(
-                AccountOwnerType.BOTH,  # yes, even if the client is single...
-                AccountType.REGULAR,
-            )
+            _surplusAccount = _regularAccount
 
         if _surplusAccount is None:
             print("Surplus Account is None")
@@ -515,7 +525,8 @@ class Projections(QRunnable):
         # else:
         #    print("Error! Spouse IRA Account not found...")
 
-        for _year in range(self._begin_year, self._end_year + 1):
+        _lastYearsFederalTaxes = 0
+        for _year in range(self._begin_year, self._end_year):
             _number_of_years = _year - self._begin_year
             # reset some asset variables (deposits, withdraws, taxable_income, ltcg_income, etc)
             for _asset in self._Assets:
@@ -525,6 +536,7 @@ class Projections(QRunnable):
                 _surplusAccount.beginning_of_year_bookkeeping()
 
             _pyd = ProjectionYearData(_year)
+            _pyd.lastYearsFederalTaxes.data = _lastYearsFederalTaxes
             # fix me
             _last_day_of_year = date(
                 _year, 12, 31
@@ -586,7 +598,14 @@ class Projections(QRunnable):
                 _pyd.expenseSources.append(DataItem(_src.Name, "${:,}", _expense))
 
                 _pyd.expenseTotal.data += _expense
-            # _pyd.expenseTotal.data = _expense_total
+
+            _pyd.expenseTotal.data += _pyd.lastYearsFederalTaxes.data
+
+            _pyd.netIncome.data = (
+                _pyd.activeIncomeTotal.data
+                + _pyd.ssIncomeTotal.data
+                - _pyd.expenseTotal.data
+            )
 
             # do transfers between accounts
             # print("Transfers")
@@ -631,11 +650,7 @@ class Projections(QRunnable):
                     / (_client_boy_balance + _spouse_boy_balance)
                 )
 
-            # print("%s: invalid logic for withdrawing totalRMD.. fix me" % __file__)
-            # use new Account functions for this.. at the end we can populate the
-            # proper pyd variables for deposit and Withdraws..
-            # calc cash flow
-
+            # contributions..
             _contribution_total = 0
             for _src in self._Assets:
                 # running this does the contributions for all accounts in self._Assets
@@ -643,12 +658,25 @@ class Projections(QRunnable):
                     _year, _number_of_years, self._inflation
                 )
 
-            _pyd.cashFlow.data = (
-                _income_total - _pyd.expenseTotal.data - _contribution_total
-            )
+            if _contribution_total > 0:  # need to pull this money somewhere...
+                if _pyd.netIncome.data >= _contribution_total:
+                    _pyd.netIncome.data -= _contribution_total
+                elif _pyd.netIncome.data > 0:
+                    _contribution_total -= _pyd.netIncome.data
+                    _pyd.netIncome.data = 0
+
+                if _contribution_total > 0:  # we still need to pull from wherewhere...
+                    if self.UseSurplusAccount:
+                        _contribution_total = _surplusAccount.withdraw(
+                            _contribution_total
+                        )
+
+                    # earney
+                    _contribution_total = _regularAccount.withdraw(_contribution_total)
+                    assert _contribution_total == 0
 
             # fix this mess..
-            if _pyd.cashFlow.data < 0:
+            if _pyd.netIncome.data < 0:
                 # we need to withdraw money from assets to make up for the cash flow deficit
                 _ws = WithdrawStrategy(
                     self._withdrawOrder,
@@ -658,13 +686,13 @@ class Projections(QRunnable):
                     _spouseIsAlive,
                     self._Assets,
                 )
-                # print(_pyd.cashFlow.data)
-                _neededAssetWithdraw = abs(_pyd.cashFlow.data)
+                _neededAssetWithdraw = abs(_pyd.netIncome.data)
                 _deficit = _ws.reconcile_required_withdraw(_neededAssetWithdraw)
 
                 if _deficit < 0:
                     # we need to take the deficit from somewhere ..
-                    _surplusAccount.balance += _deficit
+                    _deficit = _surplusAccount.withdraw(-_deficit)
+                    assert _deficit == 0
 
             for _src in self._Assets:
                 _src.calc_interest(self._inflation)
@@ -687,6 +715,13 @@ class Projections(QRunnable):
                         _pyd.assetRegularReturns.data += _src.interest
                     case _:
                         print("Error invalid AccountType %s" % (_src.Type))
+
+            _pyd.assetTotalNetDeposits.data = _pyd.assetTotalDeposits.data
+            _pyd.assetTotalNetDeposits.data -= _pyd.assetTotalWithdraws.data
+
+            _pyd.assetTotalCashFlow.data = _pyd.assetTotalNetDeposits.data
+            _pyd.assetTotalCashFlow.data += _pyd.assetTotalContributions.data
+            _pyd.assetTotalCashFlow.data += _pyd.assetTotalReturns.data
 
             _pyd.incomeTotal.data = _income_total + _pyd.assetRegularReturns.data
 
@@ -725,23 +760,6 @@ class Projections(QRunnable):
                 _pyd.ssTaxableIncome.data = 0
                 _pyd.ssTaxRate.data = 0.0
 
-            # _surplusWithdraw = 0
-            if self.UseSurplusAccount:
-                _surplusAccount.calc_interest(self._inflation)
-                # should we calculate this years interest after deposits/withdraws or before?
-                # does it really matter?
-
-                if _pyd.surplusDeficit.data < 0:
-                    if _surplusAccount.balance >= _pyd.surplusDeficit.data:
-                        _surplusAccount.withdraw(_pyd.surplusDeficit.data)
-                        _pyd.surplusDeficit.data = 0
-                else:
-                    _surplusAccount.deposit(_pyd.surplusDeficit.data)
-
-                _pyd.surplusBalance.data = _surplusAccount.balance
-
-            # print(_pyd.taxableIncome, _pyd.federalMarginalTaxRate)
-
             # federal poverty level...
             _fpl = FederalPovertyLevel(2 if _spouseIsAlive else 1)
             _pyd.FPL.data = _fpl.calc_percent(
@@ -751,13 +769,6 @@ class Projections(QRunnable):
             # federal taxes
             # fix me!
             _ft = FederalTax(_pyd.federalTaxFilingStatus.data)
-            # _taxable_income = (
-            #    _income_total - _ss_income_total + _pyd.ssTaxableIncome
-            # )  # + _surplusWithdraw
-
-            # print(_year, _income_total, _ss_income_total, _pyd.ssTaxableIncome) #, _surplusWithdraw)
-            # _pyd.taxableIncome = _taxable_income
-
             _pyd.thisYearsFederalTaxes.data = _ft.calc_taxes(
                 max(_pyd.taxableIncomeTotal.data - _ft.StandardDeduction, 0)
             )
@@ -767,9 +778,9 @@ class Projections(QRunnable):
             # _pyd.longTermCapitalGainsTaxes.data = _ft.calc_ltcg_taxes(
             #    _withdraw_dict[AccountType.REGULAR] + _pyd.surplusWithdraw.data
             # )
-            _pyd.thisYearsFederalTaxes.data = (
-                _pyd.thisYearsFederalTaxes.data + _pyd.longTermCapitalGainsTaxes.data
-            )
+            # _pyd.thisYearsFederalTaxes.data = (
+            #    _pyd.thisYearsFederalTaxes.data + _pyd.longTermCapitalGainsTaxes.data
+            # )
 
             _pyd.federalEffectiveTaxRate.data = _ft.effective_tax_rate(
                 _pyd.thisYearsFederalTaxes.data, _pyd.taxableIncomeTotal.data
@@ -779,19 +790,18 @@ class Projections(QRunnable):
                 _pyd.taxableIncomeTotal.data
             )
 
-            # adding this years federal taxes to the expenses
-            _pyd.expenseTotal.data += _pyd.thisYearsFederalTaxes.data
-
-            # asset withdraw rate  (AWR)
             if self.UseSurplusAccount:
-                _pyd.AW.data = -_pyd.cashFlow.data
-            else:
-                _pyd.AW.data = _pyd.assetTotalWithdraws.data
+                # calculate interest??
+                _surplusAccount.calc_interest(self._inflation)
+
+            _pyd.AW.data = -_pyd.assetTotalNetDeposits.data
 
             if _pyd.assetTotalBalance.data == 0:
                 _pyd.AWR.data = 0.0
             else:
                 _pyd.AWR.data = 100.0 * _pyd.AW.data / _pyd.assetTotalBalance.data
+
+            _lastYearsFederalTaxes = _pyd.thisYearsFederalTaxes.data
 
             _projection_data.append(_pyd)
 

@@ -1,5 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QTabWidget
-from PyQt6.QtWidgets import QStatusBar
+from PyQt6.QtWidgets import QMainWindow, QTabWidget, QApplication, QStatusBar
 from PyQt6.QtGui import QIcon
 
 from libs.gui.MenuBar import MenuBar
@@ -32,7 +31,7 @@ class Main(QMainWindow):
         self.__version__ = APP_VERSION
         self.title = "Wealth Manager v%s" % self.__version__
 
-        logger.debug("starting Main Window")
+        logger.debug("starting main window")
         self.tabs = QTabWidget()
         self.InputsTab = InputsTab(self)
         self.AnalysisTab = AnalysisTab(self)
@@ -48,14 +47,24 @@ class Main(QMainWindow):
         self.setCentralWidget(self.tabs)
 
         self.setWindowTitle(self.title)
-        self.resize(1024, 800)
+        screen = QApplication.primaryScreen()
+        screen_size = screen.size()
+        screen_width = screen_size.width()
+        screen_height = screen_size.height()
+        logger.debug("screen height=%s, width=%s" % (screen_height, screen_width))
+
+        self.resize(int(screen_width * 3 / 4), int(screen_height * 3 / 4))
+        self.move(
+            (screen_width - self.width()) // 2, (screen_height - self.height()) // 2
+        )
 
         self.statusbar = QStatusBar(self)
         self.setStatusBar(self.statusbar)
 
         self._createMenuBar()
 
-        # self.setWindowIcon(QIcon("resources/app.ico"))
+        # fix me
+        self.setWindowIcon(QIcon("resources/app.ico"))
 
         self.show()
         logger.debug("ending Main Window")
@@ -93,7 +102,7 @@ if __name__ == "__main__":
     from PyQt6.QtWidgets import QApplication
 
     _app = QApplication(sys.argv)
-    _app.setWindowIcon(QIcon(os.path.join(basename, "resources/app.ico")))
+    # _app.setWindowIcon(QIcon(os.path.join(basename, "resources/app.ico")))
 
     _main = Main()
     if getattr(sys, "frozen", False):  # this is running via pyinstaller

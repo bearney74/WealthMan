@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QComboBox
 
-from ...Projections import DataItem
+from ...Projections import DataItem, PercentDataItem
 from .Charts import LineChart
 
 
@@ -38,13 +38,15 @@ class ChartTab(QWidget):
         self.variables.clear()
 
         self.variables.addItems(list(self._variable_map.keys()))
-        self.variables.setCurrentText("Total Assets")
+        self.variables.setCurrentText("Total Asset Balance")
 
     def _selectionchange(self, i):
-        _ndx = self.variables.currentIndex()
+        # _ndx = self.variables.currentIndex()
         _category = self.variables.currentText()
 
         # figure out the variable name from the "user friendly" category variable..
+        if _category == "":
+            _category = "Total Asset Balance"
         _variable_name = self._variable_map[_category]
 
         if _variable_name is not None:
@@ -56,8 +58,12 @@ class ChartTab(QWidget):
 
             self.chart.setTitle(_category)
             self.chart.setXLabel("Year")
-            self.chart.setYLabel("Dollars", units="$")
-            self.chart.setRightYLabel("Dollars", units="$")
+            if isinstance(_record[_variable_name], PercentDataItem):
+                self.chart.setYLabel("Percent", units="%")
+                self.chart.setRightYLabel("Percent", units="%")
+            else:
+                self.chart.setYLabel("Dollars", units="$")
+                self.chart.setRightYLabel("Dollars", units="$")
 
             # fix me currently subtitles don't work well
             if self.parent.tableData.InTodaysDollars:

@@ -55,7 +55,8 @@ class TableData:
                 _list.append(_dataItem)
 
             # also add this years taxes, since this is technically an expense for this year..
-            _list.append(_record.thisYearsFederalTaxes)
+            # _list.append(_record.thisYearsFederalTaxes)
+            _list.append(_record.lastYearsFederalTaxes)
 
             _list.append(_record.expenseTotal)
 
@@ -121,43 +122,14 @@ class TableData:
                 _list.append(_record.surplusBalance)
                 _list.append(_record.surplusWithdraw)
 
-            _list.append(_record.assetTotalBalance)
             _list.append(_record.assetTotalDeposits)
             _list.append(_record.assetTotalWithdraws)
+            _list.append(_record.assetTotalNetDeposits)  # deposits - withdraws
+
             _list.append(_record.assetTotalReturns)
             _list.append(_record.assetTotalContributions)
-
-            """
-            _list.append(_record.assetTaxDeferredBalance)
-            _list.append(_record.assetTaxDeferredDeposits)
-            _list.append(_record.assetTaxDeferredWithdraws)
-            _list.append(_record.assetTaxDeferredReturns)
-            _list.append(_record.assetTaxDeferredContributions)
-
-            _list.append(_record.assetTaxFreeBalance)
-            _list.append(_record.assetTaxFreeDeposits)
-            _list.append(_record.assetTaxFreeWithdraws)
-            _list.append(_record.assetTaxFreeReturns)
-            _list.append(_record.assetTaxFreeContributions)
-
-            _list.append(_record.assetRegularBalance)
-            _list.append(_record.assetRegularDeposits)
-            _list.append(_record.assetRegularWithdraws)
-            _list.append(_record.assetRegularReturns)
-            _list.append(_record.assetRegularContributions)
-            """
-            _list.append(_record.transfersTotal)
-
-            _list.append(_record.clientRMD)
-            _list.append(_record.clientRMDPercent)
-
-            if _record.spouseAge is not None:
-                _list.append(_record.spouseRMD)
-                _list.append(_record.spouseRMDPercent)
-
-            _list.append(_record.totalRMD)
-
-            _list.append(_record.totalRMDPercent)
+            _list.append(_record.assetTotalCashFlow)
+            _list.append(_record.assetTotalBalance)
 
             _data.append(_list)
 
@@ -187,10 +159,10 @@ class TableData:
 
             _list.append(_record.federalTaxFilingStatus)
 
-            # _list.append(_record.lastYearsFederalTaxes)
+            _list.append(_record.lastYearsFederalTaxes)
             _list.append(_record.thisYearsFederalTaxes)
 
-            _list.append(_record.longTermCapitalGainsTaxes)
+            # _list.append(_record.longTermCapitalGainsTaxes)
 
             _list.append(_record.federalEffectiveTaxRate)
             _list.append(_record.federalMarginalTaxRate)
@@ -227,24 +199,14 @@ class TableData:
                 "%s:%s" % (_record.projectionYear, self._calc_ages(_record))
             )
 
-            _list.append(_record.incomeTotal)
-            _list.append(_record.FPL)
-            _list.append(_record.expenseTotal)
-
-            _list.append(_record.assetTotalContributions)
-            _list.append(_record.assetTotalWithdraws)
-
-            _list.append(_record.cashFlow)
-
-            _list.append(_record.surplusDeficit)
-
-            _list.append(_record.assetTotalBalance)
-
-            _list.append(_record.totalRMD)
-            _list.append(_record.totalRMDPercent)
-
-            _list.append(_record.AW)
-            _list.append(_record.AWR)
+            for _attr in _record.__dict__:
+                _obj = getattr(_record, _attr)
+                if isinstance(_obj, DataItem):
+                    _list.append(_obj)
+                elif isinstance(_obj, list):
+                    for _item in _obj:
+                        if isinstance(_item, DataItem):
+                            _list.append(_item)
 
             _data.append(_list)
 

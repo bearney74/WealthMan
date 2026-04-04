@@ -172,13 +172,21 @@ class HistoricalAnalysis:
         self._accountAllocations = accountAllocations
         self._defaultReturnRate = DefaultReturnRate
 
-        self._data = historicalData.get_data(begin_year, end_year)
+        self._data = historicalData.get_data(begin_year, end_year - 1)
 
         assert (
             len(incomes_fixed)
             == len(incomes_with_COLA)
             == len(expenses)
             == len(self._data)
+        ), (
+            "len(incomes_fixed) = %s, len(incomes_with_COLA) = %s, len(expenses) = %s, len(self._data) = %s"
+            % (
+                len(incomes_fixed),
+                len(incomes_with_COLA),
+                len(expenses),
+                len(self._data),
+            )
         )
 
     def get_allocation_period(self, year):
